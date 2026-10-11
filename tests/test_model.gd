@@ -157,4 +157,4 @@ func _test_seed_and_limits() -> void:
 		a.hp = a.max_hp
 		a.step(0.05, Vector2.from_angle(float(i) * 0.007), i % 65 == 0)
 		a.events.clear()
-	check(a.enemies.size() <= 161 and a.gems.size() <= 300 and a.shots.size() <= 240, "long simulation remains bounded")
+	check(a.enemies.size() <= 243 and a.gems.size() <= 300 and a.shots.size() <= 240, "long simulation remains bounded")

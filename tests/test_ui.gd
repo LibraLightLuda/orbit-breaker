@@ -259,7 +259,7 @@ func run_checks() -> void:
 	game.run.boundary_time = 3.0
 	game.run.current_speed = game.run.base_speed() * game.run.movement_multiplier(game.run.player)
 	game._resume()
-	check(game.net_gauge < 0.0 and game.speed_gauge < 0.2 and game.hud.vital_detail.text.contains("외곽 -"), "boundary HUD includes damage and severe slowdown")
+	check(game.net_gauge < 0.0 and game.speed_gauge <= 0.301 and game.hud.vital_detail.text.contains("외곽 -"), "boundary HUD includes damage and severe slowdown")
 	await snapshot("16-boundary-warning")
 	game.records.data.reduced_motion = true
 	await snapshot("17-boundary-reduced-motion")

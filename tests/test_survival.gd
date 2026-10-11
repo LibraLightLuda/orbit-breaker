@@ -30,7 +30,7 @@ func _test_boundary_buffer() -> void:
 		model.step(0.05, direction, false)
 		check(model.boundary_depth(model.player) > 0.0, "all four edges allow buffer movement")
 		model.player = outer.get_center() + direction * outer.size * 0.5
-		check(is_equal_approx(model.boundary_depth(model.player), 1.0) and model.movement_multiplier(model.player) <= 0.08, "deep buffer has severe drag")
+		check(is_equal_approx(model.boundary_depth(model.player), 1.0) and model.movement_multiplier(model.player) <= 0.301, "deep buffer has severe drag")
 		model.step(0.05, direction, true)
 		check(outer.grow(0.001).has_point(model.player), "outward dash respects final visible bounds")
 		model.dash_time = 0.0

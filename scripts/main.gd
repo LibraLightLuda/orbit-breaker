@@ -290,7 +290,7 @@ func _show_menu() -> void:
 	_button("설정", Rect2(410, 468, 148, 50), _show_settings)
 	_label("최고 %s   /   돌파 %d회   /   업적 %d점" % [_number(int(records.data.best_score)), int(records.data.wins), Achievements.points(records.data.achievements)], Rect2(80, 565, 660, 30), 18, MUTED)
 	_label("마우스 / WASD 이동    좌클릭 / SPACE 돌진    우클릭 / E 오버드라이브", Rect2(80, 642, 850, 30), 16, MUTED)
-	_label("VERSION 3.3  /  MADE WITH GODOT", Rect2(922, 650, 350, 24), 13, MUTED)
+	_label("VERSION 3.4  /  MADE WITH GODOT", Rect2(922, 650, 350, 24), 13, MUTED)
 
 func _wrap_label(text: String, rect: Rect2, size: int = 18, color: Color = MUTED, parent: Control = null) -> Label:
 	return _label(text, rect, size, color, parent, true)
@@ -475,12 +475,6 @@ func _resume() -> void:
 	var pause := _button("Ⅱ", Rect2(1170, 26, 60, 54), _show_pause)
 	pause.focus_mode = Control.FOCUS_NONE
 	hud.level = _label("", Rect2(48, 684, 270, 27), 14, CYAN)
-	hud.dash = _label("", Rect2(320, 684, 350, 27), 14, LIME)
-	hud.dash.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hud.dash_charge = _label("", Rect2(380, 650, 285, 28), 17, LIME)
-	hud.overdrive = _label("", Rect2(678, 684, 354, 27), 14, GOLD)
-	hud.overdrive.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hud.overdrive_charge = _label("", Rect2(738, 650, 288, 28), 17, GOLD)
 	_label("TAB 도감   ESC 정지", Rect2(1060, 684, 210, 27), 14, MUTED)
 	net_gauge = run.net_hull_rate() / maxf(1.0, run.regeneration_rate() + run.decay_rate() + run.boundary_damage_rate())
 	speed_gauge = clampf(run.current_speed / run.base_speed(), 0.0, 1.0)
@@ -492,7 +486,7 @@ func _update_hud() -> void:
 	hud.hp.text = "선체  %d / %d" % [ceili(run.hp), int(run.max_hp)]
 	match run.ship_id:
 		"striker":
-			hud.trait.text = "연속 포격  %d/5  ·  모든 화력 +%d%%  ·  피격 / 사격 중단 시 초기화" % [run.firing_heat, run.firing_heat * 8]
+			hud.trait.text = "조준 고정  ·  " + ("자동포 피해 +60%" if run.focus_time >= 1.2 else "정지 조준 %d%% · 이동 / 돌진 / 피격 시 초기화" % floori(run.focus_time / 1.2 * 100))
 		"scout":
 			hud.trait.text = "돌파 추진  ·  돌진 피해 ×1.75  ·  " + ("가속 +35%%  %.1f초" % maxf(0.0, run.slipstream_time - run.dash_time) if run.slipstream_time > 0.0 else "대시 후 1.4초 가속 +35%")
 		"bastion":
@@ -509,13 +503,6 @@ func _update_hud() -> void:
 	hud.speed_detail.text = "%d px/s · %s" % [roundi(run.current_speed), "돌진" if run.dash_time > 0.0 else ("외곽 감속" if run.boundary_depth(run.player) > 0.0 else "현재 속도")]
 	hud.score.text = "%s  /  %d 처치" % [_number(run.ranked_score()), run.kills]
 	hud.level.text = "LV.%02d   /   %d EXP → %d" % [run.level, int(run.xp), int(run.xp_needed)]
-	hud.dash.text = "좌클릭 / SPACE  ·  돌진"
-	hud.dash_charge.text = "돌진  ✓ 준비 완료" if run.dash_cooldown <= 0.0 else "돌진  %d%% · %.1f초" % [floori(run.dash_charge() * 100), run.dash_cooldown]
-	hud.overdrive_charge.text = "오버드라이브  ✓ 준비 완료" if run.overdrive_meter >= 100.0 else "오버드라이브  %d%%" % run.overdrive_meter
-	hud.overdrive.text = "우클릭 / E  ·  적 처치로 충전"
-	if run.overdrive_time > 0:
-		hud.overdrive.text = "화력 증폭 중  %.1f초" % run.overdrive_time
-		hud.overdrive_charge.text = "화력 증폭  ·  작동 중"
 	if run.elapsed < 60:
 		hud.phase.text = "01 / 접촉   ·   경험치를 모아 위성을 강화하세요"
 	elif run.elapsed < 150:
@@ -576,7 +563,7 @@ func _show_help() -> void:
 		_label(rows[i][0], Rect2(124, y + 20, 80, 46), 30, LIME)
 		_label(rows[i][1], Rect2(211, y + 13, 850, 34), 23)
 		_label(rows[i][2], Rect2(211, y + 54, 930, 28), 16, MUTED)
-	_wrap_label("원형 활동영역 밖: 1층 희박권 → 2층 붕괴권 → 3층 소멸권. 깊을수록 손상·감속이 강해집니다.\n오른쪽 원형 항법도로 궤도와 침공 방향을 확인하세요. 하단 게이지가 가득 차면 스킬 사용 가능!", Rect2(103, 567, 1080, 59), 16, GOLD)
+	_wrap_label("청록 → 금색 → 붉은색 → 보라색 빛으로 위험을 확인하세요. 바깥으로 갈수록 손상과 감속이 강해집니다.\n기체 아래 왼쪽 초록 게이지는 돌진, 오른쪽 금색 게이지는 오버드라이브입니다.", Rect2(103, 567, 1080, 59), 16, GOLD)
 	_button("돌아가기", Rect2(100, 640, 190, 50), _show_menu, false, true)
 
 func _show_settings() -> void:
@@ -831,7 +818,7 @@ func _draw_arena() -> void:
 			for side: float in [-1.0, 1.0]:
 				draw_line(player + wing * side * 8, player + wing * side * 8 + run.facing * 27, ship_color, 4, true)
 			for i: int in range(5):
-				draw_circle(player - run.facing * 22 + wing * (i - 2) * 7, 2.5, ship_color if i < run.firing_heat else LINE, true, -1, true)
+				draw_circle(player - run.facing * 22 + wing * (i - 2) * 7, 2.5, ship_color if i < floori(run.focus_time / 1.2 * 5) else LINE, true, -1, true)
 		"scout":
 			for side: float in [-1.0, 1.0]:
 				var tip := player - run.facing * 12 + wing * side * 22
@@ -842,13 +829,18 @@ func _draw_arena() -> void:
 			for side: float in [-1.0, 1.0]:
 				_polygon(player + wing * side * 18, 8, 6, ship_color, run.facing.angle())
 			draw_arc(player, 29, -PI / 2, -PI / 2 + TAU * maxf(0.01, 1.0 - run.guard_cooldown / 8.0), 40, ship_color, 3 if run.guard_cooldown <= 0.0 else 1, true)
-	if run.dash_cooldown <= 0:
-		draw_arc(player, 23, -0.5, 0.5, 12, LIME, 2, true)
+	if screen == "playing":
+		_draw_skill_meter(player + Vector2(-25, 37), run.dash_charge(), LIME, run.dash_cooldown <= 0)
+		_draw_skill_meter(player + Vector2(25, 37), clampf(run.overdrive_time / 6.0 if run.overdrive_time > 0 else run.overdrive_meter / 100.0, 0, 1), GOLD, run.overdrive_meter >= 100.0 and run.overdrive_time <= 0)
+		for side: int in range(2):
+			var at := player + Vector2(-25 if side == 0 else 25, 37)
+			draw_style_box(_style(BG, MUTED), Rect2(at - Vector2(4, 6), Vector2(8, 12)))
+			draw_rect(Rect2(at + Vector2(-3 if side == 0 else 0, -5), Vector2(3, 4)), LIME if side == 0 else GOLD)
 	draw_set_transform(Vector2.ZERO)
 	if screen == "playing":
 		draw_rect(Rect2(0, 0, 1280, 124), Color(BG, 0.95))
 		_draw_meters()
-		_draw_navigation()
+		_draw_invasion_markers()
 	if hurt_flash > 0 and not reduced:
 		draw_rect(Rect2(0, 0, 1280, 720), Color(CORAL, hurt_flash * 0.17))
 
@@ -862,49 +854,31 @@ func _draw_orbital_regions(sector_color: Color) -> void:
 	for layer: int in range(4):
 		var edge := radius + layer * RunModel.LAYER_WIDTH
 		var color: Color = colors[layer]
-		for band: int in range(6):
-			draw_arc(center, edge - band * 4, 0, TAU, 256, Color(color, 0.10 - band * 0.014), 4, true)
-		draw_arc(center, edge, 0, TAU, 256, Color(color, 0.65), 1.5, true)
-		for mark: int in range(48):
-			var normal := Vector2.from_angle(TAU * mark / 48.0)
-			draw_line(center + normal * (edge - 8), center + normal * (edge + 8), Color(color, 0.35), 1, true)
-		for quadrant: int in range(4):
-			var at := center + Vector2.from_angle(quadrant * PI / 2) * (edge - 32)
-			draw_string(font, at + Vector2(-62, -70), ["ORBIT / 활동영역", "01 / 희박권", "02 / 붕괴권", "03 / 소멸권"][layer], HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
+		for band: int in range(-9, 10):
+			var alpha := 0.18 * pow(1.0 - absf(band) / 10.0, 2.0)
+			draw_arc(center, edge + band * 4, 0, TAU, 256, Color(color, alpha), 5, true)
 
-func _draw_navigation() -> void:
-	var at := Vector2(1171, 564)
-	var scale := 63.0 / (RunModel.ACTIVITY_RADIUS + RunModel.BOUNDARY_BUFFER + 180)
-	draw_circle(at, 78, Color(BG, 0.94), true, -1, true)
-	for layer: int in range(4):
-		draw_arc(at, (RunModel.ACTIVITY_RADIUS + layer * RunModel.LAYER_WIDTH) * scale, 0, TAU, 64, Color([CYAN, GOLD, CORAL, Color("bd81ff")][layer], 0.5), 1, true)
-	draw_string(font, at + Vector2(-57, -86), "ORBITAL / 항법", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, MUTED)
+func _draw_invasion_markers() -> void:
 	for enemy: Dictionary in run.enemies:
-		var offset := (Vector2(enemy.pos) - RunModel.CENTER) * scale
-		draw_circle(at + offset.limit_length(70), 3 if enemy.kind in ["boss", "elite"] else 1, CORAL if enemy.kind in ["boss", "elite"] else GOLD, true, -1, true)
 		if enemy.kind in ["boss", "elite"] and Vector2(enemy.pos).distance_to(RunModel.CENTER) > RunModel.ACTIVITY_RADIUS:
 			var direction := (Vector2(enemy.pos) - run.player).normalized()
 			var marker := Vector2(640, 386) + direction * minf(505.0 / maxf(0.01, absf(direction.x)), 173.0 / maxf(0.01, absf(direction.y)))
 			_polygon(marker, 9, 3, CORAL, direction.angle())
 			draw_string(font, marker + Vector2(-68, 25), "%s 접근 · %dm" % ["지휘체" if enemy.kind == "boss" else "정예", roundi(run.player.distance_to(enemy.pos))], HORIZONTAL_ALIGNMENT_LEFT, -1, 13, CORAL)
-	draw_circle(at + ((run.player - RunModel.CENTER) * scale).limit_length(73), 3.5, INK, true, -1, true)
-	draw_string(font, at + Vector2(-60, 90), ["활동영역 · 안정", "1층 · 희박권", "2층 · 붕괴권", "3층 · 소멸권"][run.boundary_layer(run.player)], HORIZONTAL_ALIGNMENT_LEFT, -1, 13, INK)
 
 func _draw_skill_meter(at: Vector2, progress: float, color: Color, ready: bool) -> void:
+	draw_circle(at, 15, Color(BG, 0.88), true, -1, true)
 	var sides := 3 if run.ship_id == "scout" else (6 if run.ship_id == "bastion" else 24)
 	var glow := 1.0 if records.data.reduced_motion or not ready else 0.82 + 0.18 * sin(space_time * 4.0)
 	if ready:
-		draw_circle(at, 25, Color(color, 0.10 * glow), true, -1, true)
+		draw_circle(at, 14, Color(color, 0.10 * glow), true, -1, true)
 	for i: int in range(24):
 		var t := float(i) * sides / 24.0
-		var start := Vector2.from_angle(-PI / 2 + TAU * floorf(t) / sides) * 20
-		var end := Vector2.from_angle(-PI / 2 + TAU * (floorf(t) + 1) / sides) * 20
+		var start := Vector2.from_angle(-PI / 2 + TAU * floorf(t) / sides) * 12
+		var end := Vector2.from_angle(-PI / 2 + TAU * (floorf(t) + 1) / sides) * 12
 		var a := start.lerp(end, fposmod(t, 1.0))
 		var b := start.lerp(end, minf(1.0, fposmod(t, 1.0) + sides / 24.0 * 0.8))
-		draw_line(at + a, at + b, Color(color, glow) if float(i) / 24.0 < progress else LINE, 3, true)
-	if ready:
-		draw_line(at + Vector2(-6, 0), at + Vector2(-1, 5), color, 2, true)
-		draw_line(at + Vector2(-1, 5), at + Vector2(8, -6), color, 2, true)
+		draw_line(at + a, at + b, Color(color, glow) if float(i) / 24.0 < progress else LINE, 2, true)
 
 func _draw_space(sector_color: Color) -> void:
 	for i: int in range(stars.size()):
@@ -946,10 +920,6 @@ func _draw_meters() -> void:
 		draw_rect(Rect2(336 + i * 6, 52, 4, 9), speed_color if fraction <= speed_gauge and speed_gauge > 0.0 else LINE)
 	draw_rect(Rect2(48, 718, 1184, 2), LINE)
 	draw_rect(Rect2(48, 718, 1184 * clampf(run.xp / run.xp_needed, 0, 1), 2), CYAN)
-	draw_style_box(_style(Color(BG, 0.94), LINE), Rect2(320, 638, 350, 77))
-	draw_style_box(_style(Color(BG, 0.94), LINE), Rect2(678, 638, 354, 77))
-	_draw_skill_meter(Vector2(347, 666), run.dash_charge(), LIME, run.dash_cooldown <= 0)
-	_draw_skill_meter(Vector2(705, 666), clampf(run.overdrive_time / 6.0 if run.overdrive_time > 0 else run.overdrive_meter / 100.0, 0, 1), GOLD, run.overdrive_meter >= 100.0 and run.overdrive_time <= 0)
 	for enemy in run.enemies:
 		if str(enemy.kind) == "boss":
 			draw_rect(Rect2(438, 114, 404, 6), LINE)
@@ -965,11 +935,6 @@ func _draw_boundary_warning() -> void:
 	draw_rect(Rect2(0, 0, 1280, 720), Color(CORAL, 0.025 * strength))
 	for i in range(6):
 		draw_rect(Rect2(i * 6, i * 6, 1280 - i * 12, 720 - i * 12), Color(CORAL, (0.24 - i * 0.035) * strength * pulse), false, 6)
-	var banner := Rect2(382, 132, 516, 54)
-	draw_style_box(_style(Color("321d2a"), CORAL), banner)
-	draw_circle(Vector2(406, 151), 5, Color(CORAL, pulse))
-	draw_string(font, Vector2(424, 155), "%d층 %s · 중앙 궤도로 복귀" % [run.boundary_layer(run.player), ["안정", "희박권", "붕괴권", "소멸권"][run.boundary_layer(run.player)]], HORIZONTAL_ALIGNMENT_LEFT, -1, 18, CORAL)
-	draw_string(font, Vector2(424, 177), "외곽 노출 %.1f초   추가 선체 손상 -%.2f HP/초" % [run.boundary_time, run.boundary_damage_rate()], HORIZONTAL_ALIGNMENT_LEFT, -1, 13, INK)
 	var inward := (ARENA.get_center() - run.player).normalized()
 	var visible_player := run.player - camera_offset
 	var tip := visible_player + inward * 43.0
@@ -1003,6 +968,8 @@ func _draw_enemy(enemy: Dictionary) -> void:
 			color = CORAL if float(enemy.hp) > float(enemy.max_hp) * 0.5 else GOLD
 			angle = clock_time * 0.3
 			draw_arc(pos, radius + 10, 0, TAU, 36, Color(CORAL, 0.4), 2, true)
+	if bool(enemy.get("flanker", false)):
+		draw_arc(pos, radius + 5, angle - 1.0, angle + 1.0, 12, Color(color, 0.65), 2, true)
 	if float(enemy.get("warn", 0)) > 0:
 		var aim: Vector2 = enemy.get("aim", Vector2.RIGHT)
 		if kind != "boss":

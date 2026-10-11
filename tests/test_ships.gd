@@ -24,42 +24,45 @@ func run_checks() -> void:
 func _test_striker() -> void:
 	var model := Model.new()
 	model.reset(31)
-	model._fire_player_shot()
-	check(model.firing_heat == 0, "no target cannot build heat")
+	model._spawn_timer = 100
+	for i: int in range(24):
+		model.step(0.05, Vector2.ZERO, false)
+	check(is_equal_approx(model.focus_time, 1.2), "stationary pilot locks aim without needing a target")
 	model.spawn_enemy("boss", model.player + Vector2(300, 0))
 	model._fire_player_shot()
-	check(is_equal_approx(float(model.shots[0].damage), 19.0) and model.firing_heat == 1, "first shot retains base damage then builds heat")
-	for i: int in range(8):
-		model._fire_player_shot()
-	check(model.firing_heat == 5 and is_equal_approx(model._power(), 1.4), "heat caps at five with forty percent damage")
+	check(is_equal_approx(float(model.shots.back().damage), 30.4), "locked automatic cannon deals sixty percent extra damage")
+	check(is_equal_approx(model._power(), 1.0), "focus does not amplify satellites or other weapons")
 	model.upgrades.power = 2
 	model.overdrive_meter = 100
 	model.activate_overdrive()
-	check(is_equal_approx(model._power(), 1.5 * 1.45 * 1.4), "heat multiplies power upgrades and overdrive")
+	model._fire_player_shot()
+	check(is_equal_approx(float(model.shots.back().damage), 19 * 1.5 * 1.45 * 1.6), "focus combines with cannon upgrades and overdrive")
 	model.state = "upgrade"
-	model.step(0.05, Vector2.ZERO, false)
-	check(model.firing_heat_time == 2.0, "upgrades pause heat")
+	model.step(0.05, Vector2.RIGHT, true)
+	check(is_equal_approx(model.focus_time, 1.2), "upgrade pauses focus")
 	model.state = "playing"
+	model.step(0.01, Vector2.RIGHT, false)
+	check(model.focus_time == 0, "movement immediately breaks aim")
+	model.focus_time = 1.2
+	model.step(0.01, Vector2.ZERO, true)
+	check(model.focus_time == 0, "dash breaks aim even without movement input")
+	model.focus_time = 1.2
 	model.invulnerable = 1
 	model.take_damage(20)
-	check(model.firing_heat == 5, "evaded hit does not reset heat")
+	check(model.focus_time == 1.2, "evaded hit keeps aim")
 	model.invulnerable = 0
 	model.take_damage(20)
-	check(model.firing_heat == 0 and model.firing_heat_time == 0, "actual combat hit resets heat")
+	check(model.focus_time == 0, "actual hit breaks aim")
 	model._fire_player_shot()
-	model.enemies.clear()
-	model._spawn_timer = 100
-	for i: int in range(41):
-		model.step(0.05, Vector2.ZERO, false)
-	check(model.firing_heat == 0, "two seconds without firing cools heat")
-	model.firing_heat = 5
+	check(is_equal_approx(float(model.shots.back().damage), 19 * 1.5 * 1.45), "moving cannon retains base damage")
+	model.focus_time = 1.2
 	model.reset(31)
-	check(model.firing_heat == 0 and model.firing_heat_time == 0, "restart clears heat")
-	model.spawn_enemy("boss", model.player + Vector2(300, 0))
-	for i: int in range(240):
-		model.shots.append({})
-	model._fire_player_shot()
-	check(model.firing_heat == 0, "projectile cap cannot grant heat without firing")
+	check(model.focus_time == 0, "restart clears focus")
+	model.reset(31, "normal", "scout")
+	model._spawn_timer = 100
+	for i: int in range(30):
+		model.step(0.05, Vector2.ZERO, false)
+	check(model.focus_time == 0, "other ships cannot lock aim")
 
 func _test_scout() -> void:
 	var model := Model.new()
@@ -157,7 +160,7 @@ func _test_ui() -> void:
 	game.sound.set_muted(true)
 	for id: String in ["striker", "scout", "bastion"]:
 		game.run.reset(34, "normal", id)
-		game.run.firing_heat = 5 if id == "striker" else 0
+		game.run.focus_time = 1.2 if id == "striker" else 0
 		game.run.slipstream_time = 1.4 if id == "scout" else 0
 		game._resume()
 		check(not game.hud.trait.text.is_empty(), "trait HUD visible for " + id)
@@ -169,7 +172,7 @@ func _test_ui() -> void:
 			DirAccess.make_dir_recursive_absolute(folder)
 			check(root.get_texture().get_image().save_png(folder + "/ship-" + id + ".png") == OK, "capture ship " + id)
 		game.run.guard_cooldown = 5
-		game.run.firing_heat = 0
+		game.run.focus_time = 0
 		game.run.slipstream_time = 0
 		game._update_hud()
 		check(game.hud.trait.get_rect().end.x < game.hud.vital_detail.position.x, "trait HUD stays clear of hull rates")

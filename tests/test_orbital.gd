@@ -24,11 +24,11 @@ func run_checks() -> void:
 			model.player = Model.CENTER + direction * (Model.ACTIVITY_RADIUS - Model.PLAYER_RADIUS + (layer - 0.5) * Model.LAYER_WIDTH)
 			check(model.boundary_layer(model.player) == layer, "equal radial layer " + str(layer))
 			var rate: float = model.boundary_damage_rate()
-			check(rate < 5 if layer == 1 else rate > (20 if layer == 2 else 200), "graded exposure damage")
+			check(rate < 5 if layer == 1 else rate > (10 if layer == 2 else 65) and rate < (25 if layer == 2 else 125), "graded exposure damage")
 	model.player = Model.CENTER + Vector2.ONE * Model.ACTIVITY_RADIUS * 0.8
 	check(model.boundary_layer(model.player) == 1, "corners of bounding square are outside the circle")
 	model.player = Model.CENTER + Vector2.RIGHT * (Model.ACTIVITY_RADIUS + Model.BOUNDARY_BUFFER)
-	check(model.boundary_drag(model.player) <= 0.061 and model.boundary_current(model.player).x < -1800, "third layer has severe drag and return current")
+	check(model.boundary_drag(model.player) <= 0.301 and model.boundary_current(model.player).x < -1800, "third layer has severe drag and return current")
 	model.hp = 280
 	model.max_hp = 280
 	model.upgrades.repair = 5
@@ -69,9 +69,52 @@ func run_checks() -> void:
 		model.state = "upgrade"
 		model.step(0.05, Vector2.ZERO, false)
 		check(is_equal_approx(model.dash_charge(), 0.5), "upgrade pauses recharge gauge")
+	_test_tactics()
 	await _test_ui()
 	print("ORBITAL SELF-CHECK: %d / %d assertions passed" % [checks - failures, checks])
 	quit(0 if failures == 0 else 1)
+
+func _test_tactics() -> void:
+	var model := Model.new()
+	model.reset(46)
+	model._spawn_timer = 0
+	for i: int in range(80):
+		model.step(0.05, Vector2.ZERO, false)
+	check(model.enemies.size() >= 8, "expanded field receives roughly twice the early invasion density")
+	model.reset(46)
+	model.player = Model.CENTER + Vector2.RIGHT * (Model.ACTIVITY_RADIUS - Model.PLAYER_RADIUS + 270)
+	model._spawn_timer = 100
+	var start: Vector2 = model.player
+	for i: int in range(80):
+		model.step(0.05, (model.player - Model.CENTER).orthogonal().normalized(), false)
+	check(model.hp > 30 and model.player.distance_to(start) > 400, "second layer permits several seconds of real travel")
+	model.reset(46)
+	var flanker: Dictionary = model.spawn_enemy("chaser", model.player + Vector2(400, 0))
+	flanker.flanker = true
+	flanker.flank_side = 1
+	model._update_enemies(0.05, model.player)
+	check(flanker.pos.y != model.player.y and flanker.pos.x < model.player.x + 400, "flanker curves toward player")
+	model.enemies.clear()
+	var shooter: Dictionary = model.spawn_enemy("shooter", model.player + Vector2(300, 0))
+	model._update_enemies(0.05, model.player)
+	check(absf(shooter.pos.x - model.player.x - 300) < 0.01 and shooter.pos.y != model.player.y, "ranged unit circles at preferred distance")
+	shooter.pos = model.player + Vector2(200, 0)
+	model._update_enemies(0.05, model.player)
+	check(shooter.pos.x > model.player.x + 200, "ranged unit retreats from close player")
+	model.enemies.clear()
+	var runner: Dictionary = model.spawn_enemy("runner", model.player + Vector2(350, 0))
+	runner.shot_timer = 0
+	model._update_enemies(0.05, model.player)
+	check(runner.warn > 0 and runner.charge_time == 0, "runner telegraphs before charging")
+	runner.warn = 0.01
+	var start_x: float = runner.pos.x
+	model._update_enemies(0.05, model.player)
+	check(runner.charge_time > 0 and start_x - runner.pos.x > runner.speed * 0.05 * 4, "runner commits to fast telegraphed dash")
+	check(model.shots.is_empty(), "runner charge does not emit ranged bullets")
+	model.enemies.clear()
+	var tank: Dictionary = model.spawn_enemy("tank", model.player + Vector2(300, 0))
+	model._update_enemies(0.05, model.player - Vector2(0, 10))
+	check(tank.pos.y > model.player.y, "tank leads the moving player to intercept")
 
 func _test_ui() -> void:
 	var game: Node2D = load("res://main.tscn").instantiate()
@@ -87,15 +130,27 @@ func _test_ui() -> void:
 		game.run.overdrive_meter = 50
 		game.run.spawn_enemy("boss")
 		game._resume()
-		check(game.hud.dash_charge.text.contains("50%") and game.hud.overdrive_charge.text.contains("50%"), "both charging skills have numeric state")
+		check(is_equal_approx(game.run.dash_charge(), 0.5) and game.run.overdrive_meter == 50 and not game.hud.has("dash_charge"), "mounted charging skills replace bottom labels")
 		await snapshot(game, "orbital-layer-" + str(layer))
 	for id: String in ["scout", "bastion"]:
 		game.run.reset(45, "normal", id)
 		game.run.overdrive_meter = 100
 		game._resume()
-		check(game.hud.dash_charge.text.contains("준비 완료") and game.hud.overdrive_charge.text.contains("준비 완료"), "both skills clearly ready")
+		check(game.run.dash_charge() == 1 and game.run.overdrive_meter == 100 and not game.hud.has("overdrive"), "mounted skills ready without bottom panels")
 		game.records.data.reduced_motion = true
 		await snapshot(game, "orbital-ready-" + id)
+	game.run.reset(47)
+	game.run.focus_time = 1.2
+	game.run.dash_cooldown = 1.2
+	game.run.overdrive_meter = 70
+	for i: int in range(60):
+		var point := Model.CENTER + Vector2.from_angle(i * 2.4) * (150 + i % 5 * 70)
+		var enemy: Dictionary = game.run.spawn_enemy(["chaser", "runner", "tank", "shooter"][i % 4], point)
+		if i % 11 == 0:
+			enemy.warn = 0.6
+			enemy.aim = (game.run.player - point).normalized()
+	game._resume()
+	await snapshot(game, "orbital-invasion-patterns")
 	game.queue_free()
 	await process_frame
 

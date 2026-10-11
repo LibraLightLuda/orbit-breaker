@@ -70,8 +70,7 @@ var _overdrives := 0
 var boundary_returns := 0
 var _outside := false
 var peak_combo := 0
-var firing_heat := 0
-var firing_heat_time := 0.0
+var focus_time := 0.0
 var slipstream_time := 0.0
 var guard_cooldown := 0.0
 
@@ -137,8 +136,7 @@ func reset(seed_value: int = 0, difficulty: String = "normal", selected_ship: St
 	boundary_returns = 0
 	_outside = false
 	peak_combo = 0
-	firing_heat = 0
-	firing_heat_time = 0.0
+	focus_time = 0.0
 	slipstream_time = 0.0
 	guard_cooldown = 0.0
 	_update_run_stats()
@@ -237,9 +235,6 @@ func step(delta: float, move: Vector2, dash_pressed: bool) -> void:
 	if state != "playing":
 		return
 	overdrive_time = maxf(0.0, overdrive_time - dt)
-	firing_heat_time = maxf(0.0, firing_heat_time - dt)
-	if firing_heat_time <= 0.0:
-		firing_heat = 0
 	slipstream_time = maxf(0.0, slipstream_time - dt)
 	guard_cooldown = maxf(0.0, guard_cooldown - dt)
 	event_remaining = maxf(0.0, event_remaining - dt)
@@ -262,6 +257,8 @@ func step(delta: float, move: Vector2, dash_pressed: bool) -> void:
 		_dash_id += 1
 		_effect(player, "dash", 55.0, 0.25)
 		events.append("dash")
+	if ship_id == "striker":
+		focus_time = minf(1.2, focus_time + dt) if direction.length_squared() <= 0.01 and dash_time <= 0.0 and boundary_current(player).length() < 5.0 else 0.0
 	var old_position := player
 	var speed := base_speed() * movement_multiplier(player) * (1.35 if slipstream_time > 0.0 else 1.0)
 	# Let an inward dash escape the buffer even at maximum drag.
@@ -278,8 +275,8 @@ func step(delta: float, move: Vector2, dash_pressed: bool) -> void:
 	orbit_angle = fmod(orbit_angle + dt * (3.5 + float(upgrades.get("speed", 0)) * 0.3), TAU)
 	_spawn_timer -= dt
 	if _spawn_timer <= 0.0:
-		_spawn_timer = maxf(0.19, 0.92 - elapsed * 0.0023) / float(Content.mode_info(mode).spawn)
-		if enemies.size() < 157:
+		_spawn_timer = maxf(0.19, 0.92 - elapsed * 0.0023) / (1.8 * float(Content.mode_info(mode).spawn))
+		if enemies.size() < 240:
 			spawn_enemy(_spawn_kind())
 	if _elite_stage < 2 and elapsed >= 90.0 * float(_elite_stage + 1):
 		_elite_stage += 1
@@ -350,12 +347,14 @@ func boundary_drag(position: Vector2) -> float:
 	if layer_depth <= 1.0:
 		return lerpf(1.0, 0.9, smoothstep(0.0, 1.0, layer_depth))
 	if layer_depth <= 2.0:
-		return lerpf(0.9, 0.6, smoothstep(0.0, 1.0, layer_depth - 1.0))
-	return lerpf(0.6, 0.06, smoothstep(0.0, 1.0, layer_depth - 2.0))
+		return lerpf(0.9, 0.78, smoothstep(0.0, 1.0, layer_depth - 1.0))
+	return lerpf(0.78, 0.30, smoothstep(0.0, 1.0, layer_depth - 2.0))
 
 func boundary_current(position: Vector2) -> Vector2:
 	var distance := maxf(0.0, position.distance_to(CENTER) - (ACTIVITY_RADIUS - PLAYER_RADIUS))
-	return (CENTER - position).normalized() * 1800.0 * pow(distance / BOUNDARY_BUFFER, 3.0)
+	var depth := distance / BOUNDARY_BUFFER
+	var force := 40.0 * pow(minf(1.0, depth * 1.5), 2.0) + 1760.0 * pow(maxf(0.0, depth * 3.0 - 2.0), 3.0)
+	return (CENTER - position).normalized() * force
 
 func ranked_score() -> int:
 	return int(score * float(Content.mode_info(mode).score))
@@ -365,8 +364,8 @@ func boundary_damage_rate() -> float:
 	if depth <= 1.0:
 		return depth * (4.0 + 0.25 * boundary_time)
 	if depth <= 2.0:
-		return lerpf(4.0, 100.0, pow(depth - 1.0, 0.5)) + boundary_time * 2.0
-	return 100.0 + 240.0 * (depth - 2.0) + 20.0 * boundary_time
+		return lerpf(4.0, 24.0, smoothstep(0.0, 1.0, depth - 1.0)) + boundary_time * lerpf(0.25, 0.6, depth - 1.0)
+	return 24.0 + 96.0 * (depth - 2.0) + boundary_time * lerpf(0.6, 2.0, depth - 2.0)
 
 func net_hull_rate() -> float:
 	return regeneration_rate() - decay_rate() - boundary_damage_rate()
@@ -426,6 +425,8 @@ func spawn_enemy(kind: String, position: Vector2 = Vector2.INF) -> Dictionary:
 	var health := float(stats[0]) * (1.0 if kind == "boss" else 1.0 + elapsed * 0.0022)
 	health *= float(Content.mode_info(mode).health)
 	var enemy := {"pos": point, "hp": health, "max_hp": health, "speed": float(stats[1]) * (0.8 if mode == "relaxed" else 1.0), "radius": float(stats[2]), "damage": float(stats[3]), "value": float(stats[4]), "kind": kind, "flash": 0.0, "angle": 0.0, "orbit_timer": 0.0, "shot_timer": rng.randf_range(1.7, 3.0), "warn": 0.0, "aim": Vector2.RIGHT, "dash_id": -1, "elite_index": 1, "charge_time": 0.0, "phase": 1}
+	enemy.flank_side = -1.0 if rng.randf() < 0.5 else 1.0
+	enemy.flanker = kind == "chaser" and rng.randf() < 0.6
 	enemies.append(enemy)
 	enemy.spawn_layer = spawn_layer
 	if spawn_layer == 4:
@@ -451,18 +452,27 @@ func _update_enemies(dt: float, old_position: Vector2) -> void:
 			enemy.phase = 2
 			enemy.shot_timer = 0.8
 			_announce("지휘체 격앙 · 탄막 강화", "phase")
-		if enemy.kind == "shooter" and toward.length() < 265.0:
-			movement = -direction * 0.35 if toward.length() < 190.0 else Vector2.ZERO
+		var tangent := direction.orthogonal() * float(enemy.flank_side)
+		if bool(enemy.flanker) and toward.length() > 110.0:
+			movement = (direction * 0.65 + tangent * 0.76).normalized()
+		elif enemy.kind == "tank":
+			movement = (player + (player - old_position) / maxf(dt, 0.001) * 0.7 - Vector2(enemy.pos)).normalized()
+		elif enemy.kind == "shooter":
+			var approach := 0.8 if toward.length() > 340.0 else (-0.9 if toward.length() < 240.0 else 0.0)
+			movement = (direction * approach + tangent * 0.55).limit_length(1.0)
 		if float(enemy.warn) > 0.0:
 			enemy.warn = maxf(0.0, float(enemy.warn) - dt)
 			movement *= 0.2
 			if float(enemy.warn) <= 0.0:
-				_fire_enemy_shots(enemy)
-		elif enemy.kind == "shooter" or enemy.kind == "boss" or enemy.kind == "elite":
+				if enemy.kind == "runner":
+					enemy.charge_time = 0.45
+				else:
+					_fire_enemy_shots(enemy)
+		elif enemy.kind in ["shooter", "boss", "elite"] or (enemy.kind == "runner" and toward.length() < 400.0):
 			enemy.shot_timer -= dt
 			if float(enemy.shot_timer) <= 0.0:
 				enemy.warn = 1.1 if enemy.kind == "elite" else 0.70
-				enemy.aim = direction
+				enemy.aim = (player + (player - old_position) / maxf(dt, 0.001) * 0.25 - Vector2(enemy.pos)).normalized() if enemy.kind == "runner" else direction
 				enemy.shot_timer = (1.35 if int(enemy.phase) == 2 else 1.8) if enemy.kind == "boss" else 3.5
 		if float(enemy.charge_time) > 0.0:
 			enemy.charge_time = maxf(0.0, float(enemy.charge_time) - dt)
@@ -507,10 +517,7 @@ func _fire_player_shot() -> void:
 	if nearest.is_empty() or shots.size() >= 240:
 		return
 	var direction := (Vector2(nearest.pos) - player).normalized()
-	shots.append({"pos": player, "velocity": direction * 590.0, "friendly": true, "radius": 5.0, "damage": 19.0 * _power(), "ttl": 1.45})
-	if ship_id == "striker":
-		firing_heat = mini(5, firing_heat + 1)
-		firing_heat_time = 2.0
+	shots.append({"pos": player, "velocity": direction * 590.0, "friendly": true, "radius": 5.0, "damage": 19.0 * _power() * (1.6 if ship_id == "striker" and focus_time >= 1.2 else 1.0), "ttl": 1.45})
 	events.append("shot")
 
 func _fire_enemy_shots(enemy: Dictionary) -> void:
@@ -578,8 +585,7 @@ func take_damage(amount: float) -> void:
 				_hit_enemy(enemy, 40.0 * _power())
 				enemy.pos += (Vector2(enemy.pos) - player).normalized() * 45.0
 		_effect(player, "guard", 125.0, 0.35)
-	firing_heat = 0
-	firing_heat_time = 0.0
+	focus_time = 0.0
 	hp = maxf(0.0, hp - amount * (0.75 if mode == "relaxed" else 1.0) * float(Content.mode_info(mode).damage) * (0.55 if overdrive_time > 0.0 else 1.0))
 	invulnerable = 0.70
 	combo = 0
@@ -658,7 +664,7 @@ func activate_overdrive() -> bool:
 	return true
 
 func _power() -> float:
-	return float(_ship.power) * (1.0 + float(upgrades.get("power", 0)) * 0.25) * (1.45 if overdrive_time > 0.0 else 1.0) * (1.0 + firing_heat * 0.08 if ship_id == "striker" else 1.0)
+	return float(_ship.power) * (1.0 + float(upgrades.get("power", 0)) * 0.25) * (1.45 if overdrive_time > 0.0 else 1.0)
 
 func _check_evolutions() -> void:
 	for id: String in Content.EVOLUTION_IDS:
