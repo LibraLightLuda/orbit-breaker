@@ -45,7 +45,7 @@ Chromium에서 최종 3.3 후보의 타이틀과 원형 활동영역·항법도�
 - Windows 3.3: https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.3.0
 - 소스: https://github.com/LibraLightLuda/orbit-breaker
 
-공개 배포 완료 후 작업 결과·공개 파일 일치·브라우저 렌더 확인을 추가한다.
+Pages 작업 https://github.com/LibraLightLuda/orbit-breaker/actions/runs/38104901866 가 completed/success로 완료됐다. 공개 웹 HTTP 200 및 index.pck SHA-256 9CA558E4747E9A6578423F81AE0C61B8A52F2B3C97365CA2C0AD94CB48AB1F50가 로컬 최신본과 일치한다. 실제 공개 Chromium에서 로딩 완료 뒤 VERSION 3.3 타이틀 표시 및 오류/경고 로그 없음 확인. Windows 업로드 digest 61B16382FAACD6E3AFAA4985E8D1407F8D2BCF4002598D9B44441411BEF53A7E 역시 로컬 최신 실행 파일과 일치한다. 게임 소스/웹 커밋은 cdd8a3f이다. GitHub 공개 Release는 최신 v3.3.0과 직전 v3.2.0만 유지하도록 v3.1.0 배포/첨부 파일을 정리했으며 Git의 과거 소스 태그는 유지했다.
 
 ## 한계와 정리 상태
 
