@@ -27,48 +27,59 @@ func _test_striker() -> void:
 	model._spawn_timer = 100
 	for i: int in range(24):
 		model.step(0.05, Vector2.ZERO, false)
-	check(is_equal_approx(model.focus_time, 1.2), "stationary pilot locks aim without needing a target")
+	check(is_equal_approx(model.focus_time, 1.2), "stationary pilot fully charges focus in 1.2 seconds")
+	model.step(0.05, Vector2.ZERO, false)
+	check(is_equal_approx(model.focus_time, 1.2), "focus caps at full charge")
 	model.spawn_enemy("boss", model.player + Vector2(300, 0))
 	model._fire_player_shot()
-	check(is_equal_approx(float(model.shots.back().damage), 30.4), "locked automatic cannon deals sixty percent extra damage")
+	check(is_equal_approx(float(model.shots.back().damage), 27.55), "full focus adds forty-five percent cannon damage")
 	check(is_equal_approx(model._power(), 1.0), "focus does not amplify satellites or other weapons")
 	model.upgrades.power = 2
 	model.overdrive_meter = 100
 	model.activate_overdrive()
 	model._fire_player_shot()
-	check(is_equal_approx(float(model.shots.back().damage), 19 * 1.5 * 1.45 * 1.6), "focus combines with cannon upgrades and overdrive")
+	check(is_equal_approx(float(model.shots.back().damage), 19 * 1.5 * 1.45 * 1.45), "focus combines with cannon upgrades and overdrive")
 	model.state = "upgrade"
 	model.step(0.05, Vector2.RIGHT, true)
 	check(is_equal_approx(model.focus_time, 1.2), "upgrade pauses focus")
 	model.state = "playing"
 	model.step(0.01, Vector2.RIGHT, false)
-	check(model.focus_time == 0, "movement immediately breaks aim")
+	check(is_equal_approx(model.focus_time, 1.1974), "movement gradually decays focus")
+	model._fire_player_shot()
+	check(float(model.shots.back().damage) > 19 * 1.5 * 1.45 * 1.44, "partial focus retains proportional cannon bonus")
 	model.focus_time = 1.2
-	model.step(0.01, Vector2.ZERO, true)
-	check(model.focus_time == 0, "dash breaks aim even without movement input")
-	model.focus_time = 1.2
+	model.step(0.01, Vector2.RIGHT, true)
+	check(model.focus_time < 1.2 and model.focus_time > 1.1, "dash drains focus with movement input")
+	check(model.slipstream_time == 0, "striker dash no longer grants acceleration")
 	model.invulnerable = 1
 	model.take_damage(20)
-	check(model.focus_time == 1.2, "evaded hit keeps aim")
+	check(model.focus_time > 1.1, "evaded hit keeps focus")
 	model.invulnerable = 0
 	model.take_damage(20)
-	check(model.focus_time == 0, "actual hit breaks aim")
+	check(model.focus_time > 0.7 and model.focus_time < 0.8, "actual hit retains partial focus")
 	model._fire_player_shot()
-	check(is_equal_approx(float(model.shots.back().damage), 19 * 1.5 * 1.45), "moving cannon retains base damage")
+	check(is_equal_approx(float(model.shots.back().damage), 19 * 1.5 * 1.45 * (1.0 + model.focus_bonus())), "unfocused cannon keeps upgrade and overdrive bonuses")
 	model.focus_time = 1.2
 	model.reset(31)
 	check(model.focus_time == 0, "restart clears focus")
+	var enemy: Dictionary = model.spawn_enemy("boss", model.player + Vector2(35, 0))
+	enemy.speed = 0
+	enemy.orbit_timer = 1
+	model.step(0.01, Vector2.RIGHT, true)
+	check(is_equal_approx(float(enemy.hp), float(enemy.max_hp) - 52), "striker dash returns to base damage")
+	model.step(0.01, Vector2.RIGHT, false)
+	check(is_equal_approx(float(enemy.hp), float(enemy.max_hp) - 52), "same dash cannot repeatedly hit target")
 	model.reset(31, "normal", "scout")
 	model._spawn_timer = 100
 	for i: int in range(30):
 		model.step(0.05, Vector2.ZERO, false)
-	check(model.focus_time == 0, "other ships cannot lock aim")
+	check(model.focus_time == 0, "other ships cannot charge focus")
 
 func _test_scout() -> void:
 	var model := Model.new()
 	model.reset(32, "normal", "scout")
 	model.step(0.01, Vector2.RIGHT, true)
-	check(is_equal_approx(model.slipstream_time, 1.6) and is_equal_approx(model.dash_time, 0.2), "scout dash starts wake without extending dash")
+	check(is_equal_approx(model.slipstream_time, 1.6) and is_equal_approx(model.dash_time, 0.19), "scout dash consumes its first frame and keeps a fixed total duration")
 	model.dash_time = 0
 	var start: Vector2 = model.player
 	model.step(0.05, Vector2.RIGHT, false)
@@ -99,7 +110,7 @@ func _test_scout() -> void:
 	check(is_equal_approx(float(enemy.hp), float(enemy.max_hp) - 52 * 0.9 * 1.75), "scout dash applies extra damage once")
 	model.step(0.01, Vector2.RIGHT, false)
 	check(is_equal_approx(float(enemy.hp), float(enemy.max_hp) - 52 * 0.9 * 1.75), "same dash cannot repeatedly hit target")
-	model.reset(32)
+	model.reset(32, "normal", "bastion")
 	model.step(0.01, Vector2.RIGHT, true)
 	check(model.slipstream_time == 0, "other ships do not receive scout wake")
 
@@ -120,6 +131,7 @@ func _test_bastion() -> void:
 	model.step(0.05, Vector2.ZERO, false)
 	check(model.guard_cooldown == 8, "upgrade cannot recharge shield")
 	model.state = "playing"
+	model.guard_stacks = 0
 	model.guard_cooldown = 0.01
 	model.step(0.05, Vector2.ZERO, false)
 	check(model.guard_cooldown == 0, "shield becomes ready after combat-time recharge")
@@ -175,6 +187,6 @@ func _test_ui() -> void:
 		game.run.focus_time = 0
 		game.run.slipstream_time = 0
 		game._update_hud()
-		check(game.hud.trait.get_rect().end.x < game.hud.vital_detail.position.x, "trait HUD stays clear of hull rates")
+		check(not game.hud.trait.get_rect().intersects(game.hud.vital_detail.get_rect()), "trait HUD stays clear of hull rates")
 	game.queue_free()
 	await process_frame

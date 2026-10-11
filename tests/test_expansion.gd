@@ -67,7 +67,7 @@ func _test_overdrive() -> void:
 	check(is_equal_approx(model.hp, 89.0), "overdrive reduces damage rather than grants invulnerability")
 	enemy = model.spawn_enemy("tank", model.player + Vector2(300.0, 0.0))
 	model._fire_player_shot()
-	check(is_equal_approx(float(model.shots[-1].damage), 27.55), "overdrive increases weapon damage")
+	check(is_equal_approx(float(model.shots[-1].damage), 27.55 * (1.0 + model.focus_bonus())), "overdrive increases weapon damage")
 	model.step(0.05, Vector2.ZERO, false)
 	check(model.overdrive_time < 6.0, "overdrive duration advances")
 	model.state = "upgrade"
@@ -100,8 +100,9 @@ func _test_weapons_and_evolutions() -> void:
 	model._update_weapons(0.01)
 	check(float(first.hp) == 72.0 and Vector2(first.pos).distance_to(model.player) > 130.0, "pulse damages and pushes nearby enemies")
 	for id: String in Content.EVOLUTION_IDS:
-		model.reset(12)
 		var info: Dictionary = Content.evolution_info(id)
+		model.reset(12, "normal", str(info.get("ship", "striker")))
+		model.elapsed = float(info.get("after", 0.0))
 		var requirements: Dictionary = info.requirements
 		var trigger := str(requirements.keys()[-1])
 		for required: String in requirements:
@@ -114,7 +115,7 @@ func _test_weapons_and_evolutions() -> void:
 		model.choose_upgrade(trigger)
 		check(model.evolutions.has(id) and model.events.has("evolution"), "chosen threshold automatically evolves " + id)
 		model._check_evolutions()
-		check(model.evolutions.size() == 1, "evolution applies only once " + id)
+		check(model.evolutions.count(id) == 1, "evolution applies only once " + id)
 	model.reset(12)
 	model.upgrades.missile = 3
 	model.upgrades.dash = 2

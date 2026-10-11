@@ -79,7 +79,7 @@ func run_checks() -> void:
 	check(game._speed_color(0.0).is_equal_approx(game.CORAL) and game._speed_color(1.0).is_equal_approx(game.SPEED_BLUE), "speed colors range from red to blue")
 	check(game._speed_color(0.5).r > game.SPEED_BLUE.r and game._speed_color(0.5).b > game.CORAL.b, "intermediate speed blends the colors")
 	var pointer := InputEventMouseMotion.new()
-	pointer.position = game.run.player + Vector2(120, 0)
+	pointer.position = game.position + game.run.player + Vector2(120, 0)
 	pointer.global_position = pointer.position
 	root.push_input(pointer, true)
 	await process_frame
@@ -166,7 +166,7 @@ func run_checks() -> void:
 	check(game.screen == "pause" and game.run.elapsed == paused_time, "pause freezes simulation")
 	check(game.space_time == space_before, "pause freezes space drift")
 	click.button_index = MOUSE_BUTTON_LEFT
-	click.position = Vector2(100, 600)
+	click.position = game.position + Vector2(100, 600)
 	click.pressed = true
 	root.push_input(click, true)
 	await process_frame
@@ -178,7 +178,7 @@ func run_checks() -> void:
 	check(not game.mouse_active, "resuming requires fresh cursor movement")
 	await process_frame
 	click.button_index = MOUSE_BUTTON_LEFT
-	click.position = Vector2(1190, 50)
+	click.position = game.position + Vector2(1218, 38)
 	click.pressed = true
 	root.push_input(click, true)
 	click.pressed = false
@@ -213,7 +213,7 @@ func run_checks() -> void:
 		if child is Button:
 			upgrade_button = child
 			break
-	click.position = upgrade_button.get_global_rect().get_center()
+	click.position = upgrade_button.get_global_transform_with_canvas() * (upgrade_button.size * 0.5)
 	click.pressed = true
 	root.push_input(click, true)
 	click.pressed = false
@@ -243,7 +243,7 @@ func run_checks() -> void:
 	game.toast_time = 0
 	game._resume()
 	await snapshot("12-expanded-combat")
-	check(game.run.evolutions.size() == 2 and not game.run.hazards.is_empty(), "expanded combat represented")
+	check(game.run.evolutions.size() == 3 and not game.run.hazards.is_empty(), "expanded combat includes blizzard evolution")
 	game._open_arsenal("pause")
 	await snapshot("13-build-guide")
 	game._close_arsenal()
@@ -252,14 +252,17 @@ func run_checks() -> void:
 	game.run.survival_cleared = true
 	game.run.upgrades.repair = 5
 	game._update_hud()
-	check(game.hud.time.text.contains("10:00") and game.hud.vital_detail.text.contains("+7.25"), "overtime HUD shows limit and maximum regeneration")
+	check(game.hud.time.text.contains("10:00") and game.hud.vital_detail.text.contains("+5.56") and game.hud.vital_detail.text.contains("77%"), "overtime HUD shows limit and reduced maximum regeneration")
+	check(game.hud.vitals.get_theme_color("font_color") == game.LIME and game.hud.phase.text.contains("완화"), "periodic lull shows actual healing and relief")
+	game.run.elapsed = 390.0
+	game._update_hud()
 	check(game.hud.vitals.get_theme_color("font_color") == game.CORAL, "net hull loss uses red warning color")
 	await snapshot("15-overtime")
 	game.run.player = Vector2(1830, 386)
 	game.run.boundary_time = 3.0
 	game.run.current_speed = game.run.base_speed() * game.run.movement_multiplier(game.run.player)
 	game._resume()
-	check(game.net_gauge < 0.0 and game.speed_gauge <= 0.301 and game.hud.vital_detail.text.contains("외곽 -"), "boundary HUD includes damage and severe slowdown")
+	check(game.net_gauge < 0.0 and game.speed_gauge <= 0.301 and game.hud.risk.text.contains("소멸권"), "boundary HUD shows region, hull loss and severe slowdown")
 	await snapshot("16-boundary-warning")
 	game.records.data.reduced_motion = true
 	await snapshot("17-boundary-reduced-motion")

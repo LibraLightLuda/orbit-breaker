@@ -7,18 +7,20 @@ const DEFAULTS: Dictionary = {
 	"total_kills": 0, "best_level": 0, "unlocked_medals": [],
 	"recent_runs": [], "best_by_loadout": {},
 	"player_name": "파일럿", "leaderboard": [], "achievement_progress": {}, "achievements": [],
-	"cleared_modes": [],
+	"cleared_modes": [], "discovered_items": [], "discovered_parts": [], "discovered_hulls": [],
 }
 const MISSION_IDS: Array[String] = ["first_run", "hunter", "survivor", "elite", "evolved", "victory"]
 const SHIP_IDS: Array[String] = ["striker", "scout", "bastion"]
 const SECTOR_IDS: Array[String] = ["ring", "storm", "forge"]
 const MODE_IDS: Array[String] = ["normal", "relaxed", "veteran", "cataclysm"]
-const SAVE_PATH: String = "user://records_v2.json"
+const SAVE_PATH: String = "user://profile/records_v2.json"
 
 var data: Dictionary = DEFAULTS.duplicate(true)
 var newly_unlocked: Array[String] = []
 var new_achievements: Array[String] = []
 var _path: String = SAVE_PATH
+var storage_error := ""
+var _migration_source := ""
 
 
 static func mission_info(id: String) -> Dictionary:
@@ -42,8 +44,12 @@ func load_data(path: String = SAVE_PATH) -> void:
 	_path = path
 	data = DEFAULTS.duplicate(true)
 	newly_unlocked.clear()
-	var legacy_path: String = "user://records.json" if path == SAVE_PATH else ""
-	var loaded: Variant = _load_source(path, legacy_path)
+	storage_error = ""
+	_migration_source = ""
+	if path == SAVE_PATH:
+		var old_root := OS.get_data_dir().path_join("Godot/app_userdata/Orbit Breaker · 오빗 브레이커")
+		_migrate_profile(path, [old_root.path_join("records_v2.json"), "user://records_v2.json", old_root.path_join("records.json"), "user://records.json"])
+	var loaded: Variant = _load_source(path if storage_error.is_empty() else _migration_source)
 	if loaded is Dictionary:
 		data = _validated(loaded)
 		_award_achievements()
@@ -51,6 +57,10 @@ func load_data(path: String = SAVE_PATH) -> void:
 
 
 func save_data() -> bool:
+	if not storage_error.is_empty():
+		return false
+	if _path == SAVE_PATH and DirAccess.make_dir_recursive_absolute(_path.get_base_dir()) != OK:
+		return false
 	var cleaned: Dictionary = _validated(data)
 	var temporary: String = _path + ".tmp"
 	var file: FileAccess = FileAccess.open(temporary, FileAccess.WRITE)
@@ -69,6 +79,44 @@ func save_data() -> bool:
 	if DirAccess.rename_absolute(temporary, _path) != OK:
 		return false
 	data = cleaned
+	return true
+
+func _migrate_profile(destination: String, sources: Array[String]) -> bool:
+	if FileAccess.file_exists(destination) or FileAccess.file_exists(destination + ".bak"):
+		return true
+	for source: String in sources:
+		if not FileAccess.file_exists(source) and not FileAccess.file_exists(source + ".bak"):
+			continue
+		_migration_source = source
+		var loaded: Variant = _load_source(source)
+		if loaded == null:
+			storage_error = "기존 기록 손상 · 원본을 보존했습니다"
+			return false
+		if DirAccess.make_dir_recursive_absolute(destination.get_base_dir()) != OK or not DirAccess.dir_exists_absolute(destination.get_base_dir()):
+			storage_error = "프로필 폴더 생성 실패 · 원본을 보존했습니다"
+			return false
+		# Commit records after verified ghost copies, so a failed import stays retryable.
+		for metadata: Variant in [loaded, _read_json(source + ".bak")]:
+			if not metadata is Dictionary or not metadata.get("leaderboard") is Array:
+				continue
+			for entry: Variant in metadata.leaderboard:
+				if not entry is Dictionary:
+					continue
+				var id := _ghost_id(entry.get("ghost"))
+				var old_ghost := source + ".ghost-" + id + ".json"
+				var new_ghost := destination + ".ghost-" + id + ".json"
+				if not id.is_empty() and FileAccess.file_exists(old_ghost):
+					if DirAccess.copy_absolute(old_ghost, new_ghost) != OK or FileAccess.get_sha256(old_ghost) != FileAccess.get_sha256(new_ghost):
+						storage_error = "고스트 복사 실패 · 원본을 보존했습니다"
+						return false
+		var primary := source if _read_json(source) != null else source + ".bak"
+		for suffix: String in [".bak", ""]:
+			var origin := source + ".bak" if suffix == ".bak" and _read_json(source + ".bak") != null else primary
+			var temporary := destination + suffix + ".tmp"
+			if DirAccess.copy_absolute(origin, temporary) != OK or FileAccess.get_sha256(origin) != FileAccess.get_sha256(temporary) or DirAccess.rename_absolute(temporary, destination + suffix) != OK:
+				storage_error = "기록 복사 실패 · 원본을 보존했습니다"
+				return false
+		return true
 	return true
 
 
@@ -131,7 +179,7 @@ func record_run(score: int, time: float, won: bool, details: Dictionary = {}) ->
 		for ranked: Dictionary in data.leaderboard:
 			if ranked.name == entry.name and ranked.mode == entry.mode:
 				var frames: Variant = details.get("ghost_frames")
-				if GhostReplay.valid(frames):
+				if frames is Array and not frames.is_empty():
 					var id := Crypto.new().generate_random_bytes(16).hex_encode()
 					if GhostReplay.write(ghost_path(id), frames):
 						ranked.ghost = id
@@ -144,6 +192,27 @@ func record_run(score: int, time: float, won: bool, details: Dictionary = {}) ->
 	_prune_ghosts()
 	return true
 
+
+func attach_ghost(entry: Dictionary, id: String) -> bool:
+	var linked := false
+	for ranked: Dictionary in data.leaderboard:
+		if ranked.name == entry.name and ranked.mode == entry.mode and ranked.score == entry.score and ranked.time == entry.time:
+			var previous: String = ranked.ghost
+			ranked.ghost = id
+			if not save_data():
+				ranked.ghost = previous
+				return false
+			linked = true
+			break
+	if linked:
+		_prune_ghosts()
+	return linked
+
+func ghost_candidate(score: int, time: float, name: String, difficulty: String) -> Dictionary:
+	for entry: Dictionary in data.leaderboard:
+		if entry.name == name and entry.mode == difficulty and entry.score == score and is_equal_approx(float(entry.time), time):
+			return entry.duplicate(true)
+	return {}
 
 func _load_source(path: String, legacy_path: String = "") -> Variant:
 	var loaded: Variant = _read_json(path)
@@ -172,7 +241,18 @@ func _read_json(path: String) -> Variant:
 
 func _validated(source: Dictionary) -> Dictionary:
 	var result: Dictionary = DEFAULTS.duplicate(true)
+	for pair: Array in [["discovered_parts", Expedition.PART_IDS], ["discovered_hulls", Expedition.RECIPE_IDS]]:
+		var known: Variant = source.get(pair[0])
+		if known is Array:
+			for id: String in pair[1]:
+				if id in known:
+					result[pair[0]].append(id)
 	result.player_name = clean_name(source.get("player_name"))
+	var discovered: Variant = source.get("discovered_items")
+	if discovered is Array:
+		for id: String in ItemCatalog.IDS:
+			if id in discovered:
+				result.discovered_items.append(id)
 	var progress: Variant = source.get("achievement_progress")
 	var achievements: Variant = source.get("achievements")
 	for item: Dictionary in Achievements.catalog():
@@ -256,7 +336,7 @@ func _evolutions(value: Variant) -> Array[String]:
 			var id: Variant = value[i]
 			if id is String and not id.is_empty() and id.length() <= 48 and id.is_valid_identifier() and not id in result:
 				result.append(id)
-				if result.size() == 8:
+				if result.size() == GameContent.EVOLUTION_IDS.size():
 					break
 	return result
 
@@ -328,7 +408,29 @@ func _ghost_id(value: Variant) -> String:
 	return value.to_lower()
 
 func ghost_path(id: String) -> String:
-	return _path + ".ghost-" + _ghost_id(id) + ".json"
+	return (_path if storage_error.is_empty() else _migration_source) + ".ghost-" + _ghost_id(id) + ".json"
+
+func record_live_achievements(details: Dictionary) -> bool:
+	var before: Array = data.achievements.duplicate()
+	var progress: Dictionary = data.achievement_progress.duplicate()
+	progress.kills = int(data.total_kills) + _integer(details.get("kills"))
+	progress.time = maxi(int(data.best_time), int(details.get("elapsed", 0)))
+	progress.combo = maxi(int(progress.get("combo", 0)), _integer(details.get("combo")))
+	for key: String in ["dashes", "overdrives", "returns", "elites"]:
+		progress[key] = int(progress.get(key, 0)) + _integer(details.get(key))
+	if not _evolutions(details.get("evolutions")).is_empty():
+		progress.evolved = 1
+	if float(details.get("elapsed", 0)) >= 180.0 and details.get("upgrades") is Dictionary:
+		for key: String in ["blade", "frost", "missile", "chain"]:
+			if _integer(details.upgrades.get(key)) >= 3:
+				progress[key] = 1
+	for item: Dictionary in Achievements.catalog():
+		if int(progress.get(item.stat, 0)) >= int(item.target) and not item.id in data.achievements:
+			data.achievements.append(item.id)
+	if data.achievements == before or save_data():
+		return true
+	data.achievements = before
+	return false
 
 func load_ghost(entry: Dictionary) -> Array:
 	var id := _ghost_id(entry.get("ghost"))
@@ -350,3 +452,53 @@ func _prune_ghosts() -> void:
 			var id := filename.trim_prefix(prefix).trim_suffix(".json")
 			if not _ghost_id(id).is_empty():
 				directory.remove(filename)
+
+func record_items(pickups: Array[Dictionary]) -> bool:
+	var before := data.duplicate(true)
+	var previous_notices := new_achievements.duplicate()
+	for pickup: Dictionary in pickups:
+		if not pickup.get("id") in ItemCatalog.IDS or not pickup.get("grade") in ItemCatalog.GRADES:
+			continue
+		if not pickup.id in data.discovered_items:
+			data.discovered_items.append(pickup.id)
+		var progress: Dictionary = data.achievement_progress
+		progress.items = mini(int(progress.get("items", 0)) + 1, 1_000_000_000)
+		if pickup.grade == "A":
+			progress.items_a = mini(int(progress.get("items_a", 0)) + 1, 1_000_000_000)
+		if pickup.get("risky") == true:
+			progress.items_risky = mini(int(progress.get("items_risky", 0)) + 1, 1_000_000_000)
+	data.achievement_progress.item_types = data.discovered_items.size()
+	_award_achievements()
+	if save_data():
+		return true
+	data = before
+	new_achievements = previous_notices
+	return false
+
+func record_tech(pickups: Array[Dictionary]) -> bool:
+	var before := data.duplicate(true)
+	var previous_notices := new_achievements.duplicate()
+	var progress: Dictionary = data.achievement_progress
+	for pickup: Dictionary in pickups:
+		var id: String = str(pickup.get("id", ""))
+		match pickup.get("kind"):
+			"mission":
+				if id in Expedition.MISSION_IDS:
+					progress.missions = mini(int(progress.get("missions", 0)) + 1, 1_000_000_000)
+			"part":
+				if id in Expedition.PART_IDS:
+					if not id in data.discovered_parts:
+						data.discovered_parts.append(id)
+					progress.parts = mini(int(progress.get("parts", 0)) + 1, 1_000_000_000)
+			"hull":
+				if id in Expedition.RECIPE_IDS:
+					if not id in data.discovered_hulls:
+						data.discovered_hulls.append(id)
+					progress["hull_" + id] = 1
+	progress.part_types = data.discovered_parts.size()
+	_award_achievements()
+	if save_data():
+		return true
+	data = before
+	new_achievements = previous_notices
+	return false

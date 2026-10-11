@@ -10,6 +10,7 @@ func _init() -> void:
 	_test_gravity_and_satellites()
 	_test_boundary_buffer()
 	_test_choices()
+	_test_late_reinforcements()
 	print("SURVIVAL SELF-CHECK: %d / %d assertions passed" % [checks - failures, checks])
 	quit(0 if failures == 0 else 1)
 
@@ -18,6 +19,58 @@ func check(condition: bool, label: String) -> void:
 	if not condition:
 		failures += 1
 		push_error(label)
+
+func _test_late_reinforcements() -> void:
+	var model := Model.new()
+	model.reset(94)
+	model.boss_spawned = true
+	model._elite_stage = 2
+	model.elapsed = 299.0
+	model.step(0.01, Vector2.ZERO, false)
+	check(not model.enemies.any(func(e: Dictionary) -> bool: return e.kind in ["elite", "boss"]), "no added threats before five minutes")
+	model.elapsed = 300.0
+	model.step(0.01, Vector2.ZERO, false)
+	var elites := model.enemies.filter(func(e: Dictionary) -> bool: return e.kind == "elite")
+	check(elites.size() == 1 and elites[0].elite_index == 1, "five minutes brings charging reinforcements without a boss kill")
+	var first_health := float(elites[0].max_hp)
+	model.elapsed = 336.0
+	model.step(0.01, Vector2.ZERO, false)
+	elites = model.enemies.filter(func(e: Dictionary) -> bool: return e.kind == "elite")
+	check(elites.size() == 2 and elites[1].elite_index == 2, "ranged elite alternates with charging elite")
+	check(not model.boss_defeated and model.enemies.any(func(e: Dictionary) -> bool: return e.kind == "boss"), "pursuit boss does not wait for first boss defeat")
+	model.elapsed = 390.0
+	model.step(0.01, Vector2.ZERO, false)
+	check(model.enemies.filter(func(e: Dictionary) -> bool: return e.kind == "boss").size() == 2, "a second boss can arrive while one survives")
+	model.elapsed = 450.0
+	model.step(0.01, Vector2.ZERO, false)
+	check(model.enemies.filter(func(e: Dictionary) -> bool: return e.kind == "boss").size() == 2 and model.enemies.filter(func(e: Dictionary) -> bool: return e.kind == "elite").size() == 2, "reinforcements cap each strong type at two")
+	model.enemies.clear()
+	model.elapsed = 550.0
+	model.step(0.01, Vector2.ZERO, false)
+	elites = model.enemies.filter(func(e: Dictionary) -> bool: return e.kind == "elite")
+	check(elites.size() == 1 and elites[0].max_hp > first_health * 1.5, "later elite waves grow tougher")
+	check(model.next_boss_at - model.elapsed < 40.0 and model._next_elite_at - model.elapsed < 25.0, "late reinforcement cadence accelerates")
+	var early := Model.new()
+	early.reset(94)
+	var early_shooter := early.spawn_enemy("shooter", early.player + Vector2(300, 0))
+	var late_shooter := model.spawn_enemy("shooter", model.player + Vector2(300, 0))
+	check(late_shooter.speed > early_shooter.speed and late_shooter.damage > early_shooter.damage and late_shooter.max_hp > early_shooter.max_hp, "ordinary enemies grow in health, speed and damage")
+	model.shots.clear()
+	model._fire_enemy_shots(late_shooter)
+	check(model.shots[0].damage > 10.0 and Vector2(model.shots[0].velocity).length() > 185.0, "late projectile damage and speed also scale")
+	var arrival := model.spawn_enemy("boss", Model.CENTER + Vector2(1100, 0))
+	arrival.spawn_layer = 4
+	arrival.shot_timer = 100.0
+	var distance := Vector2(arrival.pos).distance_to(model.player)
+	model._update_enemies(1.0, model.player)
+	check(distance - Vector2(arrival.pos).distance_to(model.player) > float(arrival.speed) * 2.0, "late strong enemies approach promptly from deep space")
+	model.state = "upgrade"
+	var time := model.elapsed
+	var schedule := model.next_boss_at
+	model.step(2.0, Vector2.ZERO, false)
+	check(model.elapsed == time and model.next_boss_at == schedule, "selection freezes reinforcement schedule")
+	model.reset(94)
+	check(model.next_boss_at == 330.0 and model._next_elite_at == 300.0 and model._elite_stage == 0, "restart resets late threat schedule")
 
 func _test_boundary_buffer() -> void:
 	var model := Model.new()
@@ -96,10 +149,10 @@ func _test_recovery_budget() -> void:
 		strong._update_vitals(0.05)
 	check(strong.state == "playing" and strong.hp > 50.0, "three repair picks support five minutes with perfect avoidance")
 	strong.upgrades.repair = 5
-	strong.elapsed = 360.0
-	check(strong.decay_rate() > strong.regeneration_rate(), "six minute decay exceeds maximum regeneration")
-	strong.elapsed = 600.0
-	check(is_equal_approx(strong.decay_rate(), 51.25), "ten minute decay reaches 51.25 HP per second")
+	strong.elapsed = 390.0
+	check(strong.decay_rate() > strong.regeneration_rate(), "late pressure exceeds maximum regeneration outside lulls")
+	strong.elapsed = 599.0
+	check(is_equal_approx(strong.decay_rate(), 12.967035), "late decay stays below thirteen HP per second before forced collapse")
 	strong.reset(9)
 	strong.hp = 40.0
 	strong._update_vitals(0.05)

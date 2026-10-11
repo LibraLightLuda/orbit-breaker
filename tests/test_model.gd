@@ -106,7 +106,7 @@ func _test_pickups_and_upgrades() -> void:
 	model.choose_upgrade("power")
 	model.spawn_enemy("tank", model.player + Vector2(300.0, 0.0))
 	model._fire_player_shot()
-	check(is_equal_approx(float(model.shots[-1].damage), 23.75), "power upgrade increases shot damage")
+	check(is_equal_approx(float(model.shots[-1].damage), 23.75 * (1.0 + model.focus_bonus())), "power upgrade combines with proportional focus damage")
 
 func _test_combat_and_boss() -> void:
 	var model := Model.new()
@@ -129,7 +129,7 @@ func _test_combat_and_boss() -> void:
 		if enemy.kind == "boss":
 			enemy.hp = 0.0
 	model.step(0.01, Vector2.ZERO, false)
-	check(model.boss_defeated and model.survival_cleared and model.state == "playing", "five minute milestone keeps combat running")
+	check(model.boss_defeated and model.survival_cleared and model.state in ["playing", "upgrade"], "five minute milestone continues combat or earned upgrade")
 	var score: int = model.score
 	model.step(0.05, Vector2.ZERO, false)
 	check(model.score == score, "milestone cannot award twice")

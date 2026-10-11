@@ -14,6 +14,10 @@ const CUES: Dictionary = {
 	"win": [330.0, 990.0, 0.85, 0.0, -13.0],
 	"lose": [330.0, 65.0, 0.7, 0.03, -14.0],
 	"boss": [90.0, 55.0, 0.75, 0.04, -13.0],
+	"event_warning": [880.0, 440.0, 0.23, 0.0, -15.0],
+	"event_start": [70.0, 210.0, 0.55, 0.18, -17.0],
+	"hazard_start": [250.0, 40.0, 0.32, 0.4, -21.0],
+	"boundary_hit": [140.0, 70.0, 0.12, 0.18, -24.0],
 }
 
 var muted: bool = false
@@ -48,16 +52,19 @@ func play(cue: String) -> void:
 	var interval: int = 70 if cue in ["shoot", "hit", "pickup"] else 45
 	if now - int(_last_played.get(cue, -1000)) < interval:
 		return
+	if not _sounds.has(cue):
+		_sounds[cue] = _make_effect(CUES[cue])
 	var available: AudioStreamPlayer = null
 	for voice: AudioStreamPlayer in _voices:
 		if not voice.playing:
 			available = voice
 			break
+	if available == null and cue in ["event_warning", "event_start", "hurt"]:
+		available = _voices[0]
+		available.stop()
 	if available == null:
 		return
 	_last_played[cue] = now
-	if not _sounds.has(cue):
-		_sounds[cue] = _make_effect(CUES[cue])
 	available.stream = _sounds[cue]
 	available.volume_db = float(CUES[cue][4])
 	available.play()

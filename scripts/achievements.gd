@@ -4,6 +4,11 @@ extends RefCounted
 static func catalog() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for row: Array in [
+		["missions", "임무 완수", [1, 10, 50], [10, 25, 50]],
+		["parts", "기체 연구", [1, 10, 30], [10, 20, 40]],
+		["items", "보급 회수", [1, 10, 50], [5, 15, 30]],
+		["items_a", "황금 보급", [1, 5, 20], [10, 25, 50]],
+		["items_risky", "위험한 회수", [1, 5, 20], [10, 20, 40]],
 		["runs", "출격 일지", [1, 10, 50], [5, 15, 30]],
 		["kills", "별의 사냥꾼", [100, 1000, 10000], [10, 20, 50]],
 		["wins", "돌파의 증명", [1, 5, 25], [10, 25, 50]],
@@ -24,6 +29,10 @@ static func catalog() -> Array[Dictionary]:
 		result.append({"id": row[0], "name": row[1], "stat": row[0], "target": 1, "points": 20, "description": "해당 강화 3단계로 180초 생존"})
 	for row: Array in [["veteran", "베테랑 돌파", 50], ["cataclysm", "대붕괴 돌파", 100], ["evolved", "진화의 시작", 20]]:
 		result.append({"id": row[0], "name": row[1], "stat": row[0], "target": 1, "points": row[2], "description": "해당 난이도 돌파" if row[0] != "evolved" else "무기 진화 달성"})
+	result.append({"id": "item_types", "name": "보급 연구자", "stat": "item_types", "target": 8, "points": 40, "description": "아이템 8종 발견"})
+	result.append({"id": "part_types", "name": "세 가지 설계", "stat": "part_types", "target": 3, "points": 30, "description": "파츠 3종 모두 발견"})
+	for id: String in Expedition.RECIPE_IDS:
+		result.append({"id": "hull_" + id, "name": Expedition.recipe(id).name, "stat": "hull_" + id, "target": 1, "points": 30, "description": "해당 기체 조합 진화 달성"})
 	return result
 
 static func points(unlocked: Array) -> int:

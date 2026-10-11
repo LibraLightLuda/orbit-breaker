@@ -43,10 +43,28 @@ Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script
     -SuccessPattern '(?m)^SURVIVAL SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_expansion.gd') `
     -SuccessPattern '(?m)^EXPANSION SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_feedback.gd') `
+    -SuccessPattern '(?m)^FEEDBACK SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_feedback_v315.gd') `
+    -SuccessPattern '(?m)^FEEDBACK315 SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_feedback_v317.gd') `
+    -SuccessPattern '(?m)^FEEDBACK317 SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_feedback_v318.gd') `
+    -SuccessPattern '(?m)^FEEDBACK318 SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_events.gd') `
+    -SuccessPattern '(?m)^EVENT SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_expedition.gd') `
+    -SuccessPattern '(?m)^EXPEDITION SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_ships.gd') `
     -SuccessPattern '(?m)^SHIP SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_viewport.gd') `
+    -SuccessPattern '(?m)^VIEWPORT SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_orbital.gd') `
     -SuccessPattern '(?m)^ORBITAL SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_items.gd') `
+    -SuccessPattern '(?m)^ITEM SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_replay_world.gd') `
+    -SuccessPattern '(?m)^REPLAY WORLD SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_balance.gd') `
     -SuccessPattern '(?m)^BALANCE SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_support.gd') `
@@ -55,6 +73,8 @@ Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script
     -SuccessPattern '(?m)^UI SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_progression.gd') `
     -SuccessPattern '(?m)^PROGRESSION SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_uiux.gd', '--', '--stage=6') `
+    -SuccessPattern '(?m)^UIUX SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--export-release', 'Windows Desktop', $outputPath)
 if (-not (Test-Path -LiteralPath $outputPath -PathType Leaf)) {

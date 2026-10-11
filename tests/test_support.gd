@@ -161,7 +161,7 @@ func _test_progression() -> void:
 	malformed["recent_runs"] = large_history
 	_write(path, JSON.stringify(malformed))
 	reloaded.load_data(path)
-	_check(reloaded.data["recent_runs"].size() == 8 and reloaded.data["recent_runs"][0]["evolutions"].size() == 8, "History and nested evolution arrays stay bounded on load")
+	_check(reloaded.data["recent_runs"].size() == 8 and reloaded.data["recent_runs"][0]["evolutions"].size() == GameContent.EVOLUTION_IDS.size(), "History and nested evolution arrays stay bounded on load")
 	_check(reloaded.record_run(10, 1.0, false, {"ship": [], "sector": {}, "mode": false, "kills": INF, "level": NAN, "elites": "1", "evolutions": "nova"}), "Malformed run details remain safe")
 	var newest: Dictionary = reloaded.data["recent_runs"][0]
 	_check(newest["ship"] == "striker" and newest["sector"] == "ring" and newest["mode"] == "normal" and newest["kills"] == 0 and newest["level"] == 1 and newest["evolutions"].is_empty(), "Malformed details use safe known defaults")
@@ -180,7 +180,7 @@ func _test_save_versions() -> void:
 	var legacy: Dictionary = {"best_score": 640, "best_time": 205.0, "runs": 3, "wins": 1, "muted": true, "music": false, "reduced_motion": true}
 	var expected_legacy: Variant = JSON.parse_string(JSON.stringify(legacy))
 	var store = SaveScript.new()
-	_check(store._path == "user://records_v2.json", "Default writes use isolated v2 records")
+	_check(store._path == "user://profile/records_v2.json", "Default writes use a stable profile folder")
 	_write(legacy_path, JSON.stringify(legacy))
 	store.load_data(current_path)
 	_check(store.data == SaveScript.DEFAULTS, "Custom paths do not import real player records")
@@ -231,6 +231,7 @@ func _test_audio() -> void:
 		audio.play(cue)
 	_check(_playing_voices(audio) <= SoundScript.VOICE_LIMIT, "All cues respect simultaneous-voice cap")
 	_check(audio._sounds.size() == SoundScript.CUES.size(), "Every requested cue generates a WAV")
+	_check(audio._last_played.has("event_warning") and audio._last_played.has("event_start"), "Important event alarms play even when voices are full")
 	for cue: String in audio._sounds:
 		var stream: AudioStreamWAV = audio._sounds[cue]
 		_check(stream.data.size() > 0 and stream.mix_rate == SoundScript.SAMPLE_RATE and stream.format == AudioStreamWAV.FORMAT_16_BITS, "Cue %s is valid PCM" % cue)
