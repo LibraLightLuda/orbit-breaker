@@ -49,7 +49,15 @@ Windows 및 단일 스레드 Web Release 내보내기 성공. 최종 Windows 실
 
 ## 공개 배포
 
-공개 게시 확인 진행 중. 공개 파일 해시·브라우저 표시·Release 업로드 확인 후 갱신한다.
+- 웹: https://libralightluda.github.io/orbit-breaker/?v=3.5
+- Windows: https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.5.0
+- 소스: https://github.com/LibraLightLuda/orbit-breaker
+
+Pages 작업 https://github.com/LibraLightLuda/orbit-breaker/actions/runs/38107544018 가 completed/success로 완료됐다. 공개 웹 HTTP200, index.pck SHA-256 DFF0DE40CED527D5EA33ED1CF0F3C19653D2126D0B36D4178448F33E1B6FC512가 로컬 최신본과 일치한다. 공개 Chromium에서 로딩 완료 후 VERSION3.5 타이틀, 오류·경고 로그 없음 확인. 공개 사이트에서는 출격하지 않아 실제 기록을 변경하지 않았다.
+
+Windows v3.5.0 업로드 digest 3F4809C9D0F6365637C8EF3B8E1AF80C53AC80CAEA23B047A8FA8402277E8264가 로컬 최신 실행 파일과 일치한다. 직전 v3.4.0 digest도 로컬 직전본과 대조했다. 두 정상본 확인 뒤 v3.3.0 Release·첨부 파일을 제거해 공개 Release는 v3.5.0/v3.4.0 두 세대만 남겼다. 과거 소스 태그는 유지한다. 게임 소스/웹 커밋은 7dca472다.
+
+공개 증거: artifacts/current/public-verification.txt 및 web-validation.txt.
 
 ## 남은 한계
 
