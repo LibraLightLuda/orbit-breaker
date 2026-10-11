@@ -34,7 +34,7 @@ build.log는 필수 검사 및 최종 두 플랫폼 내보내기, ui/progression
 - 소스: https://github.com/LibraLightLuda/orbit-breaker
 - Windows 3.2: https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.2.0
 
-공개 웹 배포 결과와 업로드 해시는 배포 후 아래에 추가한다.
+Pages 작업 https://github.com/LibraLightLuda/orbit-breaker/actions/runs/38103128749 가 completed/success로 완료됐다. 공개 웹 HTTP 200 및 index.pck SHA-256 D7729CEFD257D43AE3258878C87B2A4D0AAD5D17B3B93F64F337472627C1FEEA가 로컬 최신본과 일치한다. 실제 공개 Chromium에서 VERSION 3.2 타이틀 렌더링 및 브라우저 오류/경고 없음 확인. Windows Release 업로드 digest 70354E66D53A6137FE28C4D1A3A700ADF75FA607DD4A769AF23F5F9850564E02는 로컬 최신 실행 파일과 일치한다. 게임 소스/웹 커밋은 0b2bf03이다.
 
 ## 한계
 
