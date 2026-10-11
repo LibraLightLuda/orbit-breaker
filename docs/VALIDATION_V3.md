@@ -27,7 +27,13 @@
 
 ## 공개 게시 상태
 
-GitHub 릴리즈와 Pages 게시 진행 중. 공개 파일의 해시 및 브라우저 확인 후 이 항목을 갱신한다.
+GitHub 릴리즈: https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.18.0
+
+웹 플레이: https://libralightluda.github.io/orbit-breaker/
+
+배포 소스 커밋4a56749eca5c6fae7f17d90bc28b4739c87e4bb6. Pages 작업38184039192 성공. 공개 PCK HTTP200·SHA-256 A0B1FDC27D5134202B56B9E3E96B31BE300A7FC4C47C62C4226E8EDA2D28BB9D가 로컬 최신본과 일치했다. 공개 Chrome에서 메뉴→출격→전투/Space 입력과 실제 캔버스 화면을 확인했고 수집된 브라우저 오류는0개다. public-browser.json/public-web-combat.png/github-publication.json이 대응 자료다.
+
+GitHub에 올린 Windows/Web ZIP·해시·검증 첨부물의 서버 SHA-256도 로컬 파일과 일치했다. 공개 최신본 확인 후 이전 릴리즈의 구배포 첨부6개와 구Pages 아티팩트5개를 정리했다. 과거 소스 태그/릴리즈 설명은 유지한다. 최신3.18 배포 산출물만 남았다.
 
 ## 남은 수동 확인
 

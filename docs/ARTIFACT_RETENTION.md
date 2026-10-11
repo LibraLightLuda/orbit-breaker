@@ -24,3 +24,5 @@
 - 이전3.17 실행 파일·체크섬·안내·대응 증거를 retiring-3.17에 보존한 뒤 후보와 교체했다. 교체 성공 후16개 구배포 루트와14개 구자료/임시 파일을 정리했다. 과거 blocked by policy로 남았던 구배포도 이번에는 정상 정리됐다.
 - build/artifacts에는 current 한 세대만 남는다. .cleanup-archive/20261011의 구build/artifacts도 제거했다. 소스 기준선 .cleanup-archive/uiux-source-3.12 및 게임 소스·과거 설계·플레이어 저장/설정은 보존했다.
 - 최종 목록/해시: artifacts/current/file-inventory.json, release-hashes.json, verification.json, build/current/SHA256.txt. 공개 GitHub 릴리즈/Pages 확인은 github-publication.json과 VALIDATION_V3.md를 따른다.
+
+- GitHub3.18 릴리즈/Pages 공개 검증 완료. 서버 첨부 SHA-256 일치 확인 후 구릴리즈 첨부6개·구Pages 아티팩트5개를 정리했다. 소스 태그와 과거 릴리즈 설명은 보존했다.
