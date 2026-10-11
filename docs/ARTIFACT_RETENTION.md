@@ -20,10 +20,10 @@
 
 ## 현재 두 세대 (2026-10-11)
 
-- 최신: build/current/OrbitBreaker.exe, 3.4 외곽 이동·조준 고정·침공 전술·간결한 HUD. SHA-256 F670C4CF121D45A13FD802FE1A54D00574D14B04A3207365E3BB682236A5BCE5. 검증 자료 artifacts/current/.
-- 직전: build/previous/OrbitBreaker.exe, 3.3 원형 궤도·세 외곽층·침공·충전 표시. SHA-256 61B16382FAACD6E3AFAA4985E8D1407F8D2BCF4002598D9B44441411BEF53A7E. 기존 체크섬·플레이 안내·대응 검증 명세·화면·로그를 artifacts/previous와 함께 보존했다. 이동 전후 해시는 동일하다.
-- 최신 후보의 필수 검사·Windows/Web 내보내기·실제 실행·브라우저 확인이 성공한 뒤 역할을 갱신했다. web/은 현재 웹 배포의 게시용 복사본으로 별도 세대가 아니다.
-- GitHub 공개 Release도 최신 v3.4.0과 직전 v3.3.0만 남겼다. 두 업로드 digest와 로컬 해시를 대조한 뒤 더 오래된 v3.2.0 Release와 첨부 파일을 정리했다. 과거 소스 태그는 유지한다. 공개 Pages 게시·파일 해시·브라우저 확인은 VALIDATION_V3.md 참조.
-- **정리 차단**: 오래된 로컬 배포 자료 삭제는 이번 작업에서도 실행 도구의 자동 승인 검토에서 `blocked by policy`로 거부됐다. 상세 이유는 제공되지 않았다. 3.0은 build/retiring 및 artifacts/retiring, 3.1은 build/retiring-3.1 및 artifacts/retiring-3.1, 3.2는 build/retiring-3.2 및 artifacts/retiring-3.2에 삭제 대기로 남는다. 최신·직전 역할은 3.4/3.3이지만 두 세대 보관 정리는 미완료다. current/previous의 release-stdout.log·release-stderr.log, current/validation-progress.txt 임시 자료도 삭제가 거부돼 남는다. 우회 삭제나 무기한 별도 아카이브는 만들지 않았다. 게임 소스·과거 기획·플레이어 저장은 보호했다.
-- .cleanup-archive의 게임 소스 스냅샷과 과거 설계 문서는 보호한다. 이 위치에 오래된 실행 파일·배포 검증 로그를 별도 아카이브로 보관하지 않는다.
-- tools/build.ps1은 build/candidate로 내보내며 정상본을 직접 덮어쓰지 않는다. 이후 교체도 필수 검사와 Windows/웹 실행 확인 후 이 문서의 보존·갱신 순서를 따른다.
+- 최신: build/current/OrbitBreaker.exe, 3.5 Windows 1600×900 창·전체 원형 전장 지름80%. SHA-256 3F4809C9D0F6365637C8EF3B8E1AF80C53AC80CAEA23B047A8FA8402277E8264. 검증 자료 artifacts/current/.
+- 직전: build/previous/OrbitBreaker.exe, 3.4 외곽 이동·조준 고정·침공 전술·간결한 HUD. SHA-256 F670C4CF121D45A13FD802FE1A54D00574D14B04A3207365E3BB682236A5BCE5. 기존 체크섬·안내·대응 검증 명세·화면·로그를 artifacts/previous와 함께 보존했다. 이동 전후 해시는 동일하다.
+- 필수 검사·Windows/Web 내보내기·실제 실행·브라우저 확인 성공 후 역할을 갱신했다. web/은 현재 웹 배포의 게시용 복사본으로 별도 세대가 아니다.
+- GitHub 공개 Release는 최신 v3.5.0과 직전 v3.4.0으로 갱신한다. 두 업로드 digest와 로컬 해시를 대조한 뒤 이전 v3.3.0 Release·첨부 파일을 정리한다. 과거 소스 태그를 유지하며 공개 검증 완료 상태는 VALIDATION_V3.md를 따른다.
+- **정리 차단**: 오래된 로컬 배포 자료 삭제가 이번 작업에서도 실행 도구의 자동 승인 검토에서 `blocked by policy`로 거부됐다. 상세 사유는 제공되지 않았다. 3.0은 build/retiring 및 artifacts/retiring, 3.1·3.2·3.3은 각각 build/retiring-3.1·retiring-3.2·retiring-3.3 및 대응 artifacts 디렉터리에 삭제 대기로 남는다. 최신·직전 역할은 3.5/3.4지만 로컬 두 세대 보관 정리는 미완료다. current/previous의 release-stdout.log·release-stderr.log, previous/validation-progress.txt 임시 자료도 남는다. 우회 삭제나 무기한 별도 아카이브를 만들지 않았다. 소스·과거 기획·플레이어 저장은 보호한다.
+- .cleanup-archive의 게임 소스 스냅샷·과거 설계 문서는 보호한다. 이 위치에 오래된 실행 파일·배포 검증 로그를 별도 아카이브로 보관하지 않는다.
+- tools/build.ps1은 build/candidate로 내보내며 정상본을 직접 덮어쓰지 않는다. 이후 교체도 필수 검사와 실행 확인 후 이 문서의 보존·갱신 순서를 따른다.

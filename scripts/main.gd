@@ -290,7 +290,7 @@ func _show_menu() -> void:
 	_button("설정", Rect2(410, 468, 148, 50), _show_settings)
 	_label("최고 %s   /   돌파 %d회   /   업적 %d점" % [_number(int(records.data.best_score)), int(records.data.wins), Achievements.points(records.data.achievements)], Rect2(80, 565, 660, 30), 18, MUTED)
 	_label("마우스 / WASD 이동    좌클릭 / SPACE 돌진    우클릭 / E 오버드라이브", Rect2(80, 642, 850, 30), 16, MUTED)
-	_label("VERSION 3.4  /  MADE WITH GODOT", Rect2(922, 650, 350, 24), 13, MUTED)
+	_label("VERSION 3.5  /  MADE WITH GODOT", Rect2(922, 650, 350, 24), 13, MUTED)
 
 func _wrap_label(text: String, rect: Rect2, size: int = 18, color: Color = MUTED, parent: Control = null) -> Label:
 	return _label(text, rect, size, color, parent, true)

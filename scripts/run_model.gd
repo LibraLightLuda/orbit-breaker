@@ -3,10 +3,11 @@ extends RefCounted
 
 const Content = preload("res://scripts/game_content.gd")
 const CENTER := Vector2(640, 386)
-const ACTIVITY_RADIUS := sqrt(1136.0 * 516.0 * 2.0 / PI)
+const WORLD_SCALE := 0.8
+const ACTIVITY_RADIUS := sqrt(1136.0 * 516.0 * 2.0 / PI) * WORLD_SCALE
 const ARENA := Rect2(CENTER - Vector2.ONE * ACTIVITY_RADIUS, Vector2.ONE * ACTIVITY_RADIUS * 2.0)
 const PLAYER_RADIUS := 13.0
-const LAYER_WIDTH := 180.0
+const LAYER_WIDTH := 180.0 * WORLD_SCALE
 const BOUNDARY_BUFFER := LAYER_WIDTH * 3.0
 const FLIGHT_BOUNDS := Rect2(ARENA.position - Vector2.ONE * BOUNDARY_BUFFER, ARENA.size + Vector2.ONE * BOUNDARY_BUFFER * 2.0)
 const UPGRADE_IDS := ["orbit", "orbit_range", "blade", "frost", "power", "rapid", "magnet", "speed", "vitality", "dash", "repair", "missile", "chain", "pulse"]
@@ -409,7 +410,7 @@ func spawn_enemy(kind: String, position: Vector2 = Vector2.INF) -> Dictionary:
 	var spawn_layer := 0
 	if not point.is_finite():
 		spawn_layer = 4 if kind in ["elite", "boss"] else (3 if kind == "shooter" else (2 if kind == "tank" else rng.randi_range(1, 2)))
-		var radius := ACTIVITY_RADIUS + (spawn_layer - 1) * LAYER_WIDTH + rng.randf_range(40.0, 130.0)
+		var radius := ACTIVITY_RADIUS + (spawn_layer - 1) * LAYER_WIDTH + rng.randf_range(40.0, 130.0) * WORLD_SCALE
 		point = CENTER + Vector2.from_angle(rng.randf_range(0.0, TAU)) * radius
 		if point.distance_to(player) < 180.0:
 			point = CENTER - (point - CENTER)

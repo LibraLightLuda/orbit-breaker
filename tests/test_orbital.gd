@@ -16,7 +16,10 @@ func check(condition: bool, message: String) -> void:
 func run_checks() -> void:
 	var model := Model.new()
 	model.reset(45)
-	check(is_equal_approx(PI * Model.ACTIVITY_RADIUS * Model.ACTIVITY_RADIUS, 1136 * 516 * 2.0), "activity circle has twice the original area")
+	check(is_equal_approx(PI * Model.ACTIVITY_RADIUS * Model.ACTIVITY_RADIUS, 1136 * 516 * 2.0 * 0.64), "activity circle area follows eighty percent diameter")
+	check(is_equal_approx((Model.ACTIVITY_RADIUS + Model.BOUNDARY_BUFFER) / (sqrt(1136.0 * 516.0 * 2.0 / PI) + 540.0), 0.8), "entire outer circle shrinks to eighty percent")
+	check(Model.LAYER_WIDTH == 144 and Model.BOUNDARY_BUFFER == 432, "all three risk layers shrink proportionally")
+	check(ProjectSettings.get_setting("display/window/size/window_width_override") == 1600 and ProjectSettings.get_setting("display/window/size/window_height_override") == 900, "native window defaults to 1600 by 900")
 	for i: int in range(8):
 		var direction := Vector2.from_angle(i * TAU / 8)
 		check(model.boundary_layer(Model.CENTER + direction * (Model.ACTIVITY_RADIUS - 20)) == 0, "radial safe zone " + str(i))
@@ -78,11 +81,12 @@ func _test_tactics() -> void:
 	var model := Model.new()
 	model.reset(46)
 	model._spawn_timer = 0
+	model._shot_timer = 100
 	for i: int in range(80):
 		model.step(0.05, Vector2.ZERO, false)
 	check(model.enemies.size() >= 8, "expanded field receives roughly twice the early invasion density")
 	model.reset(46)
-	model.player = Model.CENTER + Vector2.RIGHT * (Model.ACTIVITY_RADIUS - Model.PLAYER_RADIUS + 270)
+	model.player = Model.CENTER + Vector2.RIGHT * (Model.ACTIVITY_RADIUS - Model.PLAYER_RADIUS + Model.LAYER_WIDTH * 1.5)
 	model._spawn_timer = 100
 	var start: Vector2 = model.player
 	for i: int in range(80):
@@ -120,6 +124,9 @@ func _test_ui() -> void:
 	var game: Node2D = load("res://main.tscn").instantiate()
 	root.add_child(game)
 	game.set_physics_process(false)
+	if DisplayServer.get_name() != "headless":
+		var expected := Vector2i(960, 540) if "--capture-small" in OS.get_cmdline_user_args() else Vector2i(1600, 900)
+		check(DisplayServer.window_get_size() == expected, "actual desktop window uses requested size")
 	game.records.load_data("user://test_orbital_%d.json" % Time.get_ticks_usec())
 	game.sound.set_muted(true)
 	for layer: int in range(4):
