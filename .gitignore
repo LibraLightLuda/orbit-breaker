@@ -1,0 +1,7 @@
+.godot/
+build/
+artifacts/
+*.tmp
+
+.cleanup-archive/
+addons/

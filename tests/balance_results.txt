@@ -1,0 +1,8 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+BALANCE mode=normal seed=7 state=won seconds=300.0 level=21 kills=564 hp=200.0 hits=12 dashes=52 boss_down_at=255.1
+BALANCE mode=normal seed=42 state=lost seconds=257.4 level=17 kills=404 hp=0.0 hits=17 dashes=40 boss_down_at=0.0
+BALANCE mode=normal seed=2026 state=won seconds=300.0 level=22 kills=567 hp=200.0 hits=15 dashes=54 boss_down_at=255.9
+BALANCE mode=relaxed seed=7 state=won seconds=300.0 level=22 kills=567 hp=244.1 hits=23 dashes=51 boss_down_at=257.4
+BALANCE mode=relaxed seed=42 state=won seconds=300.0 level=22 kills=561 hp=250.0 hits=13 dashes=52 boss_down_at=256.4
+BALANCE mode=relaxed seed=2026 state=won seconds=300.0 level=21 kills=563 hp=250.0 hits=16 dashes=48 boss_down_at=256.5
