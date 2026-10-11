@@ -20,10 +20,10 @@
 
 ## 현재 두 세대 (2026-10-11)
 
-- 최신: build/current/OrbitBreaker.exe, 3.2 세 기체 고유 능력. SHA-256 70354E66D53A6137FE28C4D1A3A700ADF75FA607DD4A769AF23F5F9850564E02. 검증 자료 artifacts/current/.
-- 직전: build/previous/OrbitBreaker.exe, 3.1 진행·로컬 랭킹·심우주. SHA-256 1A0EBCD603638518CD4F642940B2D36A2BD703DE227333E42641783321113412. 기존 체크섬·플레이 안내·대응 검증 명세·화면과 로그를 artifacts/previous/와 함께 보존했다. 이전 실행 파일의 해시가 이동 전후 동일하다.
+- 최신: build/current/OrbitBreaker.exe, 3.3 원형 궤도·세 외곽층·침공·충전 표시. SHA-256 61B16382FAACD6E3AFAA4985E8D1407F8D2BCF4002598D9B44441411BEF53A7E. 검증 자료 artifacts/current/.
+- 직전: build/previous/OrbitBreaker.exe, 3.2 세 기체 고유 능력. SHA-256 70354E66D53A6137FE28C4D1A3A700ADF75FA607DD4A769AF23F5F9850564E02. 기존 체크섬·플레이 안내·대응 검증 명세·화면과 로그를 artifacts/previous/와 함께 보존했다. 이전 실행 파일의 해시가 이동 전후 동일하다.
 - 최신 Windows/웹 후보의 필수 검사·내보내기·실행을 확인한 뒤 역할을 갱신했다. web/은 현재 웹 배포와 동일한 게시용 복사본이며 별도 세대가 아니다.
-- **정리 차단**: 오래된 3.0은 build/retiring 및 artifacts/retiring에 임시로 남아 있다. 안전한 경로 검사를 포함한 일괄 삭제와 개별 파일 삭제 모두 실행 도구의 자동 승인 검토에서 `blocked by policy`로 거부됐다. 상세 사유는 제공되지 않았다. 무기한 아카이브가 아니며 두 세대 보관 정리는 미완료다. artifacts/current/server.cjs 및 release-stdout.log / release-stderr.log 임시 자료도 같은 삭제 차단으로 남았다.
+- **정리 차단**: 오래된 3.0은 build/retiring 및 artifacts/retiring, 3.1은 build/retiring-3.1 및 artifacts/retiring-3.1에 임시로 남아 있다. 앞선 작업에서 안전한 경로 검사를 포함한 일괄 삭제와 개별 파일 삭제 모두 실행 도구의 자동 승인 검토에서 `blocked by policy`로 거부됐고 상세 사유는 제공되지 않았다. 이 차단이 해결되지 않아 두 세대 보관 정리는 미완료다. 무기한 아카이브가 아니며 삭제 대기 위치다. 현재/직전 자료의 release-stdout.log / release-stderr.log와 직전 server.cjs 임시 자료도 남았다.
 - .cleanup-archive 안의 더 오래된 실행 파일·화면·로그·임시 체크섬·정리 스크립트를 제거했다. 게임 소스 스냅샷(5개 .gd 및 .uid)과 과거 README/SURVIVAL 설계 문서는 사용자 보호 규칙에 따라 유지한다. 이 위치에 오래된 실행 파일·배포 검증 로그를 별도 아카이브로 보관하지 않는다.
-- 플레이어 저장 및 설정은 정리하지 않았다. 임시 실패 로그·중간 내보내기 로그·검증용 서버 스크립트는 최종 자료에서 제거했다.
+- 플레이어 저장 및 설정은 정리하지 않았다. 정리 차단 전에 제거한 구자료와 현재 삭제 대기 자료를 구분하며, 위에 명시한 임시 자료는 제거 완료로 표시하지 않는다.
 - tools/build.ps1은 항상 build/candidate로 내보낸다. 정상본을 직접 덮어쓰지 않는다. 이후 교체도 필수 검사와 Windows/웹 실행 확인을 끝낸 뒤 이 문서의 보존·갱신 순서대로 진행한다.

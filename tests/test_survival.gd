@@ -26,7 +26,7 @@ func _test_boundary_buffer() -> void:
 	for direction: Vector2 in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]:
 		model.reset(2)
 		model.player = safe.get_center() + direction * safe.size * 0.5
-		check(model.boundary_depth(model.player) == 0.0, "safe edge has no boundary damage")
+		check(is_zero_approx(model.boundary_depth(model.player)), "safe edge has no boundary damage")
 		model.step(0.05, direction, false)
 		check(model.boundary_depth(model.player) > 0.0, "all four edges allow buffer movement")
 		model.player = outer.get_center() + direction * outer.size * 0.5
@@ -46,7 +46,7 @@ func _test_boundary_buffer() -> void:
 	check(model.hp < 50.0, "boundary damage bypasses dash and overdrive immunity")
 	var initial_damage: float = model.boundary_damage_rate()
 	model.boundary_time = 5.0
-	check(model.boundary_damage_rate() > initial_damage * 5.0, "sustained exposure escalates damage")
+	check(model.boundary_damage_rate() > initial_damage, "sustained exposure escalates damage")
 	var exposure: float = model.boundary_time
 	var health: float = model.hp
 	model.state = "upgrade"

@@ -48,7 +48,7 @@ func _run_case(ship_id: String, sector_id: String, difficulty: String) -> Dictio
 		if model.overdrive_meter >= 100.0 and model.activate_overdrive():
 			overdrives += 1
 		var phase: float = model.elapsed * 0.48
-		var target := Model.ARENA.get_center() + Vector2(cos(phase) * 408.0, sin(phase) * 180.0)
+		var target := Model.CENTER + Vector2.from_angle(phase) * 408.0
 		var closest_enemy := 1000.0
 		var avoid := Vector2.ZERO
 		for enemy: Dictionary in model.enemies:
@@ -73,10 +73,8 @@ func _run_case(ship_id: String, sector_id: String, difficulty: String) -> Dictio
 				avoid += (model.player - Vector2(shot.pos)).normalized() * 0.35
 		var hazard_avoid := _avoid_hazards(model)
 		var move: Vector2 = (target - model.player).normalized() + avoid + hazard_avoid
-		if model.player.x < 115.0: move.x = maxf(move.x, 0.7)
-		if model.player.x > 1165.0: move.x = minf(move.x, -0.7)
-		if model.player.y < 172.0: move.y = maxf(move.y, 0.7)
-		if model.player.y > 600.0: move.y = minf(move.y, -0.7)
+		if model.player.distance_to(Model.CENTER) > Model.ACTIVITY_RADIUS - 70.0:
+			move = (Model.CENTER - model.player).normalized() * 1.5 + avoid * 0.2
 		model.step(1.0 / 60.0, move, closest_enemy < 45.0 or bullet_close or hazard_avoid.length() > 1.8)
 		if model.events.has("hurt"): hits += 1
 		if model.events.has("dash"): dashes += 1

@@ -2,9 +2,12 @@ class_name RunModel
 extends RefCounted
 
 const Content = preload("res://scripts/game_content.gd")
-const ARENA := Rect2(72, 128, 1136, 516)
+const CENTER := Vector2(640, 386)
+const ACTIVITY_RADIUS := sqrt(1136.0 * 516.0 * 2.0 / PI)
+const ARENA := Rect2(CENTER - Vector2.ONE * ACTIVITY_RADIUS, Vector2.ONE * ACTIVITY_RADIUS * 2.0)
 const PLAYER_RADIUS := 13.0
-const BOUNDARY_BUFFER := 640.0
+const LAYER_WIDTH := 180.0
+const BOUNDARY_BUFFER := LAYER_WIDTH * 3.0
 const FLIGHT_BOUNDS := Rect2(ARENA.position - Vector2.ONE * BOUNDARY_BUFFER, ARENA.size + Vector2.ONE * BOUNDARY_BUFFER * 2.0)
 const UPGRADE_IDS := ["orbit", "orbit_range", "blade", "frost", "power", "rapid", "magnet", "speed", "vitality", "dash", "repair", "missile", "chain", "pulse"]
 
@@ -27,6 +30,7 @@ var score := 0
 var combo := 0
 var dash_cooldown := 0.0
 var dash_time := 0.0
+var dash_recharge_total := 3.0
 var enemies: Array[Dictionary] = []
 var gems: Array[Dictionary] = []
 var shots: Array[Dictionary] = []
@@ -99,6 +103,7 @@ func reset(seed_value: int = 0, difficulty: String = "normal", selected_ship: St
 	combo = 0
 	dash_cooldown = 0.0
 	dash_time = 0.0
+	dash_recharge_total = float(_ship.dash)
 	enemies.clear()
 	gems.clear()
 	shots.clear()
@@ -252,6 +257,7 @@ func step(delta: float, move: Vector2, dash_pressed: bool) -> void:
 		if ship_id == "scout":
 			slipstream_time = 1.6
 		dash_cooldown = maxf(0.8, float(_ship.dash) - float(upgrades.get("dash", 0)) * 0.35)
+		dash_recharge_total = dash_cooldown
 		invulnerable = 0.34
 		_dash_id += 1
 		_effect(player, "dash", 55.0, 0.25)
@@ -282,11 +288,11 @@ func step(delta: float, move: Vector2, dash_pressed: bool) -> void:
 		if _elite_stage == 2:
 			elite.hp *= 1.6
 			elite.max_hp = elite.hp
-		_announce("돌격 정예 출현" if _elite_stage == 1 else "포격 정예 출현", "elite")
+		_announce("심우주 침공 · " + ("돌격 정예 접근 중" if _elite_stage == 1 else "포격 정예 접근 중"), "elite")
 	if elapsed >= 240.0 and not boss_spawned:
 		boss_spawned = true
 		spawn_enemy("boss")
-		_announce("최종 지휘체 출현", "boss")
+		_announce("심우주 침공 경보 · 최종 지휘체 접근 중", "boss")
 	_shot_timer -= dt
 	if _shot_timer <= 0.0:
 		_fire_player_shot()
@@ -330,23 +336,37 @@ func _update_vitals(dt: float) -> void:
 		_finish_run("boundary" if boundary_damage_rate() > 0.0 else "decay")
 
 func boundary_depth(position: Vector2) -> float:
-	var excess := (position - ARENA.get_center()).abs() - (ARENA.size * 0.5 - Vector2.ONE * PLAYER_RADIUS)
-	return clampf(maxf(excess.x, excess.y) / BOUNDARY_BUFFER, 0.0, 1.0)
+	return clampf((position.distance_to(CENTER) - (ACTIVITY_RADIUS - PLAYER_RADIUS)) / BOUNDARY_BUFFER, 0.0, 1.0)
+
+func boundary_layer(position: Vector2) -> int:
+	var excess := position.distance_to(CENTER) - (ACTIVITY_RADIUS - PLAYER_RADIUS)
+	return 0 if excess <= 0.0 else mini(3, ceili(excess / LAYER_WIDTH))
+
+func dash_charge() -> float:
+	return clampf(1.0 - dash_cooldown / maxf(0.01, dash_recharge_total), 0.0, 1.0)
 
 func boundary_drag(position: Vector2) -> float:
-	return lerpf(1.0, 0.08, smoothstep(0.0, 1.0, boundary_depth(position)))
+	var layer_depth := boundary_depth(position) * 3.0
+	if layer_depth <= 1.0:
+		return lerpf(1.0, 0.9, smoothstep(0.0, 1.0, layer_depth))
+	if layer_depth <= 2.0:
+		return lerpf(0.9, 0.6, smoothstep(0.0, 1.0, layer_depth - 1.0))
+	return lerpf(0.6, 0.06, smoothstep(0.0, 1.0, layer_depth - 2.0))
 
 func boundary_current(position: Vector2) -> Vector2:
-	var safe := ARENA.grow(-PLAYER_RADIUS)
-	var nearest := Vector2(clampf(position.x, safe.position.x, safe.end.x), clampf(position.y, safe.position.y, safe.end.y))
-	var distance := position.distance_to(nearest)
-	return (nearest - position).normalized() * 1800.0 * pow(distance / BOUNDARY_BUFFER, 2.0)
+	var distance := maxf(0.0, position.distance_to(CENTER) - (ACTIVITY_RADIUS - PLAYER_RADIUS))
+	return (CENTER - position).normalized() * 1800.0 * pow(distance / BOUNDARY_BUFFER, 3.0)
 
 func ranked_score() -> int:
 	return int(score * float(Content.mode_info(mode).score))
 
 func boundary_damage_rate() -> float:
-	return boundary_depth(player) * (2.0 + 1.5 * boundary_time + 0.6 * boundary_time * boundary_time)
+	var depth := boundary_depth(player) * 3.0
+	if depth <= 1.0:
+		return depth * (4.0 + 0.25 * boundary_time)
+	if depth <= 2.0:
+		return lerpf(4.0, 100.0, pow(depth - 1.0, 0.5)) + boundary_time * 2.0
+	return 100.0 + 240.0 * (depth - 2.0) + 20.0 * boundary_time
 
 func net_hull_rate() -> float:
 	return regeneration_rate() - decay_rate() - boundary_damage_rate()
@@ -361,8 +381,8 @@ func _finish_run(reason: String) -> void:
 	_update_run_stats()
 
 func movement_multiplier(position: Vector2) -> float:
-	var offset := (position - ARENA.get_center()).abs() / (ARENA.size * 0.5 - Vector2.ONE * PLAYER_RADIUS)
-	var edge := clampf((maxf(offset.x, offset.y) - 0.25) / 0.75, 0.0, 1.0)
+	var offset := position.distance_to(CENTER) / (ACTIVITY_RADIUS - PLAYER_RADIUS)
+	var edge := clampf((offset - 0.25) / 0.75, 0.0, 1.0)
 	edge = edge * edge * (3.0 - 2.0 * edge)
 	var floor_speed := lerpf(1.0, 0.8, clampf(elapsed / 300.0, 0.0, 1.0)) if elapsed <= 300.0 else lerpf(0.8, 0.6, clampf((elapsed - 300.0) / 300.0, 0.0, 1.0))
 	return lerpf(1.0, floor_speed, edge) * boundary_drag(position)
@@ -387,12 +407,14 @@ func _spawn_kind() -> String:
 
 func spawn_enemy(kind: String, position: Vector2 = Vector2.INF) -> Dictionary:
 	var point := position
+	var spawn_layer := 0
 	if not point.is_finite():
-		match rng.randi_range(0, 3):
-			0: point = Vector2(ARENA.position.x - 18.0, rng.randf_range(ARENA.position.y, ARENA.end.y))
-			1: point = Vector2(ARENA.end.x + 18.0, rng.randf_range(ARENA.position.y, ARENA.end.y))
-			2: point = Vector2(rng.randf_range(ARENA.position.x, ARENA.end.x), ARENA.position.y - 18.0)
-			3: point = Vector2(rng.randf_range(ARENA.position.x, ARENA.end.x), ARENA.end.y + 18.0)
+		spawn_layer = 4 if kind in ["elite", "boss"] else (3 if kind == "shooter" else (2 if kind == "tank" else rng.randi_range(1, 2)))
+		var radius := ACTIVITY_RADIUS + (spawn_layer - 1) * LAYER_WIDTH + rng.randf_range(40.0, 130.0)
+		point = CENTER + Vector2.from_angle(rng.randf_range(0.0, TAU)) * radius
+		if point.distance_to(player) < 180.0:
+			point = CENTER - (point - CENTER)
+		_effect(point, "arrival", 36.0 if spawn_layer < 4 else 70.0, 1.4)
 	var stats: Array = {
 		"chaser": [23.0, 62.0, 13.0, 10.0, 1.0],
 		"runner": [18.0, 115.0, 10.0, 9.0, 1.0],
@@ -405,6 +427,9 @@ func spawn_enemy(kind: String, position: Vector2 = Vector2.INF) -> Dictionary:
 	health *= float(Content.mode_info(mode).health)
 	var enemy := {"pos": point, "hp": health, "max_hp": health, "speed": float(stats[1]) * (0.8 if mode == "relaxed" else 1.0), "radius": float(stats[2]), "damage": float(stats[3]), "value": float(stats[4]), "kind": kind, "flash": 0.0, "angle": 0.0, "orbit_timer": 0.0, "shot_timer": rng.randf_range(1.7, 3.0), "warn": 0.0, "aim": Vector2.RIGHT, "dash_id": -1, "elite_index": 1, "charge_time": 0.0, "phase": 1}
 	enemies.append(enemy)
+	enemy.spawn_layer = spawn_layer
+	if spawn_layer == 4:
+		_announce("심우주 침공 경보 · " + ("지휘체" if kind == "boss" else "정예") + " 접근 중", "invasion")
 	enemy.speed *= float(Content.mode_info(mode).speed)
 	return enemy
 
@@ -443,7 +468,7 @@ func _update_enemies(dt: float, old_position: Vector2) -> void:
 			enemy.charge_time = maxf(0.0, float(enemy.charge_time) - dt)
 			movement = Vector2(enemy.aim) * 4.5
 		enemy.slow_time = maxf(0.0, float(enemy.get("slow_time", 0.0)) - dt)
-		enemy.pos += movement * float(enemy.speed) * (float(enemy.get("slow_factor", 1.0)) if float(enemy.slow_time) > 0.0 else 1.0) * dt
+		enemy.pos += movement * float(enemy.speed) * (0.7 if int(enemy.get("spawn_layer", 0)) == 4 and Vector2(enemy.pos).distance_to(CENTER) > ACTIVITY_RADIUS else 1.0) * (float(enemy.get("slow_factor", 1.0)) if float(enemy.slow_time) > 0.0 else 1.0) * dt
 		if dash_time > 0.0 and int(enemy.dash_id) != _dash_id:
 			var closest := Geometry2D.get_closest_point_to_segment(enemy.pos, old_position, player)
 			if closest.distance_to(enemy.pos) < float(enemy.radius) + 28.0:
@@ -702,7 +727,7 @@ func _update_weapons(dt: float) -> void:
 func _add_blast(position: Vector2, radius: float) -> void:
 	if hazards.size() >= 6:
 		return
-	var point := Vector2(clampf(position.x, ARENA.position.x + radius, ARENA.end.x - radius), clampf(position.y, ARENA.position.y + radius, ARENA.end.y - radius))
+	var point := CENTER + (position - CENTER).limit_length(ACTIVITY_RADIUS - radius)
 	hazards.append({"kind": "blast", "pos": point, "radius": radius, "rect": Rect2(), "warn": 1.6, "ttl": 0.35, "active": false})
 
 func _add_lane() -> void:
@@ -710,7 +735,9 @@ func _add_lane() -> void:
 		return
 	var vertical := rng.randf() < 0.5
 	var width := 62.0 if mode == "relaxed" else 74.0
-	var rect := Rect2(Vector2(clampf(player.x - width * 0.5, ARENA.position.x, ARENA.end.x - width), ARENA.position.y), Vector2(width, ARENA.size.y)) if vertical else Rect2(Vector2(ARENA.position.x, clampf(player.y - width * 0.5, ARENA.position.y, ARENA.end.y - width)), Vector2(ARENA.size.x, width))
+	var offset := clampf((player.x - CENTER.x) if vertical else (player.y - CENTER.y), -ACTIVITY_RADIUS + width, ACTIVITY_RADIUS - width)
+	var half_length := sqrt(ACTIVITY_RADIUS * ACTIVITY_RADIUS - pow(absf(offset) + width * 0.5, 2.0))
+	var rect := Rect2(CENTER + Vector2(offset - width * 0.5, -half_length), Vector2(width, half_length * 2.0)) if vertical else Rect2(CENTER + Vector2(-half_length, offset - width * 0.5), Vector2(half_length * 2.0, width))
 	hazards.append({"kind": "lane", "pos": rect.get_center(), "radius": 0.0, "rect": rect, "warn": 1.5, "ttl": 1.1, "active": false})
 
 func _update_hazards(dt: float) -> void:
@@ -723,7 +750,7 @@ func _update_hazards(dt: float) -> void:
 			_add_lane()
 		else:
 			_add_blast(player, 72.0)
-			_add_blast(ARENA.position + Vector2(rng.randf_range(100.0, ARENA.size.x - 100.0), rng.randf_range(90.0, ARENA.size.y - 90.0)), 68.0)
+			_add_blast(CENTER + Vector2.from_angle(rng.randf_range(0.0, TAU)) * sqrt(rng.randf()) * (ACTIVITY_RADIUS - 68.0), 68.0)
 		_announce("전기 통로 충전 · 표시 구역 이탈" if sector_id == "storm" else "포격 경보 · 노란 예고 원 이탈", "hazard")
 	for i in range(hazards.size() - 1, -1, -1):
 		var hazard: Dictionary = hazards[i]

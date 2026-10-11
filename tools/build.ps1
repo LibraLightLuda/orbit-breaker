@@ -45,6 +45,8 @@ Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script
     -SuccessPattern '(?m)^EXPANSION SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_ships.gd') `
     -SuccessPattern '(?m)^SHIP SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_orbital.gd') `
+    -SuccessPattern '(?m)^ORBITAL SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_balance.gd') `
     -SuccessPattern '(?m)^BALANCE SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_support.gd') `

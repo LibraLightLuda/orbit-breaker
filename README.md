@@ -1,6 +1,6 @@
-# ORBIT BREAKER 3.2
+# ORBIT BREAKER 3.3
 
-우주 생존 액션: 회복과 무기 강화를 조합하여 5분을 돌파하고 최대 10분까지 생존하세요.
+우주 생존 액션: 두 배 면적의 원형 활동영역에서 외계 침공을 막고 최대 10분까지 생존하세요. 바깥의 희박권·붕괴권·소멸권은 단계마다 손상과 감속이 강해집니다. 원형 항법도로 경계와 강적의 침공 방향을 확인하고, 하단 스킬 게이지가 차면 돌진과 오버드라이브를 사용하세요.
 
 스트라이커는 연속 사격으로 최대 +40% 화력, 스카우트는 강한 돌진과 대시 후 +35% 가속, 배스천은 8초마다 피해를 줄이는 반격 방벽을 활용합니다. 선택 화면과 전투 중 상태 표시로 각 기체의 강점과 재사용 조건을 확인하세요.
 
@@ -16,6 +16,6 @@
 
 빌드는 tools/build.ps1로 검사 후 build/candidate에 생성합니다. 정상 배포를 먼저 덮어쓰지 않으며 검증 완료 후 최신·직전 두 세대만 보관합니다.
 
-[게임 규칙](docs/SURVIVAL_V3.md) · [검증](docs/VALIDATION_V3.md) · [보관 정책](docs/ARTIFACT_RETENTION.md)
+[통합 게임 기획서](docs/SURVIVAL_V3.md) · [검증](docs/VALIDATION_V3.md) · [보관 정책](docs/ARTIFACT_RETENTION.md)
 
 Noto Sans KR: assets/fonts/OFL.txt (SIL Open Font License 1.1). Godot 라이선스는 게임 제작 정보에서 확인할 수 있습니다.
