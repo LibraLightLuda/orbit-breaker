@@ -49,7 +49,15 @@ Chromium에서 VERSION 3.4, 기존 localhost 최고 1,065/업적 35점 보존, �
 
 ## 공개 배포
 
-공개 게시 확인 진행 중. 로컬 최종 후보 검증을 통과한 상태다. 게시 성공·공개 해시 대조·공개 브라우저 표시 후 이 항목을 갱신한다.
+- 웹: https://libralightluda.github.io/orbit-breaker/?v=3.4
+- Windows: https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.4.0
+- 소스: https://github.com/LibraLightLuda/orbit-breaker
+
+Pages 작업 https://github.com/LibraLightLuda/orbit-breaker/actions/runs/38106518968 가 completed/success로 완료됐다. 공개 웹 HTTP 200, index.pck SHA-256 FC6DD5747980CC8229F3512A3C625E4513CD6A9B6EA7FCD7EB3CBBAE2C88B3DE가 로컬 최신본과 일치한다. 공개 Chromium에서 로딩 후 VERSION 3.4 타이틀을 확인했고 경고·오류 로그는 비었다. 공개 사이트에서는 출격하지 않아 실제 기록을 변경하지 않았다.
+
+Windows v3.4.0 업로드 digest F670C4CF121D45A13FD802FE1A54D00574D14B04A3207365E3BB682236A5BCE5가 로컬 최신 실행 파일과 일치한다. 직전 v3.3.0 digest도 로컬 직전본과 대조했다. 두 정상본 확인 후 v3.2.0 Release 및 첨부 파일을 정리해 GitHub 공개 Release는 v3.4.0/v3.3.0 두 세대만 남겼다. 과거 Git 소스 태그는 유지한다. 게임 소스/웹 커밋은 3ac27b2다.
+
+공개 검증 증거: artifacts/current/public-verification.txt 및 web-validation.txt.
 
 ## 남은 한계
 
