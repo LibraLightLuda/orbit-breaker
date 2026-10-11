@@ -2,7 +2,7 @@
 
 검증일: 2026-10-11 (한국 시간). Godot 4.7.1 stable. 현재 규칙은 SURVIVAL_V3.md다.
 
-현재 Windows 배포본: build/current/OrbitBreaker.exe (116049200 bytes). SHA-256: 1A0EBCD603638518CD4F642940B2D36A2BD703DE227333E42641783321113412. 내장 데이터 Release를 실제 OpenGL로 180프레임 실행했고 종료 코드 0 및 오류 없음 확인. 직전 정상본은 build/previous/OrbitBreaker.exe에 보존했다. 직전 SHA-256은 6DECA51300CB7324FC0B871DA54A1FE2021BAEA916BD13332327975B563CC30B이며 이동 전후 일치한다. 검증 자료는 artifacts/current와 artifacts/previous다. 웹 파일은 web/ 및 build/current/web/이며 같은 세대의 동일 파일이다. GitHub Pages 공개 확인은 배포 후 갱신한다.
+현재 Windows 배포본: build/current/OrbitBreaker.exe (116049200 bytes). SHA-256: 1A0EBCD603638518CD4F642940B2D36A2BD703DE227333E42641783321113412. 내장 데이터 Release를 실제 OpenGL로 180프레임 실행했고 종료 코드 0 및 오류 없음 확인. 직전 정상본은 build/previous/OrbitBreaker.exe에 보존했다. 직전 SHA-256은 6DECA51300CB7324FC0B871DA54A1FE2021BAEA916BD13332327975B563CC30B이며 이동 전후 일치한다. 검증 자료는 artifacts/current와 artifacts/previous다. 웹 파일은 web/ 및 build/current/web/이며 같은 세대의 동일 파일이다. GitHub Pages 공개와 실브라우저 렌더링 확인을 완료했다.
 
 ## 검증 범위
 
@@ -10,7 +10,7 @@
 
 실제 OpenGL UI는 1280×720과 960×540에서 확인한다. 테스트의 저장 경로는 실제 플레이어 기록과 분리한다. 새 화면을 포함한 캡처는 상태 주입 검사 장면이며 사람의 실전 플레이 기록이 아니다.
 
-브라우저 로컬 후보에서 실제 키/마우스 입력으로 출격 → 외곽 이동/카메라 추적 → 종료 → 업적/이름별 랭킹 저장 → 랭킹에서 고스트 재생을 확인했다. 페이지 새로고침 후 최고 점수 205와 업적 5점이 유지됐다. 이 경로에서 브라우저 오류·경고 로그는 없었다. 공개 주소 검증은 배포 후 별도로 기록한다.
+브라우저 로컬 후보에서 실제 키/마우스 입력으로 출격 → 외곽 이동/카메라 추적 → 종료 → 업적/이름별 랭킹 저장 → 랭킹에서 고스트 재생을 확인했다. 페이지 새로고침 후 최고 점수 205와 업적 5점이 유지됐다. 이 경로에서 브라우저 오류·경고 로그는 없었다. 공개 주소에서도 최종 게임 타이틀의 실제 렌더링 및 오류·경고 없음 확인을 완료했다.
 
 ## 한계
 
@@ -36,3 +36,13 @@ OpenGL 화면 검사는 두 해상도(1280×720, 960×540) 각각 기존 UI 79/7
 소스 타이틀 종료 시 ObjectDB 객체 2개 누수 경고가 기록됐다. 스크립트 오류는 없으며 내보낸 최종 실행 파일의 별도 180프레임 실행에는 이 경고와 오류가 없었다. 이 경고를 숨기거나 오류 0과 같은 의미로 취급하지 않는다.
 
 최종 웹 파일을 다시 연 뒤 기존 점수 205/업적 5점과 이름별 랭킹 및 고스트 재생을 재확인했다. 한글 글꼴 가중치를 수정하여 최종 후보의 정상 표시를 확인했다.
+
+## 공개 배포
+
+- 웹: https://libralightluda.github.io/orbit-breaker/
+- 소스: https://github.com/LibraLightLuda/orbit-breaker
+- Windows 다운로드: https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.1.0
+- Pages 작업: https://github.com/LibraLightLuda/orbit-breaker/actions/runs/38102205941 (completed / success).
+- 공개 웹 HTTP 200 및 실제 Chromium 렌더링 확인. 브라우저 오류·경고 로그 없음. 공개 index.pck의 SHA-256 E17535F8E7918B093A36A599100C05E278AF6EBBBA87301E2067F9D6BD87D89E 는 로컬 최종 후보와 일치한다.
+- GitHub Release의 OrbitBreaker.exe 업로드 digest는 1A0EBCD603638518CD4F642940B2D36A2BD703DE227333E42641783321113412 로 로컬 최신 실행 파일과 일치한다.
+- 최초 공개 게임 소스/웹 커밋: 61dbbec. 이후 문서 커밋은 게임 코드와 내보낸 바이너리를 변경하지 않는다.
