@@ -66,6 +66,10 @@ var _overdrives := 0
 var boundary_returns := 0
 var _outside := false
 var peak_combo := 0
+var firing_heat := 0
+var firing_heat_time := 0.0
+var slipstream_time := 0.0
+var guard_cooldown := 0.0
 
 func reset(seed_value: int = 0, difficulty: String = "normal", selected_ship: String = "striker", selected_sector: String = "ring") -> void:
 	mode = difficulty if difficulty in Content.MODE_IDS else "normal"
@@ -128,6 +132,10 @@ func reset(seed_value: int = 0, difficulty: String = "normal", selected_ship: St
 	boundary_returns = 0
 	_outside = false
 	peak_combo = 0
+	firing_heat = 0
+	firing_heat_time = 0.0
+	slipstream_time = 0.0
+	guard_cooldown = 0.0
 	_update_run_stats()
 
 static func upgrade_info(id: String) -> Dictionary:
@@ -224,6 +232,11 @@ func step(delta: float, move: Vector2, dash_pressed: bool) -> void:
 	if state != "playing":
 		return
 	overdrive_time = maxf(0.0, overdrive_time - dt)
+	firing_heat_time = maxf(0.0, firing_heat_time - dt)
+	if firing_heat_time <= 0.0:
+		firing_heat = 0
+	slipstream_time = maxf(0.0, slipstream_time - dt)
+	guard_cooldown = maxf(0.0, guard_cooldown - dt)
 	event_remaining = maxf(0.0, event_remaining - dt)
 	dash_cooldown = maxf(0.0, dash_cooldown - dt)
 	dash_time = maxf(0.0, dash_time - dt)
@@ -236,13 +249,15 @@ func step(delta: float, move: Vector2, dash_pressed: bool) -> void:
 		facing = direction.normalized()
 	if dash_pressed and dash_cooldown <= 0.0:
 		dash_time = 0.20
+		if ship_id == "scout":
+			slipstream_time = 1.6
 		dash_cooldown = maxf(0.8, float(_ship.dash) - float(upgrades.get("dash", 0)) * 0.35)
 		invulnerable = 0.34
 		_dash_id += 1
 		_effect(player, "dash", 55.0, 0.25)
 		events.append("dash")
 	var old_position := player
-	var speed := base_speed() * movement_multiplier(player)
+	var speed := base_speed() * movement_multiplier(player) * (1.35 if slipstream_time > 0.0 else 1.0)
 	# Let an inward dash escape the buffer even at maximum drag.
 	var dash_speed := 940.0 * (boundary_drag(player) if boundary_depth(player + facing) > boundary_depth(player) else 1.0)
 	player += (facing * dash_speed if dash_time > 0.0 else direction * speed) * dt
@@ -433,7 +448,7 @@ func _update_enemies(dt: float, old_position: Vector2) -> void:
 			var closest := Geometry2D.get_closest_point_to_segment(enemy.pos, old_position, player)
 			if closest.distance_to(enemy.pos) < float(enemy.radius) + 28.0:
 				enemy.dash_id = _dash_id
-				_hit_enemy(enemy, (52.0 + float(upgrades.get("dash", 0)) * 15.0) * power)
+				_hit_enemy(enemy, (52.0 + float(upgrades.get("dash", 0)) * 15.0) * power * (1.75 if ship_id == "scout" else 1.0))
 		if float(enemy.orbit_timer) <= 0.0:
 			for j in orbit_count:
 				var orb := orbit_position(j)
@@ -468,6 +483,9 @@ func _fire_player_shot() -> void:
 		return
 	var direction := (Vector2(nearest.pos) - player).normalized()
 	shots.append({"pos": player, "velocity": direction * 590.0, "friendly": true, "radius": 5.0, "damage": 19.0 * _power(), "ttl": 1.45})
+	if ship_id == "striker":
+		firing_heat = mini(5, firing_heat + 1)
+		firing_heat_time = 2.0
 	events.append("shot")
 
 func _fire_enemy_shots(enemy: Dictionary) -> void:
@@ -527,6 +545,16 @@ func _update_shots(dt: float) -> void:
 func take_damage(amount: float) -> void:
 	if state != "playing" or invulnerable > 0.0 or amount <= 0.0:
 		return
+	if ship_id == "bastion" and guard_cooldown <= 0.0:
+		amount *= 0.4
+		guard_cooldown = 8.0
+		for enemy: Dictionary in enemies:
+			if float(enemy.hp) > 0.0 and player.distance_to(enemy.pos) <= 125.0 + float(enemy.radius):
+				_hit_enemy(enemy, 40.0 * _power())
+				enemy.pos += (Vector2(enemy.pos) - player).normalized() * 45.0
+		_effect(player, "guard", 125.0, 0.35)
+	firing_heat = 0
+	firing_heat_time = 0.0
 	hp = maxf(0.0, hp - amount * (0.75 if mode == "relaxed" else 1.0) * float(Content.mode_info(mode).damage) * (0.55 if overdrive_time > 0.0 else 1.0))
 	invulnerable = 0.70
 	combo = 0
@@ -605,7 +633,7 @@ func activate_overdrive() -> bool:
 	return true
 
 func _power() -> float:
-	return float(_ship.power) * (1.0 + float(upgrades.get("power", 0)) * 0.25) * (1.45 if overdrive_time > 0.0 else 1.0)
+	return float(_ship.power) * (1.0 + float(upgrades.get("power", 0)) * 0.25) * (1.45 if overdrive_time > 0.0 else 1.0) * (1.0 + firing_heat * 0.08 if ship_id == "striker" else 1.0)
 
 func _check_evolutions() -> void:
 	for id: String in Content.EVOLUTION_IDS:

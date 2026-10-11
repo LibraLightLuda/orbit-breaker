@@ -16,9 +16,9 @@ static func mode_info(id: String) -> Dictionary:
 
 static func ship_info(id: String) -> Dictionary:
 	var ships := {
-		"striker": {"id": "striker", "name": "스트라이커", "description": "균형형 · 체력 100 · 기본 화력 100%", "color": Color("62e8d8"), "hp": 100.0, "speed": 218.0, "dash": 3.0, "orbits": 3, "power": 1.0},
-		"scout": {"id": "scout", "name": "스카우트", "description": "기동형 · 체력 80 · 빠른 이동과 대시 · 화력 90%", "color": Color("89baff"), "hp": 80.0, "speed": 255.0, "dash": 2.45, "orbits": 3, "power": 0.9},
-		"bastion": {"id": "bastion", "name": "배스천", "description": "방어형 · 체력 140 · 시작 위성 4개 · 느린 이동 · 화력 95%", "color": Color("ffcb75"), "hp": 140.0, "speed": 185.0, "dash": 3.35, "orbits": 4, "power": 0.95},
+		"striker": {"id": "striker", "name": "스트라이커", "description": "연속 사격: 화력 +8%씩, 최대 +40%\n피격 / 2초간 사격 중단 시 초기화", "color": Color("62e8d8"), "hp": 100.0, "speed": 218.0, "dash": 3.0, "orbits": 3, "power": 1.0},
+		"scout": {"id": "scout", "name": "스카우트", "description": "돌파형 · 돌진 피해 ×1.75\n대시 후 1.4초 가속 +35% · 치고 빠지기", "color": Color("89baff"), "hp": 80.0, "speed": 255.0, "dash": 2.45, "orbits": 3, "power": 0.9},
+		"bastion": {"id": "bastion", "name": "배스천", "description": "요새형 · 8초마다 방벽: 피격 피해 -60%\n방벽 피격 시 근거리 반격 · 시작 위성 4기", "color": Color("ffcb75"), "hp": 140.0, "speed": 185.0, "dash": 3.35, "orbits": 4, "power": 0.95},
 	}
 	return ships.get(id, ships.striker).duplicate()
 

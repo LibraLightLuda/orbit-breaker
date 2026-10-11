@@ -290,7 +290,7 @@ func _show_menu() -> void:
 	_button("설정", Rect2(410, 468, 148, 50), _show_settings)
 	_label("최고 %s   /   돌파 %d회   /   업적 %d점" % [_number(int(records.data.best_score)), int(records.data.wins), Achievements.points(records.data.achievements)], Rect2(80, 565, 660, 30), 18, MUTED)
 	_label("마우스 / WASD 이동    좌클릭 / SPACE 돌진    우클릭 / E 오버드라이브", Rect2(80, 642, 850, 30), 16, MUTED)
-	_label("VERSION 3.1  /  MADE WITH GODOT", Rect2(922, 650, 350, 24), 13, MUTED)
+	_label("VERSION 3.2  /  MADE WITH GODOT", Rect2(922, 650, 350, 24), 13, MUTED)
 
 func _wrap_label(text: String, rect: Rect2, size: int = 18, color: Color = MUTED, parent: Control = null) -> Label:
 	return _label(text, rect, size, color, parent, true)
@@ -459,6 +459,7 @@ func _resume() -> void:
 	_label("ORBIT / BREAKER", Rect2(48, 20, 250, 30), 20, LIME)
 	_label("%s / %s" % [GameContent.ship_info(run.ship_id).name, GameContent.sector_info(run.sector_id).name], Rect2(49, 48, 365, 21), 12, MUTED)
 	hud.hp = _label("", Rect2(48, 57, 280, 26), 18)
+	hud.trait = _label("", Rect2(49, 96, 700, 24), 14, GameContent.ship_info(run.ship_id).color)
 	hud.speed = _label("", Rect2(336, 21, 164, 26), 16, SPEED_BLUE)
 	hud.speed_detail = _label("", Rect2(336, 66, 170, 20), 11, MUTED)
 	hud.time = _label("", Rect2(531, 22, 240, 46), 32)
@@ -487,6 +488,13 @@ func _update_hud() -> void:
 	if hud.is_empty():
 		return
 	hud.hp.text = "선체  %d / %d" % [ceili(run.hp), int(run.max_hp)]
+	match run.ship_id:
+		"striker":
+			hud.trait.text = "연속 포격  %d/5  ·  모든 화력 +%d%%  ·  피격 / 사격 중단 시 초기화" % [run.firing_heat, run.firing_heat * 8]
+		"scout":
+			hud.trait.text = "돌파 추진  ·  돌진 피해 ×1.75  ·  " + ("가속 +35%%  %.1f초" % maxf(0.0, run.slipstream_time - run.dash_time) if run.slipstream_time > 0.0 else "대시 후 1.4초 가속 +35%")
+		"bastion":
+			hud.trait.text = "반격 방벽  ·  " + ("준비 완료: 다음 피격 -60% + 근거리 반격" if run.guard_cooldown <= 0.0 else "재충전 %.1f초 / 8초" % run.guard_cooldown)
 	hud.time.text = "%s / %s" % [_time(run.elapsed), "05:00" if run.elapsed < 300.0 else "10:00"]
 	var net := run.net_hull_rate()
 	hud.vitals.text = "%s  %+.2f HP/초" % ["선체 붕괴 ▼" if net < 0.0 else ("선체 회복 ▲" if net > 0.0 else "선체 균형 −"), net]
@@ -784,7 +792,7 @@ func _draw_arena() -> void:
 			var middle := (start + end) * 0.5 + (end - start).orthogonal().normalized() * 12
 			draw_polyline(PackedVector2Array([start, middle, end]), Color(CYAN, life), 3, true)
 			continue
-		if str(effect.kind) == "missile":
+		if str(effect.kind) in ["missile", "guard"]:
 			color = GOLD
 		draw_arc(effect.pos, maxf(2, float(effect.get("radius", 20)) * (1.2 - life * 0.4)), 0, TAU, 22, Color(color, life * 0.65), 2, true)
 	for shot in run.shots:
@@ -821,6 +829,23 @@ func _draw_arena() -> void:
 	var ship_sides := 3 if run.ship_id == "scout" else (6 if run.ship_id == "bastion" else 4)
 	_polygon(player, 15, ship_sides, INK if hurt_flash > 0 else ship_color, run.facing.angle())
 	_polygon(player, 6, ship_sides, BG, run.facing.angle())
+	var wing := run.facing.orthogonal()
+	match run.ship_id:
+		"striker":
+			for side: float in [-1.0, 1.0]:
+				draw_line(player + wing * side * 8, player + wing * side * 8 + run.facing * 27, ship_color, 4, true)
+			for i: int in range(5):
+				draw_circle(player - run.facing * 22 + wing * (i - 2) * 7, 2.5, ship_color if i < run.firing_heat else LINE, true, -1, true)
+		"scout":
+			for side: float in [-1.0, 1.0]:
+				var tip := player - run.facing * 12 + wing * side * 22
+				draw_line(player + run.facing * 9, tip, ship_color, 2, true)
+				if run.slipstream_time > 0.0:
+					draw_line(tip, tip - run.facing * (24 if reduced else 48), Color(ship_color, 0.65), 3, true)
+		"bastion":
+			for side: float in [-1.0, 1.0]:
+				_polygon(player + wing * side * 18, 8, 6, ship_color, run.facing.angle())
+			draw_arc(player, 29, -PI / 2, -PI / 2 + TAU * maxf(0.01, 1.0 - run.guard_cooldown / 8.0), 40, ship_color, 3 if run.guard_cooldown <= 0.0 else 1, true)
 	if run.dash_cooldown <= 0:
 		draw_arc(player, 23, -0.5, 0.5, 12, LIME, 2, true)
 	draw_set_transform(Vector2.ZERO)

@@ -1,6 +1,8 @@
-# ORBIT BREAKER 3.1
+# ORBIT BREAKER 3.2
 
 우주 생존 액션: 회복과 무기 강화를 조합하여 5분을 돌파하고 최대 10분까지 생존하세요.
+
+스트라이커는 연속 사격으로 최대 +40% 화력, 스카우트는 강한 돌진과 대시 후 +35% 가속, 배스천은 8초마다 피해를 줄이는 반격 방벽을 활용합니다. 선택 화면과 전투 중 상태 표시로 각 기체의 강점과 재사용 조건을 확인하세요.
 
 - 웹: https://LibraLightLuda.github.io/orbit-breaker/ (공개 상태는 검증 문서 참조)
 - Windows: build/current/OrbitBreaker.exe
