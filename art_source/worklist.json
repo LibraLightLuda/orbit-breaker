@@ -1,0 +1,2145 @@
+[
+  {
+    "source_line": 15,
+    "target": "스트라이커 `striker`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/combat-striker.png",
+      "artifacts/current/art/final/forms-striker-2.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ships/striker"
+    ],
+    "resource_paths": [
+      "res://assets/art/ships/striker.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 16,
+    "target": "스카우트 `scout`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/combat-scout.png",
+      "artifacts/current/art/final/forms-scout-2.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ships/scout"
+    ],
+    "resource_paths": [
+      "res://assets/art/ships/scout.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 17,
+    "target": "배스천 `bastion`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/combat-bastion.png",
+      "artifacts/current/art/final/forms-bastion-2.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ships/bastion"
+    ],
+    "resource_paths": [
+      "res://assets/art/ships/bastion.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 18,
+    "target": "화력·추진·장갑 장착부 `core/drive/shell`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/forms-striker-1.png",
+      "artifacts/current/art/final/forms-striker-2.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "objects/core",
+      "objects/drive",
+      "objects/shell"
+    ],
+    "resource_paths": [
+      "res://assets/art/objects/core.png",
+      "res://assets/art/objects/drive.png",
+      "res://assets/art/objects/shell.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 19,
+    "target": "돌격 창기병 `lancer` I/II",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/forms-striker-1.png",
+      "artifacts/current/art/final/forms-striker-2.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "objects/core",
+      "objects/drive",
+      "objects/shell"
+    ],
+    "resource_paths": [
+      "res://assets/art/objects/core.png",
+      "res://assets/art/objects/drive.png",
+      "res://assets/art/objects/shell.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 20,
+    "target": "쌍열 포대 `battery` I/II",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/forms-striker-1.png",
+      "artifacts/current/art/final/forms-striker-2.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "objects/core",
+      "objects/drive",
+      "objects/shell"
+    ],
+    "resource_paths": [
+      "res://assets/art/objects/core.png",
+      "res://assets/art/objects/drive.png",
+      "res://assets/art/objects/shell.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 21,
+    "target": "기동 방벽 `aegis` I/II",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/forms-striker-1.png",
+      "artifacts/current/art/final/forms-striker-2.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "objects/core",
+      "objects/drive",
+      "objects/shell"
+    ],
+    "resource_paths": [
+      "res://assets/art/objects/core.png",
+      "res://assets/art/objects/drive.png",
+      "res://assets/art/objects/shell.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 22,
+    "target": "삼위일체 `trinity` I/II",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/forms-striker-1.png",
+      "artifacts/current/art/final/forms-striker-2.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "objects/core",
+      "objects/drive",
+      "objects/shell"
+    ],
+    "resource_paths": [
+      "res://assets/art/objects/core.png",
+      "res://assets/art/objects/drive.png",
+      "res://assets/art/objects/shell.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 23,
+    "target": "추적체 `chaser`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/elite-statuses.png",
+      "artifacts/current/uiux/stage6/combat-late-reinforcements.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "enemies/chaser"
+    ],
+    "resource_paths": [
+      "res://assets/art/enemies/chaser.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 24,
+    "target": "질주체 `runner`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/elite-statuses.png",
+      "artifacts/current/uiux/stage6/combat-late-reinforcements.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "enemies/runner"
+    ],
+    "resource_paths": [
+      "res://assets/art/enemies/runner.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 25,
+    "target": "중장체 `tank`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/elite-statuses.png",
+      "artifacts/current/uiux/stage6/combat-late-reinforcements.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "enemies/tank"
+    ],
+    "resource_paths": [
+      "res://assets/art/enemies/tank.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 26,
+    "target": "포격수 `shooter`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/elite-statuses.png",
+      "artifacts/current/uiux/stage6/combat-late-reinforcements.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "enemies/shooter"
+    ],
+    "resource_paths": [
+      "res://assets/art/enemies/shooter.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 27,
+    "target": "돌격 정예 `elite`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/elite-statuses.png",
+      "artifacts/current/uiux/stage6/combat-late-reinforcements.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "enemies/elite_assault"
+    ],
+    "resource_paths": [
+      "res://assets/art/enemies/elite_assault.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 28,
+    "target": "포격 정예 `elite`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/elite-statuses.png",
+      "artifacts/current/uiux/stage6/combat-late-reinforcements.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "enemies/elite_artillery"
+    ],
+    "resource_paths": [
+      "res://assets/art/enemies/elite_artillery.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 29,
+    "target": "지휘체 `boss`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/elite-statuses.png",
+      "artifacts/current/uiux/stage6/combat-late-reinforcements.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "enemies/boss"
+    ],
+    "resource_paths": [
+      "res://assets/art/enemies/boss.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 30,
+    "target": "지휘체 전장 패턴·격앙·후반 추격",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/elite-statuses.png",
+      "artifacts/current/uiux/stage6/combat-late-reinforcements.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "enemies/boss"
+    ],
+    "resource_paths": [
+      "res://assets/art/enemies/boss.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 31,
+    "target": "공통 피격·빙결·마비·체력 상태",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/elite-statuses.png",
+      "artifacts/current/uiux/stage6/combat-late-reinforcements.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/stun"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/stun.svg"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_enemy/_draw_part_icon + UiGlyph",
+    "implementation": "새 외피와 기존 피격/빙결/마비의 정확한 상태 표식 결합; 별도 서리 쉘 셰이더는 사용하지 않음"
+  },
+  {
+    "source_line": 41,
+    "target": "자동포·아군 탄",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "fx/projectile"
+    ],
+    "resource_paths": [
+      "res://assets/art/fx/projectile.svg"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 42,
+    "target": "적탄/보스 탄막",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "fx/projectile"
+    ],
+    "resource_paths": [
+      "res://assets/art/fx/projectile.svg"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 43,
+    "target": "기본 위성 `normal`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "objects/normal"
+    ],
+    "resource_paths": [
+      "res://assets/art/objects/normal.png"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 44,
+    "target": "절삭 위성 `blade`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "objects/blade"
+    ],
+    "resource_paths": [
+      "res://assets/art/objects/blade.png"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 45,
+    "target": "빙결 위성 `frost`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "objects/frost"
+    ],
+    "resource_paths": [
+      "res://assets/art/objects/frost.png"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 46,
+    "target": "궤도 확장·수집 범위",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 47,
+    "target": "유도탄 `missile`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "objects/missile",
+      "fx/thrust"
+    ],
+    "resource_paths": [
+      "res://assets/art/objects/missile.png",
+      "res://assets/art/fx/thrust.png"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 48,
+    "target": "기본 연쇄 번개 `lightning`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/chain"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/chain.svg"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 49,
+    "target": "기본 충격파 `pulse`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "fx/wave"
+    ],
+    "resource_paths": [
+      "res://assets/art/fx/wave.png"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 50,
+    "target": "`superorbit` 태양 고리",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/evolution-superorbit.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/superorbit"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/superorbit.svg"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 51,
+    "target": "`storm` 연쇄 폭풍",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/evolution-storm.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/storm"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/storm.svg"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 52,
+    "target": "`salvo` 유성 세례",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/evolution-salvo.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/salvo"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/salvo.svg"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 53,
+    "target": "`rail` 관통 성창",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/evolution-rail.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/rail"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/rail.svg"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 54,
+    "target": "`blizzard` 절대 영도",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/evolution-blizzard.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/blizzard"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/blizzard.svg"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 55,
+    "target": "`nova` 중력 신성",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/evolution-nova.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/nova"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/nova.svg"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 56,
+    "target": "`sentry` 고정 성좌 / shot `sentry`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/evolution-sentry.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/sentry"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/sentry.svg"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 57,
+    "target": "`wake` 섬광 항적 / shot `wake`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/evolution-wake.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/wake"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/wake.svg"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 58,
+    "target": "`citadel` 반격 성채",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/evolution-citadel.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/citadel"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/citadel.svg"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 59,
+    "target": "`ellipse` 혜성 타원궤도",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/evolution-ellipse.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/ellipse"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/ellipse.svg"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 60,
+    "target": "`hatchet` 귀환 도끼 / shot `axe`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/evolution-hatchet.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/hatchet"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/hatchet.svg"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 61,
+    "target": "`minefield` 성운 지뢰밭 / shot `mine`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/evolution-minefield.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/minefield"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/minefield.svg"
+    ],
+    "consumer": "main.gd::_draw_arena, model.orbit_position/orbit_kind/shot kind",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 73,
+    "target": "`power` 출력 코어",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/items-36-grades.png",
+      "artifacts/current/uiux/stage6/items-known.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/power",
+      "fx/container"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/power.svg",
+      "res://assets/art/fx/container.png"
+    ],
+    "consumer": "ItemCatalog.draw_icon / ItemIcon / main.gd field,status,direction / codex / replay",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 74,
+    "target": "`speed` 추진 연료",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/items-36-grades.png",
+      "artifacts/current/uiux/stage6/items-known.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/speed",
+      "fx/container"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/speed.svg",
+      "res://assets/art/fx/container.png"
+    ],
+    "consumer": "ItemCatalog.draw_icon / ItemIcon / main.gd field,status,direction / codex / replay",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 75,
+    "target": "`rapid` 속사 회로",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/items-36-grades.png",
+      "artifacts/current/uiux/stage6/items-known.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/rapid",
+      "fx/container"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/rapid.svg",
+      "res://assets/art/fx/container.png"
+    ],
+    "consumer": "ItemCatalog.draw_icon / ItemIcon / main.gd field,status,direction / codex / replay",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 76,
+    "target": "`repair` 수리 나노봇",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/items-36-grades.png",
+      "artifacts/current/uiux/stage6/items-known.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/repair",
+      "fx/container"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/repair.svg",
+      "res://assets/art/fx/container.png"
+    ],
+    "consumer": "ItemCatalog.draw_icon / ItemIcon / main.gd field,status,direction / codex / replay",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 77,
+    "target": "`heal` 응급 수리",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/items-36-grades.png",
+      "artifacts/current/uiux/stage6/items-known.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/heal",
+      "fx/container"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/heal.svg",
+      "res://assets/art/fx/container.png"
+    ],
+    "consumer": "ItemCatalog.draw_icon / ItemIcon / main.gd field,status,direction / codex / replay",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 78,
+    "target": "`stun` 정지장",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/items-36-grades.png",
+      "artifacts/current/uiux/stage6/items-known.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/stun",
+      "fx/container"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/stun.svg",
+      "res://assets/art/fx/container.png"
+    ],
+    "consumer": "ItemCatalog.draw_icon / ItemIcon / main.gd field,status,direction / codex / replay",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 79,
+    "target": "`emp` EMP 폭탄",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/items-36-grades.png",
+      "artifacts/current/uiux/stage6/items-known.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/emp",
+      "fx/container"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/emp.svg",
+      "res://assets/art/fx/container.png"
+    ],
+    "consumer": "ItemCatalog.draw_icon / ItemIcon / main.gd field,status,direction / codex / replay",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 80,
+    "target": "`frenzy` 광전 회로",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/items-36-grades.png",
+      "artifacts/current/uiux/stage6/items-known.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/frenzy",
+      "fx/container"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/frenzy.svg",
+      "res://assets/art/fx/container.png"
+    ],
+    "consumer": "ItemCatalog.draw_icon / ItemIcon / main.gd field,status,direction / codex / replay",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 81,
+    "target": "`insight` 학습 증폭기",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/items-36-grades.png",
+      "artifacts/current/uiux/stage6/items-known.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/insight",
+      "fx/container"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/insight.svg",
+      "res://assets/art/fx/container.png"
+    ],
+    "consumer": "ItemCatalog.draw_icon / ItemIcon / main.gd field,status,direction / codex / replay",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 82,
+    "target": "`bounty` 현상금 비콘",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/items-36-grades.png",
+      "artifacts/current/uiux/stage6/items-known.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/bounty",
+      "fx/container"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/bounty.svg",
+      "res://assets/art/fx/container.png"
+    ],
+    "consumer": "ItemCatalog.draw_icon / ItemIcon / main.gd field,status,direction / codex / replay",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 83,
+    "target": "`shield` 붕괴 흡수막",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/items-36-grades.png",
+      "artifacts/current/uiux/stage6/items-known.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/shield",
+      "fx/container"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/shield.svg",
+      "res://assets/art/fx/container.png"
+    ],
+    "consumer": "ItemCatalog.draw_icon / ItemIcon / main.gd field,status,direction / codex / replay",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 84,
+    "target": "`haste` 점멸 축전지",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/items-36-grades.png",
+      "artifacts/current/uiux/stage6/items-known.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/haste",
+      "fx/container"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/haste.svg",
+      "res://assets/art/fx/container.png"
+    ],
+    "consumer": "ItemCatalog.draw_icon / ItemIcon / main.gd field,status,direction / codex / replay",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 90,
+    "target": "경험치 `gems.kind=xp`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/legacy-recovery-gem.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "objects/xp",
+      "objects/heal"
+    ],
+    "resource_paths": [
+      "res://assets/art/objects/xp.png",
+      "res://assets/art/objects/heal.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_direction_marker/_draw_expedition",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 91,
+    "target": "과거 회복 블록 `gems.kind=heal`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/legacy-recovery-gem.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "objects/xp",
+      "objects/heal"
+    ],
+    "resource_paths": [
+      "res://assets/art/objects/xp.png",
+      "res://assets/art/objects/heal.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_direction_marker/_draw_expedition",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 92,
+    "target": "파츠 드롭 `core/drive/shell`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/legacy-recovery-gem.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "objects/core",
+      "objects/drive",
+      "objects/shell"
+    ],
+    "resource_paths": [
+      "res://assets/art/objects/core.png",
+      "res://assets/art/objects/drive.png",
+      "res://assets/art/objects/shell.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_direction_marker/_draw_expedition",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 93,
+    "target": "회수/등급/만료/방향 공통 표시",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/legacy-recovery-gem.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "objects/core",
+      "objects/drive",
+      "objects/shell"
+    ],
+    "resource_paths": [
+      "res://assets/art/objects/core.png",
+      "res://assets/art/objects/drive.png",
+      "res://assets/art/objects/shell.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_direction_marker/_draw_expedition",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 101,
+    "target": "`orbit`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/orbit"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/orbit.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 102,
+    "target": "`orbit_range`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/orbit_range"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/orbit_range.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 103,
+    "target": "`blade`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/blade"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/blade.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 104,
+    "target": "`frost`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/frost"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/frost.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 105,
+    "target": "`power`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/power"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/power.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 106,
+    "target": "`rapid`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/rapid"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/rapid.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 107,
+    "target": "`magnet`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/magnet"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/magnet.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 108,
+    "target": "`speed`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/speed"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/speed.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 109,
+    "target": "`vitality`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/vitality"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/vitality.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 110,
+    "target": "`dash`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/dash"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/dash.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 111,
+    "target": "`repair`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/repair"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/repair.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 112,
+    "target": "`missile`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/missile"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/missile.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 113,
+    "target": "`chain`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/chain"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/chain.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 114,
+    "target": "`pulse`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/pulse"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/pulse.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 115,
+    "target": "`focus_amp`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/focus_amp"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/focus_amp.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 116,
+    "target": "`focus_memory`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/focus_memory"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/focus_memory.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 117,
+    "target": "`scout_lance`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/scout_lance"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/scout_lance.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 118,
+    "target": "`scout_drive`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/scout_drive"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/scout_drive.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 119,
+    "target": "`guard_reserve`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/guard_reserve"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/guard_reserve.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 120,
+    "target": "`guard_pulse`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/guard_pulse"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/guard_pulse.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 121,
+    "target": "`restore`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/restore"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/restore.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 122,
+    "target": "`burst`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/burst"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/burst.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 123,
+    "target": "`fortune`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/icon-catalog.png",
+      "artifacts/current/art/final/upgrade-scroll.png",
+      "artifacts/current/art/final/upgrade-390x844-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "ui/fortune"
+    ],
+    "resource_paths": [
+      "res://assets/art/ui/fortune.svg"
+    ],
+    "consumer": "UiGlyph / main.gd::_show_upgrades/_upgrade_links / tech codex",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 133,
+    "target": "기본 우주·별 3깊이",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/sector-ring.png",
+      "artifacts/current/art/final/sector-storm.png",
+      "artifacts/current/art/final/sector-forge.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "world/ring",
+      "world/storm",
+      "world/forge"
+    ],
+    "resource_paths": [
+      "res://assets/art/world/ring.png",
+      "res://assets/art/world/storm.png",
+      "res://assets/art/world/forge.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 134,
+    "target": "`ring` 외곽 고리",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/sector-ring.png",
+      "artifacts/current/art/final/sector-storm.png",
+      "artifacts/current/art/final/sector-forge.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "world/ring"
+    ],
+    "resource_paths": [
+      "res://assets/art/world/ring.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 135,
+    "target": "`storm` 번개 회랑",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/sector-ring.png",
+      "artifacts/current/art/final/sector-storm.png",
+      "artifacts/current/art/final/sector-forge.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "world/storm"
+    ],
+    "resource_paths": [
+      "res://assets/art/world/storm.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 136,
+    "target": "`forge` 잔해 용광로",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/sector-ring.png",
+      "artifacts/current/art/final/sector-storm.png",
+      "artifacts/current/art/final/sector-forge.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "world/forge"
+    ],
+    "resource_paths": [
+      "res://assets/art/world/forge.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 137,
+    "target": "활동 경계+외곽 1/2/3층",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/impact-fx.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "새 표면/FX와 모델 범위·시간의 절차적 기능 표식. 경계·계기·방향선은 의도적으로 유지"
+  },
+  {
+    "source_line": 138,
+    "target": "내부 안내 궤도·중앙 표식",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/impact-fx.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "새 표면/FX와 모델 범위·시간의 절차적 기능 표식. 경계·계기·방향선은 의도적으로 유지"
+  },
+  {
+    "source_line": 139,
+    "target": "`lane` 전기 통로",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/event-lane-warn.png",
+      "artifacts/current/art/final/event-lane-active.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 140,
+    "target": "`blast` 포격/용광로 폭발",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/event-blast-warn.png",
+      "artifacts/current/art/final/event-blast-active.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "fx/explosion"
+    ],
+    "resource_paths": [
+      "res://assets/art/fx/explosion.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 141,
+    "target": "`black_hole` 블랙홀",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/event-black_hole-warn.png",
+      "artifacts/current/art/final/event-black_hole-active.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "fx/black_hole"
+    ],
+    "resource_paths": [
+      "res://assets/art/fx/black_hole.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 142,
+    "target": "`planet` 행성 방어",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/event-planet-warn.png",
+      "artifacts/current/art/final/event-planet-active.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "objects/planet"
+    ],
+    "resource_paths": [
+      "res://assets/art/objects/planet.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 143,
+    "target": "`meteor` 유성우",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/event-meteor-warn.png",
+      "artifacts/current/art/final/event-meteor-active.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "objects/meteor",
+      "fx/explosion"
+    ],
+    "resource_paths": [
+      "res://assets/art/objects/meteor.png",
+      "res://assets/art/fx/explosion.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 144,
+    "target": "`flare` 태양 플레어",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/event-flare-warn.png",
+      "artifacts/current/art/final/event-flare-active.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [
+      "fx/wave"
+    ],
+    "resource_paths": [
+      "res://assets/art/fx/wave.png"
+    ],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 145,
+    "target": "공통10초 예고/3·2·1/화면 밖 안내",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/impact-fx.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "새 표면/FX와 모델 범위·시간의 절차적 기능 표식. 경계·계기·방향선은 의도적으로 유지"
+  },
+  {
+    "source_line": 146,
+    "target": "적 출현·강적 접근 `arrival`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/impact-fx.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "새 표면/FX와 모델 범위·시간의 절차적 기능 표식. 경계·계기·방향선은 의도적으로 유지"
+  },
+  {
+    "source_line": 147,
+    "target": "포구 `fire`, 일반 명중 `hit`, 파괴 `death`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/impact-fx.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "새 표면/FX와 모델 범위·시간의 절차적 기능 표식. 경계·계기·방향선은 의도적으로 유지"
+  },
+  {
+    "source_line": 148,
+    "target": "플레이어 `hurt`, `impact_combat`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/impact-fx.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "새 표면/FX와 모델 범위·시간의 절차적 기능 표식. 경계·계기·방향선은 의도적으로 유지"
+  },
+  {
+    "source_line": 149,
+    "target": "`impact_lane/blast/meteor/flare/boundary`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/impact-fx.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "새 표면/FX와 모델 범위·시간의 절차적 기능 표식. 경계·계기·방향선은 의도적으로 유지"
+  },
+  {
+    "source_line": 150,
+    "target": "`dash`·오버드라이브·`guard`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/impact-fx.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "새 표면/FX와 모델 범위·시간의 절차적 기능 표식. 경계·계기·방향선은 의도적으로 유지"
+  },
+  {
+    "source_line": 151,
+    "target": "`missile/lightning/pulse`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/impact-fx.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "새 표면/FX와 모델 범위·시간의 절차적 기능 표식. 경계·계기·방향선은 의도적으로 유지"
+  },
+  {
+    "source_line": 152,
+    "target": "`hazard_start/meteor_impact`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/impact-fx.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "새 표면/FX와 모델 범위·시간의 절차적 기능 표식. 경계·계기·방향선은 의도적으로 유지"
+  },
+  {
+    "source_line": 153,
+    "target": "`pickup/reward/level` 및 실제 도달 가능한 레벨·진화·돌파 알림",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/impact-fx.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "새 표면/FX와 모델 범위·시간의 절차적 기능 표식. 경계·계기·방향선은 의도적으로 유지"
+  },
+  {
+    "source_line": 154,
+    "target": "`risk_score/risk_xp`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/impact-fx.png",
+      "artifacts/current/art/release-input/soak-03.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "새 표면/FX와 모델 범위·시간의 절차적 기능 표식. 경계·계기·방향선은 의도적으로 유지"
+  },
+  {
+    "source_line": 155,
+    "target": "최종600초·실패/돌파 결과 전환",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/result.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "main.gd::_draw_arena/_draw_orbital_regions/_draw_hazard/_draw_encounter/_draw_impact/_show_result",
+    "implementation": "최종 전장 정지·차광과 새 공통 패널로 전환; 저장/버튼을 지연하는 별도 fade는 추가하지 않음"
+  },
+  {
+    "source_line": 165,
+    "target": "타이틀 `_show_menu/_draw_motif`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/title.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 166,
+    "target": "출격 준비 `_show_hangar`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/hangar.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 167,
+    "target": "상단 좌측 `_draw_meters/_update_hud`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/combat-striker.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 168,
+    "target": "중앙 시간/전장/미션 `_draw_expedition`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/combat-striker.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 169,
+    "target": "우측 `_draw_reward_feedback/_draw_progress_notice`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/combat-striker.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 170,
+    "target": "기체 주변 `_draw_skill_meter`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/combat-striker.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 171,
+    "target": "버프/파츠 `_draw_item_status/_draw_expedition`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/combat-striker.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 172,
+    "target": "방향 `_draw_invasion_markers/_draw_direction_marker`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/combat-striker.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 173,
+    "target": "웹 돌진 끝점 조준표",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/web-combat.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "Web 실제 클릭 돌진/가속/끝점 조준표 관측과 기존 입력 회귀; OS 커서 직접 조작 검증과 구분"
+  },
+  {
+    "source_line": 174,
+    "target": "강화 `_show_upgrades`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/upgrades.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 175,
+    "target": "무기 도감 `_open_arsenal`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/weapons.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 176,
+    "target": "아이템 `_show_item_codex/_show_item_detail`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/items-known.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 177,
+    "target": "기체 도감 `_show_tech_codex/_show_ship_parts`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/tech.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 178,
+    "target": "기록·업적 `_show_records`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/achievements.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 179,
+    "target": "일시정지 `_show_pause`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/release-input/pause.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 180,
+    "target": "포기 확인 `_confirm_abandon`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/abandon-confirm.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 181,
+    "target": "결과 `_show_result`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/result.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 182,
+    "target": "관전 `_show_replay/_draw_replay/_draw_replay_path`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/release-input/replay-4x.png",
+      "artifacts/current/art/release-input/replay-legacy-path.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 183,
+    "target": "설정 `_show_settings`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/settings.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 184,
+    "target": "도움말 `_show_help`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/help.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 185,
+    "target": "크레딧 `_show_credits`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/final/credits.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 186,
+    "target": "앱·웹 아이콘 `icon.svg`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/production-comparison.png",
+      "artifacts/current/art/windows-exe-icon.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [
+      "res://icon.svg"
+    ],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "자체 SVG 앱 상징; Godot 16/32/64/128px 실제 렌더와 Windows PE 아이콘 추출 확인"
+  },
+  {
+    "source_line": 187,
+    "target": "웹 엔진 로딩/실패 표시",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/art/web-loader-failure.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [
+      "res://assets/branding/splash.png",
+      "export_presets.cfg"
+    ],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "export preset의 지속 가능한 로딩/오류 표면; 의도적으로 WASM/PCK를 뺀 별도 QA fixture"
+  },
+  {
+    "source_line": 188,
+    "target": "모든 버튼/카드/스위치",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/combat-striker.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  },
+  {
+    "source_line": 189,
+    "target": "작은 메뉴 `menu_flow.gd`",
+    "status": "implemented-render-verified",
+    "evidence": [
+      "artifacts/current/uiux/stage6/menu-390x844.png",
+      "artifacts/current/art/final/upgrade-390x844-top.png",
+      "artifacts/current/art/final/upgrade-844x390-links-bottom.png"
+    ],
+    "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
+    "resource_keys": [],
+    "resource_paths": [],
+    "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
+    "implementation": "공유 자산과 콘텐츠 ID 연결, 기존 판정/정보/동작 유지"
+  }
+]

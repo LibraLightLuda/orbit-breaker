@@ -18,11 +18,12 @@
 
 ## 현재 최신본 (2026-10-12)
 
-- 최신3.18: build/current/OrbitBreaker.exe. SHA-256 D60452D5E341CFBDEF1182ACD5E454B862FD34245A1C3C0A2E15094A76058234.
-- Web PCK: A0B1FDC27D5134202B56B9E3E96B31BE300A7FC4C47C62C4226E8EDA2D28BB9D. build/current/web와web/ 게시용 복사본이 일치한다.
-- 자동2,272/2,272, 실제 화면2,504/2,504, 최종 Windows Release180프레임 종료0. 로컬 Chrome과 마지막 Web PCK 해시 확인 후 승격했다.
-- 이전3.17 실행 파일·체크섬·안내·대응 증거를 retiring-3.17에 보존한 뒤 후보와 교체했다. 교체 성공 후16개 구배포 루트와14개 구자료/임시 파일을 정리했다. 과거 blocked by policy로 남았던 구배포도 이번에는 정상 정리됐다.
-- build/artifacts에는 current 한 세대만 남는다. .cleanup-archive/20261011의 구build/artifacts도 제거했다. 소스 기준선 .cleanup-archive/uiux-source-3.12 및 게임 소스·과거 설계·플레이어 저장/설정은 보존했다.
-- 최종 목록/해시: artifacts/current/file-inventory.json, release-hashes.json, verification.json, build/current/SHA256.txt. 공개 GitHub 릴리즈/Pages 확인은 github-publication.json과 VALIDATION_V3.md를 따른다.
+최신 로컬 세대는 **3.18 / art-20261012**다. `build/current/OrbitBreaker.exe`, Windows/Web ZIP, `build/current/web`와 `web/`, 대응 증거 `artifacts/current`가 최종본이다.
 
-- GitHub3.18 릴리즈/Pages 공개 검증 완료. 서버 첨부 SHA-256 일치 확인 후 구릴리즈 첨부6개·구Pages 아티팩트5개를 정리했다. 소스 태그와 과거 릴리즈 설명은 보존했다.
+Windows SHA-256: `15D4D4098BD767B8B8D63C5550749387DC57FC091651285BCB7BA5F37FF77939`. Web PCK: `DA1B5DACF6A8FBDE1E05D481BBC12845F82D19418E3374B6C03A8D83E984FAF0`.
+
+기존 정상 실행 파일·해시·안내·증거를 retiring에 먼저 보존하고 후보 검증/내보내기/실행/해시 일치를 확인한 뒤 교체했다. 교체 후 이전 세대와 임시 백업을 정리했다. 최신 한 세대 정책을 지키며 원본 계획·제작 소스·미커밋 변경·플레이어 데이터는 보존했다. 최종 목록은 `artifacts/current/file-inventory.json`, `release-hashes.json`, `retention-status.json`, `verification.json`이다.
+
+계획 조사 Temp 삭제 차단은 배포 세대 정리와 구분한다. 공개 사이트는 기존3.18이며 이번 로컬 아트 세대는 게시하지 않았다.
+
+최종 보관 확인: 추가 QA 임시 정리는 자동 승인 검토에서 `blocked by policy`로 거부되어 실행되지 않았다. 남은 경로는 `artifacts/candidate`(검증 art 자료만 있으며 후보 실행 파일 없음), `art_source/web_qa_project`, `art_source/memory_baseline_project`다. 최종 증거는 `artifacts/current`에 합쳐 보존했다. 정상 배포본은 build/current 한 세대이며 이전 배포 세대 정리는 완료됐지만 이 임시 정리는 미완료다. 삭제를 다른 방법으로 우회하지 않았다.

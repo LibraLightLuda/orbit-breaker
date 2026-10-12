@@ -38,35 +38,4 @@ static func grade_color(grade: String) -> Color:
 	return {"C": Color("72dce6"), "B": Color("a798ff"), "A": Color("ffd18a")}.get(grade, Color.WHITE)
 
 static func draw_icon(canvas: CanvasItem, at: Vector2, id: String, color: Color, scale: float = 1.0) -> void:
-	var lines: Array = []
-	match id:
-		"insight":
-			lines = [[-9,0,0,-10],[0,-10,9,0],[9,0,0,10],[0,10,-9,0],[0,-5,0,5],[-5,0,5,0]]
-		"bounty":
-			canvas.draw_arc(at, 10 * scale, 0, TAU, 6, color, 2 * scale, true)
-			lines = [[-5,-4,5,-4],[5,-4,-5,4],[-5,4,5,4]]
-		"shield":
-			lines = [[-9,-8,9,-8],[9,-8,7,4],[7,4,0,11],[0,11,-7,4],[-7,4,-9,-8]]
-		"haste":
-			canvas.draw_arc(at, 11 * scale, 0, TAU, 24, color, 2 * scale, true)
-			lines = [[0,-8,-4,1],[-4,1,3,1],[3,1,0,8]]
-		"power":
-			lines = [[-8,8,0,-9],[0,-9,8,8],[-5,3,5,3],[0,-4,0,7]]
-		"speed":
-			lines = [[-8,-8,0,0],[0,0,-8,8],[0,-8,8,0],[8,0,0,8]]
-		"rapid":
-			lines = [[-8,-7,8,-7],[-8,0,8,0],[-8,7,8,7]]
-		"repair", "heal":
-			lines = [[-8,0,8,0],[0,-8,0,8]]
-			if id == "repair":
-				canvas.draw_arc(at, 12 * scale, 0.3, 5.8, 24, color, 2 * scale, true)
-		"stun":
-			lines = [[-4,-9,-4,9],[4,-9,4,9],[-9,-4,9,-4],[-9,4,9,4]]
-		"emp":
-			canvas.draw_circle(at, 4 * scale, color)
-			canvas.draw_arc(at, 10 * scale, 0, TAU, 24, color, 2 * scale, true)
-			lines = [[-14,0,-11,0],[11,0,14,0],[0,-14,0,-11],[0,11,0,14]]
-		"frenzy":
-			lines = [[2,-11,-7,1],[-7,1,2,1],[2,1,-2,11],[-2,11,8,-2],[8,-2,1,-2],[1,-2,2,-11]]
-	for line: Array in lines:
-		canvas.draw_line(at + Vector2(line[0], line[1]) * scale, at + Vector2(line[2], line[3]) * scale, color, 2.5 * scale, true)
+	ArtAssets.icon(canvas, at, id, color, scale)

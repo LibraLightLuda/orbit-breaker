@@ -162,10 +162,12 @@ func feature_checks() -> void:
 					scroll.scroll_vertical = int(scroll.get_v_scroll_bar().max_value)
 					await shot("hangar-bottom-%dx%d" % [dimensions.x, dimensions.y])
 				for menu in ["_show_menu", "_show_settings", "_show_records", "_show_upgrades"]:
+					if menu=="_show_upgrades": game.run.state="upgrade"
 					game.call(menu)
 					await process_frame
 					await process_frame
 					check(_compact_fits(game.ui), "compact text and targets " + menu)
+					if menu=="_show_upgrades": check(game.choices.size()==3,"compact upgrades have real choices")
 					await shot(menu.trim_prefix("_show_") + "-%dx%d" % [dimensions.x, dimensions.y])
 				for tab in ["items", "weapons", "tech"]:
 					game.codex_tab = tab

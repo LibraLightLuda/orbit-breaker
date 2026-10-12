@@ -44,8 +44,20 @@ func run_checks() -> void:
 	if capture:
 		await snapshot("translucent-header")
 		var image := root.get_texture().get_image()
-		var sample_at := Vector2i((game.position + Vector2(805, 25)) * Vector2(image.get_size()) / root.get_visible_rect().size)
-		check(image.get_pixelv(sample_at).r > 0.30, "enemy remains visible through upper HUD background")
+		game.run.enemies.clear()
+		game.queue_redraw()
+		await process_frame
+		await RenderingServer.frame_post_draw
+		var without_enemy := root.get_texture().get_image()
+		var scale := Vector2(image.get_size()) / root.get_visible_rect().size
+		var max_contrast := 0.0
+		for x in range(740,820,3):
+			for y in range(0,80,3):
+				var at := Vector2i((game.position + Vector2(x,y)) * scale)
+				var a := image.get_pixelv(at)
+				var b := without_enemy.get_pixelv(at)
+				max_contrast=maxf(max_contrast,maxf(absf(a.r-b.r),maxf(absf(a.g-b.g),absf(a.b-b.b))))
+		check(max_contrast > 0.15, "actual enemy sprite remains visible through upper HUD background")
 	for id: String in ["striker", "scout", "bastion"]:
 		game.run.reset(39, "normal", id)
 		game.run.dash_cooldown = 1.5
@@ -112,9 +124,13 @@ func snapshot(label: String, edge_color: Color = Color.TRANSPARENT) -> void:
 	await RenderingServer.frame_post_draw
 	var image := root.get_texture().get_image()
 	if edge_color.a > 0:
+		var background := ArtAssets.texture("world/ring").get_image()
 		for point: Vector2i in [Vector2i(0, 0), Vector2i(image.get_width() - 1, 0), Vector2i(0, image.get_height() - 1), Vector2i(image.get_width() - 1, image.get_height() - 1)]:
 			var pixel := image.get_pixelv(point)
-			check(absf(pixel.r - edge_color.r) < 0.02 and absf(pixel.g - edge_color.g) < 0.02 and absf(pixel.b - edge_color.b) < 0.02, "screen corner has scene background instead of black border")
+			var uv := Vector2(point) / Vector2(image.get_size() - Vector2i.ONE)
+			var source := background.get_pixelv(Vector2i(uv * Vector2(background.get_size() - Vector2i.ONE)))
+			var expected := edge_color.lerp(source,0.55)
+			check(absf(pixel.r - expected.r) < 0.025 and absf(pixel.g - expected.g) < 0.025 and absf(pixel.b - expected.b) < 0.025, "screen corner contains authored scene background without black border")
 	var folder := "res://artifacts/candidate/viewport-%dx%d" % [image.get_width(), image.get_height()]
 	DirAccess.make_dir_recursive_absolute(folder)
 	check(image.save_png(folder + "/" + label + ".png") == OK, "capture " + label)

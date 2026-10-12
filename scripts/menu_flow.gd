@@ -43,6 +43,11 @@ static func apply(game: Node2D) -> void:
 	game.ui.get_parent().offset = Vector2.ZERO
 
 static func _layout(control: Control, width: float) -> float:
+	if control is ScrollContainer and control.get_child_count()==1 and control.get_child(0) is Label:
+		var label: Label=control.get_child(0)
+		var height := _layout(label,width-16)
+		label.custom_minimum_size=Vector2(width-16,height)
+		return clampf(height,96,200)
 	if control is Label:
 		var size := clampi(control.get_theme_font_size("font_size"), 18, 28)
 		control.add_theme_font_size_override("font_size", size)

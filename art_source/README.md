@@ -1,0 +1,21 @@
+# Orbit Breaker art source
+
+Approved source baseline: c0b1236f6855e5f3b6256fda40add9ad2a516a81, 2026-10-12.
+
+`baseline/` preserves the three approved art documents and original source/fixture hashes. These are source design records, not a retained release generation. `raw/` contains original Imagegen outputs. No commercial reference screenshot is shipped in the game.
+
+`render_assets.py` runs in Blender 5.2.2 LTS with Cycles, 32 samples, transparent orthographic camera, shared ceramic/graphite/emission materials and two area lights. It renders the comparison Striker and small equipment. The initial beveled Striker is kept in `precision_assets.blend` for the production method comparison. The reproducible Python source contains the equipment designs.
+
+`prepare_assets.py` slices the authored sprite sheets, checks/preserves originals, crops alpha bounds, adds 5% padding, downsizes production actors, writes distinct authored SVG diagrams and the preload registry. It needs Python 3.13 + Pillow; neither is a runtime dependency. Generated image source locations are recorded in that script. To regenerate on another machine, use the corresponding preserved `raw/` files instead of the original generation directory. Re-running a generator is a source operation and must be followed by Godot import and visual QA.
+
+Imagegen briefs: orthographic right-facing ceramic/graphite twin-cannon Striker, spear Scout, shield Bastion; obsidian segmented coral-core Chaser, Runner, Tank, Shooter, assault/artillery Elite and command Boss; restrained dark ring dust, storm ion flow and forge debris; kinetic spark/plasma explosion/energy wave/thrust/accretion disk/supply case; atmospheric blue rocky planet. New player variants were conditioned on the same Striker image; the Boss on the enemy fleet sheet; sector backdrops on ring. Prompts required no text, no gameplay markers or background on cutouts and controlled local glow. The tool was actually called; raw source IDs and preparation mapping are preserved. This is not a claim that independently regenerating a prompt gives identical pixels.
+
+Production choice: actual Godot 320/80/48/36px comparison showed the simple Blender Striker lacked material and mechanical richness. Imagegen was selected for the main actors, world and impact surfaces. Blender remains useful for exact small equipment axes and distinct physical attachment silhouettes. Vector diagrams are the correct medium for small system symbols. No runtime Blender/AI generation, no external service, no new dependency or save format is introduced.
+
+`integrate.py` is the one-time presentation migration record; do not rerun it against an already migrated source. `worklist.json` tracks every row in the approved matrix. A row marked pending is not accepted merely because a PNG exists.
+
+Validation: `tools/verify_art.ps1`, `tests/test_art.gd`, existing `tools/build.ps1` and `tools/verify_uiux.ps1`. Exact gameplay rings, hazard outlines, gauges, arrows, XP/score semantics and legitimate unknown `?` states remain intentional functional geometry. Art source is excluded with `.gdignore` and export filters.
+
+Final local delivery: `artifacts/current/verification.json` and `worklist.json` (125 verified rows). Source hashes match the promoted product. `finish_art_records.py` finalizes documentation/evidence only; it requires successful supplemental candidate QA evidence. `prepare_art_delivery.py` / `promote_art_release.ps1` are the completed generation transition and must not be rerun against current without reviewing their previous-generation guards.
+
+Shared projectile textures and grouped trails reduce draw calls; rotated actors use textured primitives. These preserve collision radii and model behavior. `create_brand_splash.gd` reproduces the boot PNG from the custom SVG. Small upgrade menus retain all conditions and associate each choice button with its card. The full-loop fixture includes main physics/HUD/ghost capture; memory comparison uses archived baseline source with a QA-only signature adapter. No scratch QA project is shipped. Cleanup of the two scratch QA projects and supplemental candidate evidence was blocked by policy; see retention-status.json. They remain outside the product package.

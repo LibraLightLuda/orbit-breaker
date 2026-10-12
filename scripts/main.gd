@@ -46,6 +46,7 @@ var stars: Array[Vector2] = []
 var mouse_active := false
 var mouse_target := Vector2.ZERO
 var space_time := 0.0
+var art_styles: Dictionary = {}
 var space_offset := Vector2.ZERO
 var space_velocity := Vector2.ZERO
 var mouse_outside := false
@@ -429,11 +430,15 @@ func _label(text: String, rect: Rect2, size: int = 20, color: Color = INK, paren
 	return label
 
 func _style(fill: Color, border: Color, width: int = 1) -> StyleBoxFlat:
+	var key := str(fill) + str(border) + str(width)
+	if art_styles.has(key): return art_styles[key]
 	var style := StyleBoxFlat.new()
+	art_styles[key] = style
 	style.bg_color = fill
 	style.border_color = border
 	style.set_border_width_all(width)
-	style.set_corner_radius_all(7)
+	style.set_corner_radius_all(3)
+	style.border_width_top = width + 1
 	style.shadow_color = Color(BG, 0.35)
 	style.shadow_size = 3
 	style.content_margin_left = 22
@@ -552,6 +557,7 @@ func _show_hangar() -> void:
 		var button := _button(str(info.name) + (" ×" + str(info.score) if unlocked else " · 잠금"), Rect2(246 + i * 156, 640, 146, 56), func() -> void: mode = id; _show_hangar())
 		button.add_theme_font_size_override("font_size", 16)
 		button.disabled = not unlocked
+		_glyph("upgrade",id,Rect2(4,18,20,20), CYAN if unlocked else MUTED,button)
 		button.tooltip_text = "표준 돌파로 해금" if id == "veteran" else ("베테랑 돌파로 해금" if id == "cataclysm" else "")
 		if id == mode:
 			button.add_theme_stylebox_override("normal", _style(PANEL, CYAN, 2))
@@ -579,7 +585,8 @@ func _show_records() -> void:
 			var y := 249 + ((i % 6) / 3) * 155
 			var card := _panel(Rect2(x, y, 366, 145), PANEL, LIME if earned else LINE)
 			_label("%s  ·  %d점" % ["달성 완료" if earned else "도전 중", item.points], Rect2(x + 18, y + 10, 326, 24), 15, LIME if earned else GOLD)
-			_label(item.name, Rect2(x + 18, y + 39, 326, 33), 22)
+			_glyph("achievement", str(item.id), Rect2(x + 18, y + 38, 32, 32), LIME if earned else MUTED)
+			_label(item.name, Rect2(x + 58, y + 39, 286, 33), 22)
 			_wrap_label(item.description, Rect2(x + 18, y + 75, 330, 40), 16, MUTED)
 			var progress_value := mini(int(records.data.achievement_progress.get(item.stat, 0)), int(item.target))
 			var progress := ColorRect.new()
@@ -888,7 +895,7 @@ func _show_credits() -> void:
 	text.position = Vector2(90, 115)
 	text.size = Vector2(1100, 490)
 	text.add_theme_font_size_override("normal_font_size", 16)
-	text.text = "Godot Engine · https://godotengine.org/license/\n\n" + Engine.get_license_text()
+	text.text = "ORBIT BREAKER / ART\n기체·침공체·전장·FX: 이 프로젝트를 위해 제작한 Imagegen 이미지.\n위성·장착 모듈: Blender 5.2.2 원형의 오프라인 렌더.\n시스템 도해·앱 아이콘: 자체 작성 SVG. 외부 게임의 이미지는 제품에 포함하지 않음.\n원본·재현 스크립트·제작 이력: art_source/\n\nNoto Sans KR · SIL Open Font License 1.1\n" + FileAccess.get_file_as_string("res://assets/fonts/OFL.txt") + "\n\nGodot Engine · https://godotengine.org/license/\n\n" + Engine.get_license_text()
 	for component in Engine.get_copyright_info():
 		text.text += "\n\n" + str(component.get("name", ""))
 		for part in component.get("parts", []):
@@ -935,14 +942,29 @@ func _show_upgrades(refresh: bool = false) -> void:
 		var x := 64 + i * 386
 		var selected := i
 		var card := _button("", Rect2(x, 254, 366, 350), func() -> void: _pick_upgrade(selected))
+		card.set_meta("flow_order",254+i*2)
 		_glyph("upgrade", id, Rect2(18, 18, 64, 64), LIME if id in ["repair", "vitality", "restore"] else CYAN, card)
 		var level_text := "즉시 적용" if int(info.cap) == 0 else "Lv.%d → %d / %d" % [run.upgrades.get(id, 0), int(run.upgrades.get(id, 0)) + 1, info.cap]
 		_label(level_text, Rect2(100, 32, 246, 30), 17, INK, card)
 		_label(str(info.name), Rect2(22, 94, 322, 40), 26, INK, card)
 		_wrap_label(str(info.description), Rect2(22, 143, 322, 60), 18, INK, card)
 		_wrap_label(_upgrade_delta(id), Rect2(22, 207, 322, 34), 16, LIME, card)
-		_wrap_label(_upgrade_links(id), Rect2(22, 245, 322, 100), 15, CYAN, card)
-		_button("선택   [%d]" % (i + 1), Rect2(x, 620, 366, 60), func() -> void: _pick_upgrade(selected), false, i == 0)
+		var links_scroll := ScrollContainer.new()
+		links_scroll.position = Vector2(22, 245)
+		links_scroll.size = Vector2(322, 96)
+		links_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		links_scroll.mouse_filter = Control.MOUSE_FILTER_PASS
+		card.add_child(links_scroll)
+		var links_label := Label.new()
+		links_label.text = _upgrade_links(id)
+		links_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		links_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		links_label.add_theme_font_size_override("font_size",15)
+		links_label.add_theme_color_override("font_color",CYAN)
+		links_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		links_scroll.add_child(links_label)
+		var choose_button := _button("선택   [%d]" % (i + 1), Rect2(x, 620, 366, 60), func() -> void: _pick_upgrade(selected), false, i == 0)
+		choose_button.set_meta("flow_order",255+i*2)
 
 func _upgrade_delta(id: String) -> String:
 	var level := int(run.upgrades.get(id, 0))
@@ -1056,9 +1078,11 @@ func _number(value: int) -> String:
 	return formatted
 
 func _draw() -> void:
-	draw_rect(_viewport_rect(), BG)
-	for i in range(stars.size()):
-		draw_circle(_viewport_rect().position + stars[i] * _viewport_rect().size / Vector2(1280, 720), 1.0 if i % 4 else 1.6, Color(0.25, 0.37, 0.44, 0.42))
+	if screen in ["menu", "help", "settings", "credits", "hangar", "records", "replay"] or (screen == "arsenal" and codex_return == "menu"):
+		draw_rect(_viewport_rect(), BG)
+		draw_texture_rect(ArtAssets.texture("world/ring"), _viewport_rect(), false, Color(1, 1, 1, 0.55))
+		for i in range(mini(stars.size(),48)):
+			draw_circle(_viewport_rect().position + stars[i] * _viewport_rect().size / Vector2(1280, 720), 1.0 if i % 4 else 1.6, Color(0.25, 0.37, 0.44, 0.42))
 	if screen in ["menu", "help", "settings", "credits", "hangar", "records"] or (screen == "arsenal" and codex_return == "menu"):
 		if screen == "menu":
 			_draw_motif(Vector2(914, 346))
@@ -1089,17 +1113,13 @@ func _draw_motif(center: Vector2) -> void:
 		var angle := t + i * TAU / 4
 		var pos := center + Vector2.from_angle(angle) * 165
 		draw_arc(center, 165, angle - 0.3, angle, 18, Color(CYAN, 0.4), 4, true)
-		_diamond(pos, 11, CYAN, angle)
-	_diamond(center, 39, Color(LIME, 0.06))
-	_diamond(center, 26, LIME)
-	_diamond(center, 13, BG)
-	preload("res://scripts/ui_glyph.gd").ship(self, center, selected_ship, CYAN, 3.2, -PI / 6)
+		ArtAssets.sprite(self, "objects/normal", pos, Vector2.ONE * 28, angle)
+	preload("res://scripts/ui_glyph.gd").ship(self, center, selected_ship, CYAN, 7.0, -PI / 6)
 	draw_arc(center, 270, -0.8, 2.9, 100, Color(CORAL, 0.22), 3, true)
 	for i in range(6):
 		var angle := -t * 0.4 + i * 1.05
 		var pos := center + Vector2.from_angle(angle) * (238 + 12 * sin(t + i))
-		_polygon(pos, 15, 3 if i % 2 else 4, CORAL if i % 2 else GOLD, angle + PI)
-		_polygon(pos, 8, 3 if i % 2 else 4, BG, angle + PI)
+		ArtAssets.sprite(self, "enemies/runner" if i % 2 else "enemies/chaser", pos, Vector2.ONE * 37, angle + PI)
 	draw_string(font, center + Vector2(-106, 292), "SURVIVE. EVOLVE. BREAK.", HORIZONTAL_ALIGNMENT_LEFT, -1, 15, MUTED)
 
 func _draw_arena(world: RunModel = null) -> void:
@@ -1108,27 +1128,30 @@ func _draw_arena(world: RunModel = null) -> void:
 	var world_rect := Rect2(camera_offset + _viewport_rect().position, _viewport_rect().size)
 	var visible_world := world_rect.grow(80.0)
 	draw_set_transform(-camera_offset)
-	draw_rect(world_rect, Color("0c1925"))
+	draw_rect(world_rect, Color("050c16"))
+	var bg_id: String = "world/" + model.sector_id
+	var bg_size := world_rect.size * 1.18
+	var bg_shift := camera_offset * 0.06
+	draw_texture_rect(ArtAssets.texture(bg_id), Rect2(world_rect.get_center() - bg_size * 0.5 - bg_shift, bg_size), false, Color(1,1,1,0.8))
 	_draw_orbital_regions(sector_color)
 	_draw_space(sector_color)
 	var center := ARENA.get_center()
 	draw_arc(center, RunModel.ACTIVITY_RADIUS / 3, 0, TAU, 96, Color("203344"), 1, true)
 	draw_arc(center, RunModel.ACTIVITY_RADIUS * 2 / 3, 0, TAU, 128, Color("203344"), 1, true)
 	for hazard in model.hazards:
-		_draw_hazard(hazard)
+		_draw_hazard(hazard, model.elapsed)
 	for gem in model.gems:
 		if not visible_world.has_point(gem.pos):
 			continue
 		var pos: Vector2 = gem.pos
 		var is_heal: bool = str(gem.get("kind", "xp")) == "heal"
-		_diamond(pos, 5 if not is_heal else 8, CYAN if not is_heal else LIME)
+		ArtAssets.sprite(self, "objects/heal" if is_heal else "objects/xp", pos, Vector2.ONE * (18 if is_heal else 12), 0, camera_offset)
 	for item: Dictionary in model.items:
 		if not visible_world.has_point(item.pos):
 			continue
 		var at: Vector2 = item.pos
 		var color := ItemCatalog.grade_color(str(item.grade))
-		draw_circle(at, 23, BG)
-		draw_arc(at, 23, 0, TAU, 32, color, 2.5, true)
+		ArtAssets.container(self, at, str(item.grade), 25)
 		ItemCatalog.draw_icon(self, at, str(item.id), INK)
 		draw_string(font, at + Vector2(-17, -29), str(item.grade), HORIZONTAL_ALIGNMENT_LEFT, -1, 18, color)
 		draw_string(font, at + Vector2(-17, 40), "%d초" % ceili(float(item.ttl)), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, color)
@@ -1159,7 +1182,14 @@ func _draw_arena(world: RunModel = null) -> void:
 			continue
 		if str(effect.kind) in ["missile", "guard", "arrival"]:
 			color = GOLD
+		if str(effect.kind) in ["pulse","guard","arrival","level"]:
+			var fx_size := maxf(16, float(effect.radius) * (2.0 - life * 0.4))
+			ArtAssets.sprite(self, "fx/wave", effect.pos, Vector2.ONE * fx_size, 0, camera_offset, Color(1,1,1,life*0.3))
 		draw_arc(effect.pos, maxf(2, float(effect.get("radius", 20)) * (1.2 - life * 0.4)), 0, TAU, 22, Color(color, life * 0.65), 2, true)
+	var friendly_tails := PackedVector2Array()
+	var hostile_tails := PackedVector2Array()
+	var rail_tails := PackedVector2Array()
+	var projectile_bodies: Array[Dictionary] = []
 	for shot in model.shots:
 		if not visible_world.has_point(shot.pos):
 			continue
@@ -1170,33 +1200,51 @@ func _draw_arena(world: RunModel = null) -> void:
 		if kind in ["sentry", "mine", "wake", "axe"]:
 			color = {"sentry": CYAN, "mine": GOLD, "wake": SPEED_BLUE, "axe": CORAL}[kind]
 			if kind == "wake":
-				draw_arc(shot.pos, float(shot.radius), 0, TAU, 24, Color(color, 0.45), 2, true)
+				ArtAssets.sprite(self, "fx/wave", shot.pos, Vector2.ONE * float(shot.radius) * 2, 0, camera_offset, Color(1,1,1,clampf(float(shot.ttl) / 2.4, 0.2, 0.45)))
 			else:
-				_polygon(shot.pos, float(shot.radius) + 4, 4 if kind == "axe" else 6, color, model.elapsed * 5 if kind == "axe" else 0)
+				var deploy_scale := 0.6 if kind == "mine" and float(shot.get("armed",0)) > 0 else 1.0
+				ArtAssets.sprite(self, "objects/" + kind, shot.pos, Vector2.ONE * (float(shot.radius) + 4) * 2.4 * deploy_scale, model.elapsed * 5 if kind == "axe" else 0, camera_offset)
 			continue
 		var velocity: Vector2 = shot.get("velocity", Vector2.ZERO)
-		draw_line(shot.pos - velocity.normalized() * 10, shot.pos, Color(color, 0.5), 2, true)
-		if not bool(shot.friendly):
-			draw_arc(shot.pos, float(shot.get("radius", 4)) + 2, 0, TAU, 12, BG, 2, true)
-		draw_circle(shot.pos, float(shot.get("radius", 4)), color, true, -1, true)
+		if kind == "missile":
+			ArtAssets.sprite(self, "fx/thrust", shot.pos - velocity.normalized() * 13, Vector2(32, 12), velocity.angle(), camera_offset, Color(1,1,1,0.75))
+			ArtAssets.sprite(self, "objects/missile", shot.pos, Vector2(24, 15), velocity.angle(), camera_offset)
+			continue
+		if bool(shot.friendly) and int(shot.get("pierce",1)) > 2:
+			rail_tails.append_array(PackedVector2Array([shot.pos - velocity.normalized() * 24, shot.pos]))
+		if bool(shot.friendly):
+			friendly_tails.append_array(PackedVector2Array([shot.pos - velocity.normalized() * 10, shot.pos]))
+		else:
+			hostile_tails.append_array(PackedVector2Array([shot.pos - velocity.normalized() * 10, shot.pos]))
+		projectile_bodies.append(shot)
+	if not friendly_tails.is_empty(): draw_multiline(friendly_tails, Color(LIME,0.5),2,true)
+	if not hostile_tails.is_empty(): draw_multiline(hostile_tails, Color(GOLD,0.5),2,true)
+	if not rail_tails.is_empty(): draw_multiline(rail_tails,Color(CYAN,0.65),3,true)
+	for shot: Dictionary in projectile_bodies:
+		var color := LIME if bool(shot.friendly) else GOLD
+		var radius := float(shot.get("radius",4))
+		# The SVG core is 24/64 of its width: its visible radius equals the model radius.
+		ArtAssets.sprite(self,"fx/projectile",shot.pos,Vector2.ONE * radius * (64.0/24.0),0,camera_offset,color)
 	if model.buffs.has("shield"):
 		draw_arc(model.player, 36, 0, TAU, 40, CYAN, 3, true)
 	for enemy in model.enemies:
 		if not visible_world.has_point(enemy.pos) and float(enemy.get("warn", 0.0)) <= 0.0:
 			continue
-		_draw_enemy(enemy)
+		_draw_enemy(enemy, model)
 	var player: Vector2 = model.player
 	for drop: Dictionary in model.part_drops:
 		var info := Expedition.part(str(drop.id))
 		var color: Color = info.color
 		var at: Vector2 = drop.pos
 		draw_circle(at, 26, BG)
-		_draw_part_icon(at, str(drop.id), color)
+		_draw_part_icon(at, str(drop.id), color, 1.0, true)
 		draw_arc(at, 26, 0, TAU * clampf(float(drop.ttl) / 45.0, 0, 1), 36, color, 2, true)
 		draw_string(font, at + Vector2(-52, -33), str(info.name), HORIZONTAL_ALIGNMENT_CENTER, 104, 13, color)
 		draw_string(font, at + Vector2(-52, 43), "%d초 · %s" % [ceili(float(drop.ttl)), "2층 탐사" if bool(drop.locked) else "회수"], HORIZONTAL_ALIGNMENT_CENTER, 104, 12, INK)
 	var reduced: bool = records.data.reduced_motion
 	var ship_color: Color = GameContent.ship_info(model.ship_id).color
+	if not reduced and speed_gauge > 0.1:
+		ArtAssets.sprite(self, "fx/thrust", player - model.facing * 23, Vector2(23 + speed_gauge * 22,12), model.facing.angle(), camera_offset, Color(1,1,1,0.5))
 	if model.overdrive_time > 0:
 		draw_arc(player, 31, 0, TAU, 40, GOLD, 3, true)
 		draw_arc(player, model.orbit_radius + 7, 0, TAU, 64, Color(GOLD, 0.35), 2, true)
@@ -1215,41 +1263,42 @@ func _draw_arena(world: RunModel = null) -> void:
 		var orbit_color: Color = CORAL if kind == "blade" else (CYAN if kind == "frost" else GOLD)
 		if not reduced and not model.evolutions.has("ellipse"):
 			draw_arc(player, model.orbit_radius, angle - 0.45, angle, 16, Color(orbit_color, 0.5), 3, true)
-		_polygon(pos, 12 if model.evolutions.has("superorbit") else 9, 3 if kind == "blade" else (6 if kind == "frost" else 4), INK if model.dash_time > 0 else orbit_color, angle)
-		if kind == "frost":
-			draw_circle(pos, 3, BG)
+		ArtAssets.sprite(self, "objects/" + kind, pos, Vector2.ONE * (30 if model.evolutions.has("superorbit") else 23), angle + PI / 2, camera_offset)
 	if model.dash_time > 0:
 		draw_circle(player, 25, Color(LIME, 0.12), true, -1, true)
 		if not reduced:
 			draw_line(player - model.facing * 70, player, Color(LIME, 0.5), 13, true)
-	_diamond(player + Vector2(0, 4), 16, Color(0, 0, 0, 0.5), model.facing.angle())
-	var ship_sides := 3 if model.ship_id == "scout" else (6 if model.ship_id == "bastion" else 4)
-	_polygon(player, 18, ship_sides, BG, model.facing.angle())
-	_polygon(player, 15, ship_sides, INK if hurt_flash > 0 else ship_color, model.facing.angle())
-	_polygon(player, 6, ship_sides, BG, model.facing.angle())
+	ArtAssets.sprite(self, "ships/" + model.ship_id, player, Vector2.ONE * 40, model.facing.angle(), camera_offset, Color(1.6,1.6,1.6) if hurt_flash > 0 else Color.WHITE)
 	for i in 3:
 		var id: String = Expedition.PART_IDS[i]
 		if int(model.parts.get(id, 0)) > 0:
 			var at := player + Vector2.from_angle(model.facing.angle() + TAU * i / 3.0) * 24.0
-			_draw_part_icon(at, id, Expedition.part(id).color, 0.45)
+			_draw_part_icon(at, id, Expedition.part(id).color, 0.45, true)
 	if not model.hull_forms.is_empty():
-		draw_arc(player, 33, model.facing.angle() - 1.0, model.facing.angle() + 1.0, 24, LIME if model.hull_rank("trinity") > 0 else CYAN, 3, true)
+		for form: String in model.hull_forms:
+			var rank := model.hull_rank(form)
+			if form == "battery":
+				for mount in (3 if rank == 2 else 2):
+					var at := player + model.facing * 11 + model.facing.orthogonal() * (mount - (1.0 if rank == 2 else 0.5)) * 13
+					ArtAssets.sprite(self, "objects/missile", at, Vector2(19,10), model.facing.angle(), camera_offset)
+			elif form == "lancer":
+				ArtAssets.sprite(self, "objects/core", player + model.facing * 17, Vector2.ONE * (14 if rank == 2 else 10), model.facing.angle(), camera_offset)
+			elif form == "aegis":
+				for side in [-1,1]:
+					ArtAssets.sprite(self, "objects/shell", player + model.facing.orthogonal() * side * 23, Vector2.ONE * (15 if rank == 2 else 11), model.facing.angle(), camera_offset)
+			elif form == "trinity":
+				draw_arc(player, 24, model.facing.angle()-1, model.facing.angle()+1, 20, Color(LIME,0.65), rank + 1, true)
 	var wing := model.facing.orthogonal()
 	match model.ship_id:
 		"striker":
-			for side: float in [-1.0, 1.0]:
-				draw_line(player + wing * side * 8, player + wing * side * 8 + model.facing * 27, ship_color, 4, true)
 			for i: int in range(5):
 				draw_circle(player - model.facing * 22 + wing * (i - 2) * 7, 2.5, ship_color if i < floori(model.focus_time / 1.2 * 5) else LINE, true, -1, true)
 		"scout":
 			for side: float in [-1.0, 1.0]:
 				var tip := player - model.facing * 12 + wing * side * 22
-				draw_line(player + model.facing * 9, tip, ship_color, 2, true)
 				if model.slipstream_time > 0.0:
 					draw_line(tip, tip - model.facing * (24 if reduced else 48), Color(ship_color, 0.65), 3, true)
 		"bastion":
-			for side: float in [-1.0, 1.0]:
-				_polygon(player + wing * side * 18, 8, 6, ship_color, model.facing.angle())
 			draw_arc(player, 29, -PI / 2, -PI / 2 + TAU * maxf(0.01, 1.0 - model.guard_cooldown / 8.0), 40, ship_color, 3 if model.guard_stacks > 0 else 1, true)
 			if model.guard_capacity() > 1:
 				draw_string(font, player + Vector2(-18, -40), "%d/%d" % [model.guard_stacks, model.guard_capacity()], HORIZONTAL_ALIGNMENT_CENTER, 36, 13, ship_color)
@@ -1317,15 +1366,13 @@ func _draw_orbital_regions(sector_color: Color) -> void:
 	var center := RunModel.CENTER
 	var radius := RunModel.ACTIVITY_RADIUS
 	var colors := [sector_color, GOLD, CORAL, Color("bd81ff")]
-	for layer: int in range(3, -1, -1):
-		var edge := radius + layer * RunModel.LAYER_WIDTH
-		draw_circle(center, edge, Color(colors[layer], 0.035), true, -1, true)
 	for layer: int in range(4):
 		var edge := radius + layer * RunModel.LAYER_WIDTH
 		var color: Color = colors[layer]
-		for band: int in range(-2, 3):
-			var alpha := 0.22 * pow(1.0 - absf(band) / 3.0, 2.0)
-			draw_arc(center, edge + band * 12, 0, TAU, 192, Color(color, alpha), 14, true)
+		draw_arc(center, edge, 0, TAU, 192, Color(color, 0.5), 1.5, true)
+		for segment in 24:
+			var a := TAU * segment / 24.0
+			draw_arc(center, edge + 5, a, a + 0.06, 4, Color(color, 0.25), 5, true)
 
 func _draw_invasion_markers() -> void:
 	var occupied: Array[Rect2] = []
@@ -1379,17 +1426,17 @@ func _draw_skill_meter(at: Vector2, progress: float, color: Color, ready: bool, 
 		draw_line(at + a, at + b, Color(color, glow) if float(i) / 24.0 < progress else LINE, 2, true)
 
 func _draw_space(sector_color: Color) -> void:
-	for i: int in range(stars.size()):
+	var bounds := _viewport_rect()
+	for i: int in range(mini(stars.size(), 48)):
 		var depth := 0.2 + float(i % 3) * 0.25
 		var drift := Vector2.ZERO if records.data.reduced_motion else space_offset * depth + Vector2(-space_time * 3.0 * depth, 0)
 		var point := stars[i] - camera_offset * depth + drift
-		var bounds := _viewport_rect()
 		point = Vector2(fposmod(point.x - bounds.position.x, bounds.size.x), fposmod(point.y - bounds.position.y, bounds.size.y)) + bounds.position + camera_offset
 		draw_circle(point, 1.0 + float(i % 3) * 0.35, Color(sector_color, 0.2 + depth * 0.3))
 
-func _draw_hazard(hazard: Dictionary) -> void:
+func _draw_hazard(hazard: Dictionary, visual_time: float = 0.0) -> void:
 	if RunModel.ENCOUNTERS.has(hazard.kind):
-		_draw_encounter(hazard)
+		_draw_encounter(hazard, visual_time)
 		return
 	var active: bool = hazard.get("active", false)
 	var color: Color = CORAL if active else GOLD
@@ -1404,7 +1451,7 @@ func _draw_hazard(hazard: Dictionary) -> void:
 			var points := PackedVector2Array()
 			for i in 25:
 				var along := float(i) / 24.0
-				var jitter := 0.0 if records.data.reduced_motion else sin(i * 7.0 + space_time * 30.0) * 14.0
+				var jitter := 0.0 if records.data.reduced_motion else sin(i * 7.0 + visual_time * 30.0) * 14.0
 				points.append(Vector2(center.x + jitter, rect.position.y + rect.size.y * along) if vertical else Vector2(rect.position.x + rect.size.x * along, center.y + jitter))
 			draw_polyline(points, Color(CYAN, 0.35), 13, true)
 			draw_polyline(points, INK, 3, true)
@@ -1416,7 +1463,7 @@ func _draw_hazard(hazard: Dictionary) -> void:
 		draw_line(pos - Vector2(10, 0), pos + Vector2(10, 0), color, 2, true)
 		draw_line(pos - Vector2(0, 10), pos + Vector2(0, 10), color, 2, true)
 
-func _draw_encounter(hazard: Dictionary) -> void:
+func _draw_encounter(hazard: Dictionary, visual_time: float = 0.0) -> void:
 	var pos: Vector2 = hazard.pos
 	var radius: float = hazard.radius
 	var active: bool = hazard.active
@@ -1430,11 +1477,8 @@ func _draw_encounter(hazard: Dictionary) -> void:
 	match str(hazard.kind):
 		"black_hole":
 			if active:
-				var turn := 0.0 if records.data.reduced_motion else space_time * 0.7
-				for ring in 4:
-					draw_arc(pos, 35.0 + ring * 43, turn + ring, turn + ring + PI * 1.4, 48, Color(color, 0.8 - ring * 0.14), 3, true)
-				draw_circle(pos, 30, BG, true, -1, true)
-				draw_arc(pos, 31, 0, TAU, 48, INK, 2, true)
+				var turn := 0.0 if records.data.reduced_motion else visual_time * 0.7
+				ArtAssets.sprite(self, "fx/black_hole", pos, Vector2.ONE * 160, turn, camera_offset, Color(1,1,1,0.9))
 				for i in 8:
 					var direction := Vector2.from_angle(TAU * i / 8.0)
 					var tip := pos + direction * 80
@@ -1442,9 +1486,7 @@ func _draw_encounter(hazard: Dictionary) -> void:
 					draw_line(tip, tip + direction.rotated(0.5) * 13, color, 2, true)
 		"planet":
 			if active:
-				draw_circle(pos, 38, Color("245a78"), true, -1, true)
-				draw_arc(pos, 39, 0, TAU, 48, CYAN, 2, true)
-				draw_arc(pos, 26, -2.8, 0.3, 24, LIME, 8, true)
+				ArtAssets.sprite(self, "objects/planet", pos, Vector2.ONE * 90, 0, camera_offset)
 				draw_arc(pos, radius - 6, -PI / 2, -PI / 2 + TAU * clampf(float(hazard.get("hold", 0.0)) / 12.0, 0.001, 1.0), 96, LIME, 6, true)
 		"meteor":
 			for point: Vector2 in RunModel.meteor_points(hazard):
@@ -1452,6 +1494,9 @@ func _draw_encounter(hazard: Dictionary) -> void:
 				draw_arc(point, 64, 0, TAU, 40, color, 2, true)
 				draw_line(point - Vector2(9, 9), point + Vector2(9, 9), color, 2, true)
 				draw_line(point - Vector2(-9, 9), point + Vector2(-9, 9), color, 2, true)
+				if active and not records.data.reduced_motion:
+					var approach := clampf(float(hazard.ttl) / 0.7, 0, 1)
+					ArtAssets.sprite(self, "objects/meteor", point + Vector2(-110,-160) * approach, Vector2.ONE * 28, 0.8, camera_offset, Color(1,1,1,1-approach*0.5))
 		"flare":
 			if active:
 				var front := maxf(2.0, radius * clampf(1.0 - float(hazard.ttl) / 3.0, 0.0, 1.0))
@@ -1483,17 +1528,11 @@ func _draw_impact(effect: Dictionary, life: float) -> void:
 	var reduced: bool = records.data.reduced_motion
 	var color := GOLD if kind in ["meteor_impact", "impact_meteor", "reward"] else (CYAN if kind == "impact_lane" else CORAL)
 	if kind == "hit":
-		color = INK
-		for i in 4:
-			var ray := Vector2.from_angle(PI * 0.25 + i * PI * 0.5)
-			draw_line(pos + ray * 3, pos + ray * (5 + 8 * life), Color(color, life), 2, true)
+		ArtAssets.sprite(self, "fx/spark", pos, Vector2.ONE * (12 + 16 * life), 0, camera_offset, Color(1,1,1,life))
 		return
 	var radius := float(effect.radius) * (0.75 if reduced else 1.3 - life * 0.6)
-	draw_arc(pos, radius, 0, TAU, 32, Color(color, life), 3, true)
-	draw_circle(pos, maxf(2.0, 9.0 * life), Color(INK, life * 0.8), true, -1, true)
-	for i in (4 if reduced else 8):
-		var direction := Vector2.from_angle(TAU * i / (4.0 if reduced else 8.0))
-		draw_line(pos + direction * radius * 0.55, pos + direction * radius, Color(color, life), 2, true)
+	var art := "fx/explosion" if kind in ["death","meteor_impact","hazard_start","impact_blast","impact_meteor"] else "fx/wave"
+	ArtAssets.sprite(self, art, pos, Vector2.ONE * maxf(18,radius * 2), 0, camera_offset, Color(1,1,1,life * (0.3 if reduced else 0.7)))
 	if kind.begins_with("impact_"):
 		var source: Vector2 = effect.get("end", pos)
 		if source.distance_to(pos) > 1.0:
@@ -1548,7 +1587,7 @@ func _draw_boundary_warning() -> void:
 	draw_line(tip, tip - inward.rotated(0.55) * 11.0, CORAL, 3, true)
 	draw_line(tip, tip - inward.rotated(-0.55) * 11.0, CORAL, 3, true)
 
-func _draw_enemy(enemy: Dictionary) -> void:
+func _draw_enemy(enemy: Dictionary, model: RunModel = null) -> void:
 	var pos: Vector2 = enemy.pos
 	var radius: float = enemy.radius
 	var kind: String = enemy.kind
@@ -1572,7 +1611,7 @@ func _draw_enemy(enemy: Dictionary) -> void:
 		"boss":
 			sides = 6
 			color = CORAL if float(enemy.hp) > float(enemy.max_hp) * 0.5 else GOLD
-			angle = (replay_time if screen == "replay" else clock_time) * 0.3
+			angle = (model.elapsed if model != null else run.elapsed) * 0.3
 			draw_arc(pos, radius + 10, 0, TAU, 36, Color(CORAL, 0.4), 2, true)
 	if bool(enemy.get("flanker", false)):
 		draw_arc(pos, radius + 5, angle - 1.0, angle + 1.0, 12, Color(color, 0.65), 2, true)
@@ -1587,9 +1626,16 @@ func _draw_enemy(enemy: Dictionary) -> void:
 		ItemCatalog.draw_icon(self, pos + Vector2(0, -radius - 18), "stun", CYAN, 0.7)
 	if float(enemy.get("slow_time", 0)) > 0:
 		draw_arc(pos, radius + 4, 0, TAU, 24, CYAN, 1.5, true)
-	_polygon(pos, radius, sides, color, angle)
-	_polygon(pos, radius * 0.61, sides, BG, angle)
-	draw_circle(pos, 3 if kind != "boss" else 8, color, true, -1, true)
+	var art_id := kind
+	if kind == "elite": art_id = "elite_assault" if int(enemy.get("elite_index", 1)) == 1 else "elite_artillery"
+	ArtAssets.sprite(self, "enemies/" + art_id, pos, Vector2.ONE * radius * 2.3, angle, camera_offset, Color(1.8,1.8,1.8) if float(enemy.get("flash",0)) > 0 else Color.WHITE)
+	if kind == "boss" and model != null:
+		var phase_color := CORAL if float(enemy.hp) > float(enemy.max_hp) * 0.5 else GOLD
+		var count := 3 if model.sector_id == "forge" else (5 if model.sector_id == "storm" else 6)
+		for organ in count:
+			var bearing := angle + TAU * organ / count
+			var tip := pos + Vector2.from_angle(bearing) * radius * 0.9
+			draw_line(tip, tip + Vector2.from_angle(bearing) * (12 if phase_color == GOLD else 5), phase_color, 3, true)
 	if float(enemy.hp) < float(enemy.max_hp):
 		draw_rect(Rect2(pos + Vector2(-radius, -radius - 9), Vector2(radius * 2, 3)), LINE)
 		draw_rect(Rect2(pos + Vector2(-radius, -radius - 9), Vector2(radius * 2 * maxf(0, float(enemy.hp) / float(enemy.max_hp)), 3)), color)
@@ -1656,11 +1702,11 @@ func _draw_replay() -> void:
 	draw_set_transform(-camera_offset)
 	_draw_orbital_regions(CYAN)
 	_draw_replay_path()
-	_polygon(point, 16, 3 if replay_entry.ship == "scout" else (6 if replay_entry.ship == "bastion" else 4), Color(CYAN, 0.75), float(frame[3]))
+	ArtAssets.sprite(self, "ships/" + str(replay_entry.ship), point, Vector2.ONE * 40, float(frame[3]), camera_offset)
 	for i: int in range(int(frame[6])):
 		var angle := float(frame[8]) + TAU * i / float(frame[6])
 		var frost := int(frame[12]) > 0 and i % 3 == 0
-		_polygon(point + Vector2.from_angle(angle) * float(frame[7]), 9, 6 if frost else (3 if int(frame[11]) > 0 else 4), CYAN if frost else GOLD, angle)
+		ArtAssets.sprite(self, "objects/" + ("frost" if frost else ("blade" if int(frame[11]) > 0 else "normal")), point + Vector2.from_angle(angle) * float(frame[7]), Vector2.ONE * 23, angle, camera_offset)
 	if int(frame[9]) > 0:
 		draw_line(point - Vector2.from_angle(float(frame[3])) * 60, point, CYAN, 5, true)
 	if int(frame[10]) > 0:
@@ -1756,17 +1802,8 @@ func _draw_item_status(world: RunModel = null, y: float = 586.0) -> void:
 			var edge := bounds.get_center() + ray * minf(bounds.size.x * 0.5 / maxf(0.001, absf(ray.x)), bounds.size.y * 0.5 / maxf(0.001, absf(ray.y)))
 			_draw_direction_marker(edge, ray, color, "item", str(nearest.id))
 
-func _draw_part_icon(at: Vector2, id: String, color: Color, scale: float = 1.0) -> void:
-	match id:
-		"core":
-			_polygon(at, 13 * scale, 3, color, -PI / 2)
-			_polygon(at, 5 * scale, 3, BG, -PI / 2)
-		"drive":
-			for x: float in [-5.0, 4.0]:
-				draw_polyline(PackedVector2Array([at + Vector2(x - 4, -10) * scale, at + Vector2(x + 5, 0) * scale, at + Vector2(x - 4, 10) * scale]), color, 3 * scale, true)
-		"shell":
-			_polygon(at, 13 * scale, 6, color)
-			_polygon(at, 8 * scale, 6, BG)
+func _draw_part_icon(at: Vector2, id: String, _color: Color, scale: float = 1.0, world: bool = false) -> void:
+	ArtAssets.sprite(self, "objects/" + id, at, Vector2.ONE * 34 * scale, 0, camera_offset if world else Vector2.ZERO)
 
 func _draw_expedition(model: RunModel) -> void:
 	var m := model.mission
@@ -1800,7 +1837,13 @@ func _draw_expedition(model: RunModel) -> void:
 	draw_line(Vector2(438, 102), Vector2(842, 102), LINE, 1)
 	draw_style_box(_style(Color(color, 0.12), color), Rect2(438, 109, 24, 24))
 	draw_string(font, Vector2(438, 127), grade, HORIZONTAL_ALIGNMENT_CENTER, 24, 15, color)
-	draw_string(font, Vector2(472, 127), heading, HORIZONTAL_ALIGNMENT_LEFT, 270, 16, color)
+	if not m.is_empty():
+		var mission_id: String = str(m.id)
+		if mission_id in ["chaser","runner","tank","shooter"]:
+			draw_texture_rect(ArtAssets.texture("enemies/" + mission_id), Rect2(469,109,24,24), false)
+		else:
+			ArtAssets.icon(self, Vector2(481,121), mission_id, color, 0.65)
+	draw_string(font, Vector2(500, 127), heading, HORIZONTAL_ALIGNMENT_LEFT, 242, 16, color)
 	draw_string(font, Vector2(752, 127), countdown, HORIZONTAL_ALIGNMENT_RIGHT, 90, 14, MUTED)
 	draw_string(font, Vector2(438, 151), status, HORIZONTAL_ALIGNMENT_LEFT, 288, 13, INK)
 	if not m.is_empty():
@@ -1858,7 +1901,8 @@ func _show_tech_codex() -> void:
 		var info := Expedition.part(id)
 		var x := 64 + i * 386
 		_panel(Rect2(x, 190, 368, 94), PANEL, info.color)
-		_label(info.name + (" · 발견" if id in records.data.discovered_parts else " · 미발견"), Rect2(x + 18, 198, 330, 30), 20, info.color)
+		_glyph("upgrade", id, Rect2(x + 16, 199, 28, 28), info.color)
+		_label(info.name + (" · 발견" if id in records.data.discovered_parts else " · 미발견"), Rect2(x + 52, 198, 296, 30), 20, info.color)
 		_wrap_label(info.effect + " · 최대6개", Rect2(x + 18, 235, 330, 40), 15)
 	for i in 4:
 		var id: String = Expedition.RECIPE_IDS[i]
@@ -1867,7 +1911,8 @@ func _show_tech_codex() -> void:
 		var y := 304 + floori(i / 2.0) * 145
 		var rank: int = run.hull_rank(id) if codex_return == "pause" else 0
 		_panel(Rect2(x, y, 568, 132), PANEL, LIME if rank > 0 else LINE)
-		_label(info.name + (" · %s 가동" % ("II" if rank == 2 else "I") if rank > 0 else (" · 연구 완료" if id in records.data.discovered_hulls else " · 미진화")), Rect2(x + 16, y + 7, 530, 30), 21, LIME if rank > 0 else CYAN)
+		_glyph("upgrade", id, Rect2(x + 16,y + 7,28,28), LIME if rank > 0 else CYAN)
+		_label(info.name + (" · %s 가동" % ("II" if rank == 2 else "I") if rank > 0 else (" · 연구 완료" if id in records.data.discovered_hulls else " · 미진화")), Rect2(x + 52, y + 7, 494, 30), 21, LIME if rank > 0 else CYAN)
 		var names: Array[String] = []
 		for part_id: String in info.needs:
 			names.append(str(Expedition.part(part_id).name).replace(" 파츠", ""))
@@ -1886,7 +1931,8 @@ func _show_ship_parts() -> void:
 		var info := RunModel.upgrade_info(id)
 		var at := Vector2(64 + (i % 2) * 584, 198 + floori(i / 2.0) * 132)
 		_panel(Rect2(at, Vector2(568, 120)), PANEL, GameContent.ship_info(spec[0]).color)
-		_label(GameContent.ship_info(spec[0]).name + " · " + info.name.replace("전용 · ", ""), Rect2(at + Vector2(16, 10), Vector2(530, 30)), 22)
+		_glyph("upgrade", id, Rect2(at + Vector2(16,10), Vector2(28,28)), GameContent.ship_info(spec[0]).color)
+		_label(GameContent.ship_info(spec[0]).name + " · " + info.name.replace("전용 · ", ""), Rect2(at + Vector2(52, 10), Vector2(494, 30)), 22)
 		_wrap_label(info.description, Rect2(at + Vector2(16, 46), Vector2(530, 62)), 17)
 	_button("전투로 돌아가기" if codex_return == "pause" else "돌아가기", Rect2(64, 650, 310, 48), _close_arsenal, true, true)
 	_button("공통 조합 ←", Rect2(912, 650, 304, 48), func() -> void: tech_page = 0; _open_arsenal(codex_return))

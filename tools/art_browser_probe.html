@@ -1,0 +1,18 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><title>Orbit Breaker · local art QA</title>
+<style>html,body{margin:0;background:#07111d;color:#eef3e7;font:14px system-ui;height:100%;overflow:hidden}header{height:54px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #355a6b}button{background:#142b3c;color:#72dce6;border:1px solid #355a6b;padding:8px;cursor:pointer}iframe{border:0;width:100%;height:calc(100% - 55px)}output{white-space:pre-wrap;font-size:12px}details{position:absolute;right:10px;top:62px;max-width:500px;background:#07111de8;padding:8px;max-height:70vh;overflow:auto}</style>
+<header><strong>LOCAL ART QA</strong><button id="production">Windows와 동일한 Web 후보</button><button id="stress">240적 / 240탄 / 300결정 스트레스</button><button id="measure">30초 프레임 측정</button><span id="summary">준비</span></header>
+<iframe id="game" src="../build/current/web/index.html" allow="autoplay"></iframe><details><summary>측정 결과</summary><output id="report"></output></details>
+<script>
+const frame=document.querySelector('#game'),summary=document.querySelector('#summary'),report=document.querySelector('#report');
+const generation=new URLSearchParams(location.search).get('generation')==='candidate'?'candidate':'current';
+const productionURL=`../build/${generation}/web/index.html`,stressURL=`../artifacts/${generation}/art/web-stress/index.html`;
+if(generation==='candidate')frame.src=productionURL;
+let recording=false,frames=[],last=0,start=0,hidden=false;
+const reports=[];
+document.querySelector('#production').onclick=()=>{frame.src=productionURL;summary.textContent='제품 Web 후보';};
+document.querySelector('#stress').onclick=()=>{frame.src=stressURL;summary.textContent='동일 소스·자산의 QA 전투 실행 중';};
+document.querySelector('#measure').onclick=()=>{recording=true;frames=[];last=0;start=performance.now();hidden=false;summary.textContent='30초 프레임 측정 중';frame.focus();};
+function finish(){recording=false;frames.sort((a,b)=>a-b);const at=q=>frames[Math.floor((frames.length-1)*q)];const result={kind:'browser-animation-frame',samples:frames.length,p95_ms:+at(.95).toFixed(3),p99_ms:+at(.99).toFixed(3),max_ms:+at(1).toFixed(3),over_33_3ms:frames.filter(n=>n>33.3).length,hidden,viewport:[frame.clientWidth,frame.clientHeight],userAgent:navigator.userAgent,note:'Parent and same-origin Godot iframe share browser scheduling; cadence, not isolated GPU time'};reports.push(result);report.textContent=JSON.stringify(reports,null,2);summary.textContent=`p95 ${result.p95_ms}ms / p99 ${result.p99_ms}ms / >33.3 ${result.over_33_3ms}`;}
+function tick(now){if(recording){if(document.hidden)hidden=true;if(last)frames.push(now-last);last=now;if(performance.now()-start>=30000)finish();}requestAnimationFrame(tick);}requestAnimationFrame(tick);
+addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==frame.contentWindow||event.data?.kind!=='orbit-art-web-stress')return;reports.push(event.data);report.textContent=JSON.stringify(reports,null,2);summary.textContent='Web 스트레스 3회 완료 · 결과 펼치기';});
+</script></html>

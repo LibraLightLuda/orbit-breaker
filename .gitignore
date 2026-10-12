@@ -5,3 +5,8 @@ artifacts/
 
 .cleanup-archive/
 addons/
+
+# Reproducible scratch projects and Blender autosave, not authored source.
+art_source/web_qa_project/
+art_source/memory_baseline_project/
+*.blend1

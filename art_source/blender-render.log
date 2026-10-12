@@ -1,0 +1,23 @@
+D:\Antigravity\NewProject\art_source\render_assets.py:17: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m=bpy.data.materials.new(name); m.diffuse_color=(*color,1); m.use_nodes=True
+00:02.032  render           | Saved: 'D:\Antigravity\NewProject\art_source\comparison\striker_blender.png'
+00:02.032  reports          | WARNING Path 'C:\Program Files\Blender Foundation\Blender 5.2\5.2\datafiles\assets\brushes\essentials_brushes-gp_draw.blend' cannot be made relative for Material 'Dots Stroke'
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+00:02.032  reports          | WARNING Path 'C:\Program Files\Blender Foundation\Blender 5.2\5.2\datafiles\assets\brushes\essentials_brushes-gp_draw.blend' cannot be made relative for Material 'Material'
+00:02.625  render           | Saved: 'D:\Antigravity\NewProject\assets\art\objects\normal.png'
+00:03.141  render           | Saved: 'D:\Antigravity\NewProject\assets\art\objects\blade.png'
+00:03.703  render           | Saved: 'D:\Antigravity\NewProject\assets\art\objects\frost.png'
+00:04.219  render           | Saved: 'D:\Antigravity\NewProject\assets\art\objects\missile.png'
+00:04.766  render           | Saved: 'D:\Antigravity\NewProject\assets\art\objects\sentry.png'
+00:05.313  render           | Saved: 'D:\Antigravity\NewProject\assets\art\objects\mine.png'
+00:05.844  render           | Saved: 'D:\Antigravity\NewProject\assets\art\objects\axe.png'
+00:06.391  render           | Saved: 'D:\Antigravity\NewProject\assets\art\objects\core.png'
+00:06.953  render           | Saved: 'D:\Antigravity\NewProject\assets\art\objects\drive.png'
+00:07.563  render           | Saved: 'D:\Antigravity\NewProject\assets\art\objects\shell.png'
+00:08.078  render           | Saved: 'D:\Antigravity\NewProject\assets\art\objects\xp.png'
+00:08.578  render           | Saved: 'D:\Antigravity\NewProject\assets\art\objects\heal.png'
+00:09.313  render           | Saved: 'D:\Antigravity\NewProject\assets\art\objects\planet.png'
+00:10.000  render           | Saved: 'D:\Antigravity\NewProject\assets\art\objects\meteor.png'
+Info: Saved as "precision_assets.blend"
+
+Blender quit

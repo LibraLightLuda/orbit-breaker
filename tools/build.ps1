@@ -76,6 +76,9 @@ Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_uiux.gd', '--', '--stage=6') `
     -SuccessPattern '(?m)^UIUX SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_art.gd') `
+    -SuccessPattern '(?m)^ART SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--export-release', 'Windows Desktop', $outputPath)
 if (-not (Test-Path -LiteralPath $outputPath -PathType Leaf)) {
     throw "Export returned success without creating $outputPath"

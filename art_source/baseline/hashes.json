@@ -1,0 +1,274 @@
+[
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\achievements.gd",
+    "Hash": "7282C0128C5A7FF65F609357FA1FEDCBB28F082FF82B40F985A7B83BE89FE115"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\achievements.gd.uid",
+    "Hash": "BB5369CDCF77755BCD275BC2C99AAF88EF8FC260C20BB9D9772C2B09BB2F0667"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\expedition.gd",
+    "Hash": "647330BF441AF407F388F741D9AEF14478CC27E8C95979974D0AEF9C8A35A8D7"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\expedition.gd.uid",
+    "Hash": "BAAC5102A2A94884E1869B48C0F626B97A4745F5321DC127458EE2A7992A9A9B"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\game_content.gd",
+    "Hash": "AA6CBF715917A9AF9C43049887675FA41DD9A17E0DB6FDABFAAFA25F899CE3FC"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\game_content.gd.uid",
+    "Hash": "3870A170286058B9284D98890457DF012B82D86F8042D33D5FEF2A35CBF34606"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\ghost_replay.gd",
+    "Hash": "283A40CE0AA9E8F991AFF4BF58EDF1B0FE07E1A6C7EEBB82135CB86BA110609B"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\ghost_replay.gd.uid",
+    "Hash": "F7DC82B25A3C40B7A6FB3293146F0763F1AB68B943F6C71B4C8A7B4543ADB3A9"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\item_catalog.gd",
+    "Hash": "E091C3124551DB7C4DC3AC245132A1728DCEB26EA0088520CBE2149CE42E8211"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\item_catalog.gd.uid",
+    "Hash": "1B5A2C81306571C6A36861F2EE6F2568CF4BD89F5324EEC60E3B8FC8BC4323B4"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\item_icon.gd",
+    "Hash": "108E7CDD08A58079FCD69BBAF7A96E7778B6B463BEC13C8C7AB1103106668E17"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\item_icon.gd.uid",
+    "Hash": "9A8CE98B385A12CF1D71EAB13AD35D885E168CDBD0563C1B79DD0D7D58841A58"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\main.gd",
+    "Hash": "76767D6C22D474059CB67FFBBFB15BD56E31E8390963DA6F84014272CDCA07BA"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\main.gd.uid",
+    "Hash": "9BB731ABEB895B397592B32310D69BE8D3084D88A74570A21E78898098600AC9"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\menu_flow.gd",
+    "Hash": "E190284B5FE1922FD78AC4F1111638027653E395A6EE21C94EADECFA0940BBA3"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\menu_flow.gd.uid",
+    "Hash": "D3686BDE12A6FE92FC83452DEE752BB328CF94CCB259A66ECCF79D00FAAE856C"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\run_model.gd",
+    "Hash": "9B33C9FB88D63A6146B1D1A9B01B3069D9F11BFB2EC7795AA35A977099A38E42"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\run_model.gd.uid",
+    "Hash": "0B71857D710D18AA0D230AE2A76553497C9AD916E5908950CD18EAE68AF0F4BE"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\save_store.gd",
+    "Hash": "B8A382D58FAEB3A28F560DBF538ABC149672B714E9CFA0C6ED7D12D35404F469"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\save_store.gd.uid",
+    "Hash": "7E5C5BB9946BA2F8A1CCE4E1506A4182406CBEFE7537253BD9BD40BB26E51528"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\sound_bank.gd",
+    "Hash": "5FCDD140C9EDEB44515FBE0693BBEBBF4D35227C8DE92F1B0D1F80ED3C5833D4"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\sound_bank.gd.uid",
+    "Hash": "7BD5F0DCC094A6DC072248903242ED77A8BC5116833D9BF25613B92E65A01885"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\ui_glyph.gd",
+    "Hash": "966B4CDA5627BAAB59CBAF67F1392FB8133B5B92D7876AECB34EAF5AF390A3DE"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\scripts\\ui_glyph.gd.uid",
+    "Hash": "9C372EBA9F23F9537B2EBF4833EAD3CCF791822C7A8CA77388107DC7C78BF5E6"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\balance_results.txt",
+    "Hash": "C271C1ECB26B59E823979143C15E343FEA5E4A888CB4E97D863F3348174B41C2"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\model_results.txt",
+    "Hash": "CE3FF7DB6BFE29672366412C72EEB0A66D90B4F76530DEA0A1CAD56183CFC169"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_balance.gd",
+    "Hash": "E5F3F66011BE6477F3E9E7B930F346E612850737FD34478C1DAB0A6048C266F4"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_balance.gd.uid",
+    "Hash": "458A0F50DB0410F307EBCAD965D0855E2540218DE5E4F8748AC37427C851D69A"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_events.gd",
+    "Hash": "4171FFD2DA0587B8DA55D73E70DD55B076398AD78DEC273518988CEEC4179457"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_events.gd.uid",
+    "Hash": "B76A8172449D1EED14B52F3755A9BF5BF7BFEADC93E157CBEC0CBD7D11154034"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_expansion.gd",
+    "Hash": "DE2029C26A20E5A6927060CF9F2BE97834AAB67FCA95593CBD675C4FD61ED523"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_expansion.gd.uid",
+    "Hash": "CA8C775D9C6FA223861FAED718D17169BB6D4F1227A45BB1076846B3ACEBE589"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_expedition.gd",
+    "Hash": "824E64852A80AD7F9F8034B7AF08F86B87BC5166F4B8874330A6F911C42CA903"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_expedition.gd.uid",
+    "Hash": "6C3410865427BE158B132D9F74F1B8F2875284038AF51029162854C9EED74537"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_feedback_v315.gd",
+    "Hash": "88FF0E1665DE2ED2DAE1CDA4F976EB7A022E25FB2E6A8600D9682615D807CF51"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_feedback_v315.gd.uid",
+    "Hash": "93D43746AB0FA8BDDAACD688DC788A2882BD9B91C6BD02B3E17A94EB65B606C7"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_feedback_v317.gd",
+    "Hash": "61EDE12E275800B62767840C53B87D7F313A5671A67DE6C129EB3471973692AC"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_feedback_v317.gd.uid",
+    "Hash": "4E573B9F344A4FF66370CDFC90391EB00B88D9E0D32C93A40F34D1F0784018C9"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_feedback_v318.gd",
+    "Hash": "6FCC60EEC1FE9B967991F71298B3ABD054975827BA5F98E7BBFD190FC78735D8"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_feedback_v318.gd.uid",
+    "Hash": "E1F588D4D25A23C08883582ED9FAED28FF8018D7ED24041FB3A0B150528BD395"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_feedback.gd",
+    "Hash": "055CA2EC3F72B5B624B67D39EDD8E8E97C7E031BC737C52F70EBED73BF91E459"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_feedback.gd.uid",
+    "Hash": "CEF7202C8FFF6BE2F406228088D67B3559C8EC0639A956FB71D354E1BFCAC79B"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_items.gd",
+    "Hash": "942F72ED1C5C13C63BCAEB41A51CF3D903976C97C50EEE644D90F1499D160011"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_items.gd.uid",
+    "Hash": "449B1F9D6D25C5BBE4FEFFF272D9436DA5B850DD150B00E93A4468B954A01871"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_model.gd",
+    "Hash": "1143D8E942DC7B79F594699C4DC6C8ACCC88CD733AA9F9267925621CA7CB8C96"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_model.gd.uid",
+    "Hash": "D4E88E710DEFD22CB1F5864B2E7D52656F305B05F1A67C1B2F25DF5E11C53869"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_orbital.gd",
+    "Hash": "7BC61FFA0476598E99D6FC6ABCC3720D12839A765C907C3C0187230E391D60C9"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_orbital.gd.uid",
+    "Hash": "8CEB3DB3EFDB6D610FE02047B470077CDC6DFE72D3A6EB7A2F6C1419CFC9FE3A"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_performance.gd",
+    "Hash": "FA1ED4AEA246206958AE41AA5F96EF15DF3F26EACA470F16B62F50E10D2BE1BC"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_performance.gd.uid",
+    "Hash": "054BBE0EA35A322E299B23E2FDB5E90043C0C44BB55420E3041BFBED5DDE1962"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_progression.gd",
+    "Hash": "EBD741C513466113F2D611C1850F11942F388FAE5ACBB15E1C3BCFDD30D315AB"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_progression.gd.uid",
+    "Hash": "5F2B12C75B8CDF5EACF4D2A09EEEB601B0FDA4E838F7054BE05673F30BFD7FA4"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_replay_world.gd",
+    "Hash": "BC18CA7373C67DEC9B99E1B12FC82A993FBC460A2EEE4EB48698CB6EF5350611"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_replay_world.gd.uid",
+    "Hash": "BEF91C7FF078D3AA8A6DAE8890A3C5F95DE1773F8F53928F714116D421BD5DAA"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_ships.gd",
+    "Hash": "D82F1C9B0C630F644D60CAB743DA3E0F34CDD1D4448D8B1B85149BC21BA3B52C"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_ships.gd.uid",
+    "Hash": "26044EDE0ADA6B8094E6BD7FB0FD872BCB3F02895399A6D1D88F748281F5D01D"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_support.gd",
+    "Hash": "09BE3F71725A1F0D4803B9EEAC9E682F2EA6E2EC379291F80ACA2D66EAF4A50C"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_support.gd.uid",
+    "Hash": "54540698BA80A0B1B83295F5A2E07F06B538D8E013757D4249BF786F19FB17F6"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_survival.gd",
+    "Hash": "0E1F80DB96DE8FDF7EA35D2873835F9974A77212B679F9A5399A2F0ABEA4CDD0"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_survival.gd.uid",
+    "Hash": "6EE235460D328B5510BC38CF80A7C6C023F121EAC53218AE732BEA9EE09371D9"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_ui.gd",
+    "Hash": "76FF67D1E38C4E1CF521C4BC0BACAB4CC76668609EA97DCE436A2FC0FAE31013"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_ui.gd.uid",
+    "Hash": "A5E7CED590AA9CE2A8660CDCAA124A2B9585EA533641C9DA1D76D47994F689D4"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_uiux.gd",
+    "Hash": "26D6AD00376C035C40774E19EF6E7A0C10D5A0E24F4179C36DB9999EE3D0B9FC"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_uiux.gd.uid",
+    "Hash": "15562D1C4FB3CCA778450B04316E271E18E88D889C9EE423AECB8CBB17E172C7"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_viewport.gd",
+    "Hash": "6BF43874A51AE1A2449935FB7774DF256062B9D2EC11D7A432F8FD448988C0E4"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\tests\\test_viewport.gd.uid",
+    "Hash": "6996882BFB2DDD5158923244C78B1C57D9856369F21FC794EA8C7F5A6E78C8E3"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\project.godot",
+    "Hash": "E11D6CEBC794F7A1D14AA8495196FBBDBFAC14DB4C3E905A552D037BBD3FA9E2"
+  },
+  {
+    "Path": "D:\\Antigravity\\NewProject\\export_presets.cfg",
+    "Hash": "5EC4035E4E0AE8F3E5BFFA33FC1108170CFB625FD5D935E432A0A47CFBDC5143"
+  }
+]
