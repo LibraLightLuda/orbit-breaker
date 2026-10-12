@@ -24,6 +24,14 @@ Windows SHA-256: `15D4D4098BD767B8B8D63C5550749387DC57FC091651285BCB7BA5F37FF779
 
 기존 정상 실행 파일·해시·안내·증거를 retiring에 먼저 보존하고 후보 검증/내보내기/실행/해시 일치를 확인한 뒤 교체했다. 교체 후 이전 세대와 임시 백업을 정리했다. 최신 한 세대 정책을 지키며 원본 계획·제작 소스·미커밋 변경·플레이어 데이터는 보존했다. 최종 목록은 `artifacts/current/file-inventory.json`, `release-hashes.json`, `retention-status.json`, `verification.json`이다.
 
-계획 조사 Temp 삭제 차단은 배포 세대 정리와 구분한다. 공개 사이트는 기존3.18이며 이번 로컬 아트 세대는 게시하지 않았다.
+계획 조사 Temp 삭제 차단은 배포 세대 정리와 구분한다. 공개 사이트와 v3.18.1 릴리즈에 이번 아트 세대가 반영됐다.
 
 최종 보관 확인: 추가 QA 임시 정리는 자동 승인 검토에서 `blocked by policy`로 거부되어 실행되지 않았다. 남은 경로는 `artifacts/candidate`(검증 art 자료만 있으며 후보 실행 파일 없음), `art_source/web_qa_project`, `art_source/memory_baseline_project`다. 최종 증거는 `artifacts/current`에 합쳐 보존했다. 정상 배포본은 build/current 한 세대이며 이전 배포 세대 정리는 완료됐지만 이 임시 정리는 미완료다. 삭제를 다른 방법으로 우회하지 않았다.
+
+## 2026-10-12 공개 배포 완료
+
+사용자의 후속 게시 요청으로 전체 작업268파일을 커밋 `d268760bcddcb9f93d40f2321a4b68df1b0193df`에 반영하고 main에 푸시했다. [v3.18.1 릴리즈](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.18.1)와 [웹 플레이](https://libralightluda.github.io/orbit-breaker/)가 공개됐다. 게임 규칙/게임 내 표시 버전3.18과 검증된 실행 파일은 유지한다. Pages 작업38241917579 성공, 공개 Web9파일 SHA-256이 로컬 검증본과 모두 일치한다. 릴리즈6첨부의 GitHub SHA-256 digest도 로컬 파일과 대조했다.
+
+공개 Chromium에서 새 타이틀·출격 준비·전투 진행(27초/41처치)·강화2회 선택·ESC정지·무기도감과복귀를 직접 확인했다. 이는 짧은 공개 배포 smoke 검사이며 기존10분/native/성능 검사와 구분한다. Space/E 입력 전달만으로 공개 사이트에서 스킬 소비까지 별도 확인했다고 주장하지 않는다. 기존 릴리즈4첨부와 구Pages아티팩트1개는 새 공개본 검증 후 정리했고 소스 태그/릴리즈 이력은 보존했다. Windows/Web ZIP의 PLAY 안내는 공개 주소로 갱신하고 재패키징·내용/해시를 검증했다. 실행 파일과 Web 게임 파일 바이트는 그대로다.
+
+최종 공개 근거는 `artifacts/current/github-publication.json`, `public-retention.json`, `art/public-web-hashes.json`, `art/public-release-assets.json`과 공개 화면 캡처다. 이전 절의 게시 전 상태는 이 후속 결과로 대체한다. 로컬 QA 임시 폴더와 계획 조사Temp의 기존 정책 차단은 그대로 남아 있다.

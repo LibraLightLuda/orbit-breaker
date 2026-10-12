@@ -1,4 +1,14 @@
-# ORBIT BREAKER 3.18
+# ORBIT BREAKER 3.18.1 · 그래픽 개편
+
+[지금 웹에서 플레이](https://libralightluda.github.io/orbit-breaker/) · [Windows/Web 다운로드](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.18.1)
+
+세라믹·흑연 기체, 흑요석 침공체,3개 우주 전장과 실물 장비/FX,61개 정보 도해를 전체 메뉴·전투·신구고스트에 적용했습니다.125개 제작 대상과95개 아트+2개 브랜딩 리소스이며, 게임 규칙·저장·고스트 형식은3.18을 유지합니다. 데스크톱 키보드/마우스 대상, 기록은 해당 기기·브라우저에 로컬 저장됩니다.
+
+![실제 Godot 전투 렌더](docs/images/orbit-breaker-art.png)
+
+공개 Pages9개 파일 해시 대조와 실제 출격·전투·강화·일시정지·도감 검사를 마쳤습니다. [최종 검증](docs/VALIDATION_V3.md) · [아트 구현/품질 보고서](docs/ART_IMPLEMENTATION_REPORT.md) · [전체 제작 목록](docs/ART_ASSET_MATRIX.md).
+
+## 기존3.18 게임 규칙과 변경 기록
 
 3.18: 기체 전용3종+공통3종으로 무기 진화12종, 아이템12종, 기체별전용파츠강화2종씩을 추가했습니다. 타원위성·귀환도끼·지뢰·설치포대·돌진잔상·방벽반격을 조합하세요. 신규공통진화는4분,전용진화는5분부터 조건충족시 자동가동됩니다. TAB 도감의 다음 페이지에서 조건을 확인할 수 있습니다.
 
