@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 	<head>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 		<title>Orbit Breaker · 오빗 브레이커</title>
 		<style>
 html, body, #canvas {
@@ -25,6 +25,17 @@ body {
 #canvas:focus {
 	outline: none;
 }
+
+#game-frame { position: fixed; inset: 0; }
+#canvas { width: 100%; height: 100%; touch-action: none; -webkit-user-select: none; user-select: none; }
+#mobile-bar { display: none; position: fixed; top: env(safe-area-inset-top, 0px); left: env(safe-area-inset-left, 0px); right: env(safe-area-inset-right, 0px); height: 34px; align-items: center; justify-content: space-between; background: #09121f; font: 12px system-ui; color: #72dce6; padding: 0 10px; }
+#mobile-bar button, #rotate-tip button { border: 1px solid #355a6b; border-radius: 6px; background: #142b3c; color: #eef3e7; padding: 7px 12px; font: inherit; }
+#mobile-bar span { flex: 1; min-width: 0; font-size: 11px; line-height: 14px; }
+#mobile-bar button { white-space: nowrap; font-size: 11px; padding: 6px 8px; }
+.orbit-mobile #mobile-bar { display: flex; }
+.orbit-mobile #game-frame { inset: calc(34px + env(safe-area-inset-top, 0px)) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+#rotate-tip { display: none; position: fixed; inset: 34px 0 auto; z-index: 5; background: #09121ff5; border-bottom: 1px solid #72dce6; padding: 20px; text-align: center; font: 16px system-ui; color: #eef3e7; }
+@media (orientation: portrait) { .orbit-mobile #rotate-tip:not([hidden]) { display: block; } }
 
 #status, #status-splash, #status-progress {
 	position: absolute;
@@ -95,9 +106,13 @@ body {
 <style>body{background:#07111d}#status{background:radial-gradient(ellipse at center,#142b3c,#07111d 70%)}#status-splash{max-width:160px!important;max-height:160px!important;width:auto!important;height:auto!important}#status-progress{accent-color:#72dce6}#status-notice{transform:translateY(125px);font-family:system-ui,sans-serif;color:#eef3e7;border:1px solid #355a6b;background:#101f2e}</style><meta name="description" content="오빗 브레이커 - 업적, 로컬 랭킹과 고스트 관전">
 	</head>
 	<body>
+		<div id="mobile-bar"><span>드래그 이동 · 탭 돌진 · 두 번 탭 오버드라이브</span><button id="landscape">가로 전체화면</button></div>
+		<div id="rotate-tip"><p>기기를 가로로 돌리면 전장을 넓게 볼 수 있습니다.</p><button id="continue-portrait">지금 플레이</button></div>
+		<div id="game-frame">
 		<canvas id="canvas">
 			Your browser does not support the canvas tag.
 		</canvas>
+		</div>
 
 		<noscript>
 			Your browser does not support JavaScript.
@@ -111,8 +126,43 @@ body {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":14252700,"index.wasm":39513091},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":14281156,"index.wasm":39513091},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
+
+const canvas = document.getElementById('canvas');
+const gameFrame = document.getElementById('game-frame');
+function fitGame() {
+	window.orbitMobile = navigator.maxTouchPoints > 0 || matchMedia('(pointer: coarse)').matches || innerWidth < 900;
+	document.documentElement.classList.toggle('orbit-mobile', window.orbitMobile);
+	const bounds = gameFrame.getBoundingClientRect();
+	// Phone DPR 2-4 should not multiply fragment work while drawing the same game.
+	const ratio = window.orbitMobile ? 1 : Math.min(devicePixelRatio || 1, 2);
+	canvas.width = Math.max(1, Math.round(bounds.width * ratio));
+	canvas.height = Math.max(1, Math.round(bounds.height * ratio));
+}
+fitGame();
+window.addEventListener('resize', fitGame);
+if (window.visualViewport) window.visualViewport.addEventListener('resize', fitGame);
+document.getElementById('continue-portrait').addEventListener('click', () => {
+	document.getElementById('rotate-tip').hidden = true;
+	canvas.focus();
+});
+document.getElementById('landscape').addEventListener('click', async () => {
+	try {
+		if (!document.fullscreenElement && document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+		if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape');
+	} catch (_) {
+		// Safari and browsers without orientation lock still support physical rotation.
+	}
+	fitGame();
+	canvas.focus();
+});
+canvas.addEventListener('contextmenu', event => event.preventDefault());
+for (const type of ['pointerdown', 'pointerup', 'pointercancel']) {
+	canvas.addEventListener(type, event => {
+		if (event.pointerType === 'touch') window.orbitTouchGuard = performance.now() + 700;
+	}, true);
+}
 const engine = new Engine(GODOT_CONFIG);
 
 (function () {

@@ -37,6 +37,9 @@ New-Item -ItemType Directory -Path $buildDirectory -Force | Out-Null
 
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--editor', '--quit')
 
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_mobile.gd') `
+    -SuccessPattern '(?m)^MOBILE SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_model.gd') `
     -SuccessPattern '(?m)^MODEL SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_survival.gd') `
@@ -84,7 +87,9 @@ if (-not (Test-Path -LiteralPath $outputPath -PathType Leaf)) {
     throw "Export returned success without creating $outputPath"
 }
 
-Get-FileHash -LiteralPath $outputPath -Algorithm SHA256
+$buildHash = [System.Security.Cryptography.SHA256]::Create()
+try { Write-Host ([BitConverter]::ToString($buildHash.ComputeHash([IO.File]::ReadAllBytes($outputPath))).Replace('-','')) }
+finally { $buildHash.Dispose() }
 $webDirectory = Join-Path $buildDirectory 'web'
 New-Item -ItemType Directory -Path $webDirectory -Force | Out-Null
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--export-release', 'Web', (Join-Path $webDirectory 'index.html'))

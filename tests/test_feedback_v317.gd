@@ -146,7 +146,12 @@ func hud_checks() -> void:
 			await RenderingServer.frame_post_draw
 			var capture := root.get_texture().get_image()
 			var scale := float(capture.get_width()) / 1280.0
-			check(capture.get_pixel(int(916 * scale), int(78 * scale)).r > 0.6, "queued event symbol remains readable")
+			var visible_symbol_pixels := 0
+			for y in range(int(71 * scale), int(99 * scale)):
+				for x in range(int(902 * scale), int(930 * scale)):
+					var pixel := capture.get_pixel(x, y)
+					if pixel.r > 0.6 and pixel.get_luminance() > 0.35: visible_symbol_pixels += 1
+			check(visible_symbol_pixels >= 24 * scale * scale, "queued event symbol remains readable across its icon area")
 			check(capture.get_pixel(int(895 * scale), int(131 * scale)).r > 0.8 and capture.get_pixel(int(895 * scale), int(163 * scale)).r > 0.8, "persistent reward lanes remain below the event in both motion modes")
 			if "--capture" in OS.get_cmdline_user_args():
 				DirAccess.make_dir_recursive_absolute("res://artifacts/candidate/feedback317")

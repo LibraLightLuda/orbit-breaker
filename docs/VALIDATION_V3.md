@@ -1,3 +1,21 @@
+# 최신 검증 결과: 3.18.2 / mobile-20261013 (2026-10-13)
+
+모바일 Web 드래그 이동·탭 돌진·두 번 탭 오버드라이브, 가로/세로 HUD·카메라, 가로 전체화면 요청과 세로 안내를 구현했다. 기존 미커밋 7영역 모션 개선을 함께 보존했다. 로컬 최신본 교체 완료, GitHub/Pages 배포 준비 중. [모바일 구현·검증 보고](MOBILE_WEB_REPORT.md).
+
+21묶음2557 회귀, native 터치42, 데스크톱 입력14, 실제16화면2536, 아트325, 모션601/576프레임, WebAssembly 터치5 통과. 최종 Web 부하3회씩 p95 혼합13.8/14.4/13.6ms, 일반10.8/10.3/10.6ms. Windows 정상 실행/종료·프로필 불변 확인. 물리 휴대폰·Safari·저사양 장치 및 전체화면 회전 잠금의 실기기 동작은 미검증이다.
+
+최신본 `build/current`, 증거 `artifacts/current/mobile`와 `verification.json`, 전체 목록 `file-inventory.json`. Windows SHA-256 `8AE93D875BE76E77153E04746729C6A3D3CF24DEEFEE3F3E9D9637CA168F1A99`. Web PCK `DAA90D44EE4253E938674914FD1E30C6018DA52D22C636F7DB378B1C8C3255FF`. 이전 정상본 보존→새본 검증→교체→이전 배포/증거 정리 순서를 지켰다. 과거 정책 차단 임시5경로는 재시도하지 않고 retention-status에 남겼다. 게임 규칙·밸런스·저장·고스트 형식은 3.18을 유지한다.
+
+---
+아래는 과거 시점 기록이며 현재 상태는 위 결과가 우선한다.
+
+# 최신 검증 결과: motion-20261013 (2026-10-13)
+
+**7영역 구현·실제 렌더/Windows·Web 검증·로컬 최신본 교체 완료.** 자세한 결과와 미검증 한계는 [모션 개선 최종 보고](MOTION_IMPLEMENTATION_REPORT.md)를 따른다. 현재 실행본은 `build/current`, 증거는 `artifacts/current`. 모션601/실제16화면2536/아트325/10분 자연전투·고스트34 통과, Web 혼합최대밀도 p95 14.6~14.9ms. Windows SHA-256 `1F4D0FCBE22227C3C7DA024AB2ECBF9ADDAA97F322D25E39C0AF7D44ECB2F74C`. 공개 사이트는 이전 v3.18.1이며 이번 모션 세대는 로컬 검증본이다. 다시 재개할 때 완료 검사를 반복하지 말고 이 세대의 manifest와 변경분을 먼저 비교한다. 임시 정리5경로는 blocked by policy로 미완료이며 `retention-status.json`에 기록했다.
+
+---
+아래는 이전 검증·과정 기록이다. 현재 상태는 위 결과가 우선한다.
+
 # ORBIT BREAKER 3.18 — art-20261012 최종 로컬 검증
 
 2026-10-12. 게임 규칙은 [SURVIVAL_V3](SURVIVAL_V3.md), 아트 결정/제작 비교/실제 화면 평가는 [구현 보고서](ART_IMPLEMENTATION_REPORT.md),125개 행의 상태는 `art_source/worklist.json`을 따른다.

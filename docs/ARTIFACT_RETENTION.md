@@ -35,3 +35,13 @@ Windows SHA-256: `15D4D4098BD767B8B8D63C5550749387DC57FC091651285BCB7BA5F37FF779
 공개 Chromium에서 새 타이틀·출격 준비·전투 진행(27초/41처치)·강화2회 선택·ESC정지·무기도감과복귀를 직접 확인했다. 이는 짧은 공개 배포 smoke 검사이며 기존10분/native/성능 검사와 구분한다. Space/E 입력 전달만으로 공개 사이트에서 스킬 소비까지 별도 확인했다고 주장하지 않는다. 기존 릴리즈4첨부와 구Pages아티팩트1개는 새 공개본 검증 후 정리했고 소스 태그/릴리즈 이력은 보존했다. Windows/Web ZIP의 PLAY 안내는 공개 주소로 갱신하고 재패키징·내용/해시를 검증했다. 실행 파일과 Web 게임 파일 바이트는 그대로다.
 
 최종 공개 근거는 `artifacts/current/github-publication.json`, `public-retention.json`, `art/public-web-hashes.json`, `art/public-release-assets.json`과 공개 화면 캡처다. 이전 절의 게시 전 상태는 이 후속 결과로 대체한다. 로컬 QA 임시 폴더와 계획 조사Temp의 기존 정책 차단은 그대로 남아 있다.
+
+
+## 2026-10-13 모션 세대 전환
+
+`motion-20261013`의 모든 필수 검사·실행·해시 일치 후 `build/current`, `artifacts/current`를 교체했다. 이전 build/artifacts/web retiring3폴더는 교체 검증 후 삭제했다. 로컬 배포본은 최신 한 세대다. 비교용 `motion_baseline_project` 삭제도 자동 승인 검토에서 blocked by policy로 거부되어, 기존 차단4경로와 함께 총5개 임시 경로가 남았다. `retention-status.json`의 removed/retained_scratch와 `file-inventory.json`이 현재 실물 기준이다. 기존 계획·소스·플레이어 저장/설정은 보존했다.
+
+
+## 2026-10-13 모바일 세대 전환
+
+최신은 **3.18.2 / mobile-20261013**. 기존 정상 EXE·체크섬·안내·대응 증거를 retiring에 먼저 보존하고 새 필수 검사/Windows·Web export/실행/해시 검증 후 current를 교체했다. 교체 후 retiring3폴더와 이번 mobile-candidate를 정리했다. 최신 Windows SHA-256 `8AE93D875BE76E77153E04746729C6A3D3CF24DEEFEE3F3E9D9637CA168F1A99`. 로컬 정상 배포본은 한 세대다. 기존 정책 차단 임시5경로는 재시도하지 않았으며 retained_scratch에 남아 있다. GitHub 구버전 첨부/Pages artifact는 신규 공개본 검증 후 정리한다. 소스·설계 이력·플레이어 데이터는 보존했다.

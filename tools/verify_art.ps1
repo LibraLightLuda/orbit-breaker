@@ -2,7 +2,8 @@ param([string]$GodotPath = 'D:\Antigravity\GodotGameProject\Godot_v4.7.1-stable_
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $baseline = Get-Content -LiteralPath (Join-Path $projectRoot 'art_source/baseline/hashes.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-$allowed = @('main.gd','item_catalog.gd','item_icon.gd','ui_glyph.gd','export_presets.cfg','project.godot','test_viewport.gd','menu_flow.gd','test_uiux.gd')
+# The 3.17 render assertion now measures the outlined event icon, replacing a solid-marker pixel.
+$allowed = @('main.gd','item_catalog.gd','item_icon.gd','ui_glyph.gd','export_presets.cfg','project.godot','test_viewport.gd','menu_flow.gd','test_uiux.gd','test_feedback_v317.gd')
 $checked = 0
 $sha256 = [System.Security.Cryptography.SHA256]::Create()
 foreach ($entry in $baseline) {

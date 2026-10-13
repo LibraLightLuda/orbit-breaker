@@ -1,3 +1,5 @@
+> 2026-10-13 후속 모션 개선과 최신 실행본은 [MOTION_IMPLEMENTATION_REPORT.md](MOTION_IMPLEMENTATION_REPORT.md)를 참조한다. 아래는 이전 아트 제작 완료 기록이다.
+
 # Orbit Breaker 3.18 그래픽 개편 구현 기록
 
 2026-10-12. 승인된 ART_DIRECTION_PLAN / ART_ASSET_MATRIX / ART_REFERENCE_REVIEW를 기준으로 구현했다. 전체125개 제작 대상 적용과 최종 통합 검증·로컬 승격을 완료했다. 아래 구현 완료와 미확인 한계를 구분한다. 원본 계획과 소스 해시는 `art_source/baseline/`에 보존했다.

@@ -23,9 +23,16 @@ static func apply(game: Node2D) -> void:
 				child.reparent(panel, false)
 				controls.erase(child)
 	controls.sort_custom(func(a: Control, b: Control) -> bool: return a.position.x < b.position.x if is_equal_approx(float(a.get_meta("flow_order", a.position.y)), float(b.get_meta("flow_order", b.position.y))) else float(a.get_meta("flow_order", a.position.y)) < float(b.get_meta("flow_order", b.position.y)))
+	var launch: Button
+	if game.screen == "hangar":
+		for control in controls.duplicate():
+			if control is Button and int(control.get_meta("flow_order", 0)) == 750:
+				launch = control
+				controls.erase(control)
 	var scroll := ScrollContainer.new()
 	scroll.name = "CompactScroll"
 	scroll.size = window
+	if launch: scroll.size.y -= 76
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.follow_focus = true
 	game.ui.add_child(scroll)
@@ -41,8 +48,33 @@ static func apply(game: Node2D) -> void:
 	content.custom_minimum_size.y = y + 24
 	game.ui.scale = Vector2.ONE * game.get_viewport_rect().size.x / window.x
 	game.ui.get_parent().offset = Vector2.ZERO
+	if launch:
+		launch.position = Vector2(20, window.y - 66)
+		launch.size = Vector2(window.x - 40, 56)
+		game.ui.move_child(launch, game.ui.get_child_count() - 1)
 
 static func _layout(control: Control, width: float) -> float:
+	# Wide compact upgrade cards show the name and effect before scrolling into recipes.
+	if control is Button and control.text.is_empty() and width >= 600 and control.get_child_count() == 6 and control.get_child(5) is ScrollContainer:
+		var icon: Control = control.get_child(0)
+		icon.position = Vector2(16, 12)
+		icon.size = Vector2(40, 40)
+		var rank: Label = control.get_child(1)
+		rank.position = Vector2(width - 220, 18)
+		rank.size = Vector2(200, 30)
+		rank.add_theme_font_size_override("font_size", 18)
+		var title: Label = control.get_child(2)
+		title.position = Vector2(72, 12)
+		title.size = Vector2(width - 310, 36)
+		title.add_theme_font_size_override("font_size", 24)
+		var y := 64.0
+		for i in [3, 4, 5]:
+			var child: Control = control.get_child(i)
+			var height := _layout(child, width - 36)
+			child.position = Vector2(18, y)
+			child.size = Vector2(width - 36, height)
+			y += height + 10
+		return y + 8
 	if control is ScrollContainer and control.get_child_count()==1 and control.get_child(0) is Label:
 		var label: Label=control.get_child(0)
 		var height := _layout(label,width-16)

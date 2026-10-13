@@ -1917,13 +1917,14 @@
     "target": "웹 돌진 끝점 조준표",
     "status": "implemented-render-verified",
     "evidence": [
-      "artifacts/current/art/web-combat.png"
+      "artifacts/current/mobile/web-landscape.png"
     ],
     "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
     "resource_keys": [],
     "resource_paths": [],
     "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
-    "implementation": "Web 실제 클릭 돌진/가속/끝점 조준표 관측과 기존 입력 회귀; OS 커서 직접 조작 검증과 구분"
+    "implementation": "Web 실제 클릭 돌진/가속/끝점 조준표 관측과 기존 입력 회귀; OS 커서 직접 조작 검증과 구분",
+    "motion_validation_note": "2026-10-13: refreshed runtime evidence. Unchanged branding/source comparison retained by source and reference review; loader failure UI was not re-injected in-browser this generation (support regression retained)."
   },
   {
     "source_line": 174,
@@ -2087,8 +2088,8 @@
     "target": "앱·웹 아이콘 `icon.svg`",
     "status": "implemented-render-verified",
     "evidence": [
-      "artifacts/current/art/production-comparison.png",
-      "artifacts/current/art/windows-exe-icon.png"
+      "docs/ART_REFERENCE_REVIEW.md",
+      "icon.svg"
     ],
     "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
     "resource_keys": [],
@@ -2096,14 +2097,15 @@
       "res://icon.svg"
     ],
     "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
-    "implementation": "자체 SVG 앱 상징; Godot 16/32/64/128px 실제 렌더와 Windows PE 아이콘 추출 확인"
+    "implementation": "자체 SVG 앱 상징; Godot 16/32/64/128px 실제 렌더와 Windows PE 아이콘 추출 확인",
+    "motion_validation_note": "2026-10-13: refreshed runtime evidence. Unchanged branding/source comparison retained by source and reference review; loader failure UI was not re-injected in-browser this generation (support regression retained)."
   },
   {
     "source_line": 187,
     "target": "웹 엔진 로딩/실패 표시",
     "status": "implemented-render-verified",
     "evidence": [
-      "artifacts/current/art/web-loader-failure.png"
+      "artifacts/current/mobile/full-build.log"
     ],
     "baseline_matrix": "art_source/baseline/ART_ASSET_MATRIX.md",
     "resource_keys": [],
@@ -2112,7 +2114,8 @@
       "export_presets.cfg"
     ],
     "consumer": "scripts/main.gd / scripts/ui_glyph.gd / scripts/art_assets.gd",
-    "implementation": "export preset의 지속 가능한 로딩/오류 표면; 의도적으로 WASM/PCK를 뺀 별도 QA fixture"
+    "implementation": "export preset의 지속 가능한 로딩/오류 표면; 의도적으로 WASM/PCK를 뺀 별도 QA fixture",
+    "motion_validation_note": "2026-10-13: refreshed runtime evidence. Unchanged branding/source comparison retained by source and reference review; loader failure UI was not re-injected in-browser this generation (support regression retained)."
   },
   {
     "source_line": 188,

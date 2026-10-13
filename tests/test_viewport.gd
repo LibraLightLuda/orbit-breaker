@@ -2,6 +2,7 @@ extends SceneTree
 
 var checks := 0
 var failures := 0
+var game: Node2D
 
 func _init() -> void:
 	call_deferred("run_checks")
@@ -13,7 +14,7 @@ func check(condition: bool, message: String) -> void:
 		push_error("FAILED: " + message)
 
 func run_checks() -> void:
-	var game: Node2D = load("res://main.tscn").instantiate()
+	game = load("res://main.tscn").instantiate()
 	root.add_child(game)
 	game.set_physics_process(false)
 	game.records.load_data("user://test_viewport_%d.json" % Time.get_ticks_usec())
@@ -124,13 +125,10 @@ func snapshot(label: String, edge_color: Color = Color.TRANSPARENT) -> void:
 	await RenderingServer.frame_post_draw
 	var image := root.get_texture().get_image()
 	if edge_color.a > 0:
-		var background := ArtAssets.texture("world/ring").get_image()
+		check(game.backdrop.bounds == game._viewport_rect(), "moving background fills the expanded viewport")
 		for point: Vector2i in [Vector2i(0, 0), Vector2i(image.get_width() - 1, 0), Vector2i(0, image.get_height() - 1), Vector2i(image.get_width() - 1, image.get_height() - 1)]:
 			var pixel := image.get_pixelv(point)
-			var uv := Vector2(point) / Vector2(image.get_size() - Vector2i.ONE)
-			var source := background.get_pixelv(Vector2i(uv * Vector2(background.get_size() - Vector2i.ONE)))
-			var expected := edge_color.lerp(source,0.55)
-			check(absf(pixel.r - expected.r) < 0.025 and absf(pixel.g - expected.g) < 0.025 and absf(pixel.b - expected.b) < 0.025, "screen corner contains authored scene background without black border")
+			check(pixel.b > 0.025 and pixel.b > pixel.r and pixel.a > 0.99, "screen corner contains blue scene detail without a black border")
 	var folder := "res://artifacts/candidate/viewport-%dx%d" % [image.get_width(), image.get_height()]
 	DirAccess.make_dir_recursive_absolute(folder)
 	check(image.save_png(folder + "/" + label + ".png") == OK, "capture " + label)

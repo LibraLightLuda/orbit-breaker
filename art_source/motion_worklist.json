@@ -1,0 +1,72 @@
+[
+  {
+    "id": "title",
+    "status": "implemented-render-verified",
+    "implementation": "3 ships, flight paths, propulsion, weapons and missiles",
+    "evidence": [
+      "artifacts/current/motion/title-120.png",
+      "artifacts/current/motion/motion-results.json",
+      "artifacts/current/mobile/web-performance.json"
+    ]
+  },
+  {
+    "id": "actors",
+    "status": "implemented-render-verified",
+    "implementation": "Idle, acceleration, recoil, hit compression, orbital and part motion",
+    "evidence": [
+      "artifacts/current/motion/combat-striker-024.png",
+      "artifacts/current/motion/motion-results.json",
+      "artifacts/current/mobile/web-performance.json"
+    ]
+  },
+  {
+    "id": "space",
+    "status": "implemented-render-verified",
+    "implementation": "Layered flow, parallax, gravity distortion and expanding hazard motion",
+    "evidence": [
+      "artifacts/current/motion/gravity-024.png",
+      "artifacts/current/motion/motion-results.json",
+      "artifacts/current/mobile/web-performance.json"
+    ]
+  },
+  {
+    "id": "readability",
+    "status": "implemented-render-verified",
+    "implementation": "Ivory hulls, coral enemies, distinct supplies and projectile cores",
+    "evidence": [
+      "artifacts/current/motion/combat-scout-024.png",
+      "artifacts/current/motion/motion-results.json",
+      "artifacts/current/mobile/web-performance.json"
+    ]
+  },
+  {
+    "id": "effects",
+    "status": "implemented-render-verified",
+    "implementation": "Authored textures, directional debris, event icons and physical drops",
+    "evidence": [
+      "artifacts/current/motion/combat-bastion-024.png",
+      "artifacts/current/motion/motion-results.json",
+      "artifacts/current/mobile/web-performance.json"
+    ]
+  },
+  {
+    "id": "experience",
+    "status": "implemented-render-verified",
+    "implementation": "18px crystals, magnet trails and absorption feedback",
+    "evidence": [
+      "artifacts/current/mobile/web-landscape.png",
+      "artifacts/current/motion/motion-results.json",
+      "artifacts/current/mobile/web-performance.json"
+    ]
+  },
+  {
+    "id": "ui",
+    "status": "implemented-render-verified",
+    "implementation": "Hover/focus/press and actual menu transitions; reduced motion and pause checks",
+    "evidence": [
+      "artifacts/current/mobile/web-upgrade.png",
+      "artifacts/current/motion/motion-results.json",
+      "artifacts/current/mobile/web-performance.json"
+    ]
+  }
+]

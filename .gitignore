@@ -10,3 +10,7 @@ addons/
 art_source/web_qa_project/
 art_source/memory_baseline_project/
 *.blend1
+
+art_source/motion_baseline_project/
+docs/**/*.import
+tools/__pycache__/

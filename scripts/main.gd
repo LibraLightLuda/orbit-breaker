@@ -1,5 +1,7 @@
 extends Node2D
 
+const Motion := preload("res://scripts/art_motion.gd")
+
 const BG := Color("09121f")
 const INK := Color("eef3e7")
 const MUTED := Color("8b9ba9")
@@ -13,6 +15,11 @@ const LINE := Color("293a49")
 const ARENA := RunModel.ARENA
 const HUD_ALPHA := 0.12
 const TOAST_ALPHA := 0.06
+
+var engine_batch := MultiMesh.new()
+var arena_grid := preload("res://scripts/arena_grid.gd").new()
+var backdrop := preload("res://scripts/space_backdrop.gd").new()
+var menu_tween: Tween
 
 var run := RunModel.new()
 var records := SaveStore.new()
@@ -74,8 +81,22 @@ var click_dash_queued := false
 var click_dash_active := false
 var dash_cursor_anchor := false
 var dash_cursor_position := Vector2.ZERO
+var touch := preload("res://scripts/touch_controls.gd").new()
+var touch_mode := false
+var touch_mouse_guard := 0.0
+var touch_landscape := true
 
 func _ready() -> void:
+	add_child(backdrop)
+	add_child(arena_grid)
+	var engine_quad := QuadMesh.new()
+	engine_quad.size = Vector2.ONE
+	engine_batch.transform_format = MultiMesh.TRANSFORM_2D
+	engine_batch.use_colors = true
+	engine_batch.mesh = engine_quad
+	engine_batch.instance_count = 256
+	engine_batch.visible_instance_count = 0
+	for i in engine_batch.instance_count: engine_batch.set_instance_color(i, Color(1.4, 0.6, 0.65, 0.65))
 	var readable_font := FontVariation.new()
 	readable_font.base_font = preload("res://assets/fonts/NotoSansKR.ttf")
 	readable_font.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): 500.0}
@@ -110,8 +131,22 @@ func _viewport_rect() -> Rect2:
 	return Rect2(-position, get_viewport_rect().size)
 
 func _fit_viewport() -> void:
+	if OS.has_feature("web"):
+		touch_mode = bool(JavaScriptBridge.eval("window.orbitMobile === true"))
+		var portrait := DisplayServer.window_get_size().x < DisplayServer.window_get_size().y
+		var base := (Vector2i(540, 960) if portrait else Vector2i(960, 540)) if touch_mode else Vector2i(1280, 720)
+		if get_window().content_scale_size != base: get_window().content_scale_size = base
+	var landscape := get_viewport_rect().size.x >= get_viewport_rect().size.y
+	if touch_mode and landscape != touch_landscape:
+		touch.reset()
+		if screen == "playing": _show_pause()
+	touch_landscape = landscape
 	position = (get_viewport_rect().size - Vector2(1280, 720)) * 0.5
+	backdrop.bounds = _viewport_rect()
+	backdrop.queue_redraw()
 	ui.get_parent().offset = position
+	if screen == "playing" and ui.has_node("MobileHUD"):
+		ui.get_node("MobileHUD").fit()
 	if ui.has_node("CompactScroll"):
 		call_deferred("_refresh_menu_layout")
 	else:
@@ -120,10 +155,32 @@ func _fit_viewport() -> void:
 	if shade != null:
 		shade.position = _viewport_rect().position
 		shade.size = _viewport_rect().size
+	_animate_menu.call_deferred()
 	queue_redraw()
 
+func _animate_menu() -> void:
+	if records.data.reduced_motion or screen in ["playing", "replay"]: return
+	if menu_tween: menu_tween.kill()
+	ui.position.y = 7
+	ui.modulate.a = 0.7
+	menu_tween = create_tween().set_parallel().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	menu_tween.tween_property(ui, "position:y", 0.0, 0.13)
+	menu_tween.tween_property(ui, "modulate:a", 1.0, 0.13)
+
 func _input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch and not event.pressed and touch.contacts.has(event.index):
+		var at: Vector2 = get_global_transform_with_canvas().affine_inverse() * event.position
+		var action: String = touch.release(event.index, at, event.canceled)
+		_touch_skill(action, touch.dash_position)
+		touch_mouse_guard = 0.6
+		get_viewport().set_input_as_handled()
+		return
+	if event is InputEventScreenDrag and touch.contacts.has(event.index):
+		touch.drag(event.index, get_global_transform_with_canvas().affine_inverse() * event.position)
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventMouseMotion:
+		if _touch_mouse_event(event): return
 		# Native cursor coordinates are rounded to screen pixels after window scaling.
 		var cursor_scale := get_viewport().get_final_transform().get_scale().x
 		if dash_cursor_anchor and event.position.distance_to(dash_cursor_position) * cursor_scale < 3.0:
@@ -135,8 +192,17 @@ func _input(event: InputEvent) -> void:
 		mouse_active = screen == "playing"
 
 func _unhandled_input(event: InputEvent) -> void:
+	if screen == "playing" and event is InputEventScreenTouch and event.pressed:
+		touch_mode = true
+		mouse_active = false
+		touch_mouse_guard = 0.6
+		var pixels := get_viewport().get_final_transform().get_scale().x
+		touch.press(event.index, get_global_transform_with_canvas().affine_inverse() * event.position, pixels if pixels > 0 else 1.0)
+		get_viewport().set_input_as_handled()
+		return
 	if screen != "playing" or not event is InputEventMouseButton or not event.pressed:
 		return
+	if _touch_mouse_event(event): return
 	if event.button_index == MOUSE_BUTTON_LEFT:
 		dash_queued = true
 		click_dash_queued = true
@@ -147,14 +213,27 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	get_viewport().set_input_as_handled()
 
+func _touch_mouse_event(event: InputEvent) -> bool:
+	if event.device == InputEvent.DEVICE_ID_EMULATION or touch_mouse_guard > 0: return true
+	return touch_mode and OS.has_feature("web") and bool(JavaScriptBridge.eval("performance.now() < (window.orbitTouchGuard || 0)"))
+
 func _movement_direction() -> Vector2:
 	var keys := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if not keys.is_zero_approx():
 		return keys
+	if not touch.direction.is_zero_approx(): return touch.direction
 	if mouse_active and mouse_outside and not dash_cursor_anchor and DisplayServer.get_name() != "headless" and not OS.has_feature("web"):
 		# Poll desktop coordinates: window-local mouse events stop at the window edge.
 		mouse_target = get_global_transform_with_canvas().affine_inverse() * get_viewport().get_screen_transform().affine_inverse() * Vector2(DisplayServer.mouse_get_position())
 	return _mouse_direction(mouse_target) if mouse_active else Vector2.ZERO
+
+func _touch_skill(action: String, at: Vector2) -> void:
+	if screen != "playing": return
+	if action == "dash":
+		dash_queued = true
+		dash_aim = (at + camera_offset - run.player).normalized()
+	elif action == "overdrive":
+		run.activate_overdrive()
 
 func _mouse_direction(cursor: Vector2) -> Vector2:
 	var offset := cursor + camera_offset - run.player
@@ -209,6 +288,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	clock_time += delta
+	touch_mouse_guard = maxf(0, touch_mouse_guard - delta)
+	if screen == "playing": _touch_skill(touch.advance(delta), touch.dash_position)
 	_poll_ghost_save()
 	item_save_retry = maxf(0.0, item_save_retry - delta)
 	if not run.pending_tech.is_empty() and item_save_retry <= 0.0:
@@ -235,7 +316,7 @@ func _physics_process(delta: float) -> void:
 		camera_offset = _camera_target(Vector2(frame[1], frame[2]))
 		hud.replay.text = "%s / %s    %.0f배속    %s" % [_time(replay_time), _time(float(replay_frames.back()[0])), replay_speed, "일시정지" if replay_paused else "재생 중"]
 	toast_time = maxf(0.0, toast_time - delta)
-	hurt_flash = maxf(0.0, hurt_flash - delta * 2.0)
+	if screen == "playing": hurt_flash = maxf(0.0, hurt_flash - delta * 2.0)
 	if screen == "playing":
 		if not notices.is_empty():
 			notices[0].ttl -= delta
@@ -351,8 +432,7 @@ func _draw_progress_notice() -> void:
 	var pulse := 0.0 if records.data.reduced_motion else pow(clampf((float(notice.ttl) - 2.4) / 0.6, 0, 1), 2)
 	var at := Vector2(894, 62)
 	draw_style_box(_style(Color(BG, HUD_ALPHA), Color(color, 0.5 + pulse * 0.5)), Rect2(at, Vector2(338, 46)))
-	_polygon(at + Vector2(22, 23), 10 + pulse * 2, int(notice.sides), color, -PI / 2)
-	draw_circle(at + Vector2(22, 23), 4, BG)
+	ArtAssets.icon(self, at + Vector2(22, 23), {3: "superorbit", 4: "power", 5: "achievement", 6: "trinity"}.get(int(notice.sides), "achievement"), color, 0.65 + pulse * 0.12)
 	draw_string(font, at + Vector2(43, 15), notice.title, HORIZONTAL_ALIGNMENT_LEFT, 265, 11, color)
 	draw_string(font, at + Vector2(43, 36), notice.name, HORIZONTAL_ALIGNMENT_LEFT, 279, 16, INK)
 	if notices.size() > 1:
@@ -384,16 +464,21 @@ func _exit_tree() -> void:
 		job.writer.cancel_write()
 
 func _clear_ui() -> void:
+	touch.reset()
 	if dash_cursor_anchor and OS.has_feature("web"):
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	dash_cursor_anchor = false
 	hud.clear()
+	if menu_tween: menu_tween.kill()
+	ui.position = Vector2.ZERO
+	ui.modulate = Color.WHITE
 	ui.scale = Vector2.ONE
 	ui.get_parent().offset = position
 	for child in ui.get_children():
 		ui.remove_child(child)
 		child.queue_free()
 	preload("res://scripts/menu_flow.gd").apply.call_deferred(self)
+	_animate_menu.call_deferred()
 
 func _refresh_menu_layout() -> void:
 	match screen:
@@ -455,7 +540,8 @@ func _panel(rect: Rect2, fill: Color = PANEL, border: Color = LINE) -> Panel:
 	return panel
 
 func _button(text: String, rect: Rect2, callback: Callable, primary: bool = false, focus: bool = false) -> Button:
-	var button := Button.new()
+	var button: Button = preload("res://scripts/motion_button.gd").new()
+	button.reduced = bool(records.data.reduced_motion)
 	button.text = text
 	button.position = rect.position
 	button.size = rect.size
@@ -492,7 +578,7 @@ func _show_menu() -> void:
 	_button("설정", Rect2(410, 468, 148, 50), _show_settings)
 	_label("최고 %s   /   돌파 %d회   /   업적 %d점" % [_number(int(records.data.best_score)), int(records.data.wins), Achievements.points(records.data.achievements)], Rect2(80, 565, 660, 30), 18, MUTED)
 	_label("마우스 / WASD 이동    좌클릭 / SPACE 돌진    우클릭 / E 오버드라이브", Rect2(80, 642, 850, 30), 16, MUTED)
-	_label("VERSION 3.18  /  MADE WITH GODOT", Rect2(922, 650, 350, 24), 13, MUTED)
+	_label("VERSION 3.18.2  /  MADE WITH GODOT", Rect2(922, 650, 350, 24), 13, MUTED)
 
 func _wrap_label(text: String, rect: Rect2, size: int = 18, color: Color = MUTED, parent: Control = null) -> Label:
 	return _label(text, rect, size, color, parent, true)
@@ -768,6 +854,13 @@ func _resume() -> void:
 	pause.focus_mode = Control.FOCUS_NONE
 	hud.level = _label("", Rect2(48, 684, 270, 27), 14, CYAN)
 	_label("TAB 도감   ESC 정지", Rect2(1060, 684, 210, 27), 14, MUTED)
+	if touch_mode:
+		for child: Control in ui.get_children(): child.visible = false
+		var mobile := preload("res://scripts/mobile_hud.gd").new()
+		mobile.name = "MobileHUD"
+		mobile.game = self
+		ui.add_child(mobile)
+		mobile.fit()
 	net_gauge = run.net_hull_rate() / maxf(1.0, run.regeneration_rate() + run.decay_rate() + run.boundary_damage_rate())
 	speed_gauge = clampf(run.current_speed / run.base_speed(), 0.0, 1.0)
 	_update_hud()
@@ -865,6 +958,10 @@ func _show_help() -> void:
 		["02", "돌진과 오버드라이브", "좌클릭 / SPACE 무적 돌진. 우클릭 / E로 충전된 오버드라이브 발동 · 6초간 화력 증폭."],
 		["03", "나만의 진화 조합", "파란 조각을 모아 1 / 2 / 3으로 강화 선택. TAB 도감에서 무기 진화 조건을 확인하세요."]
 	]
+	if touch_mode:
+		rows[0] = ["01", "드래그로 이동", "화면을 누른 채 원하는 방향으로 밀면 이동합니다. 손을 떼면 멈춥니다. 공격은 자동."]
+		rows[1] = ["02", "탭 · 두 번 탭", "탭은 그 방향으로 돌진. 가까운 곳을 두 번 탭하면 오버드라이브. 아래 스킬 버튼도 사용할 수 있습니다."]
+		rows[2] = ["03", "강화와 도감", "강화 카드를 터치해 선택하세요. 전투 중 도감과 일시정지는 오른쪽 위에 있습니다."]
 	for i in range(rows.size()):
 		var y := 217 + i * 112
 		_panel(Rect2(100, y, 1080, 96))
@@ -1078,11 +1175,9 @@ func _number(value: int) -> String:
 	return formatted
 
 func _draw() -> void:
+	arena_grid.visible = false
 	if screen in ["menu", "help", "settings", "credits", "hangar", "records", "replay"] or (screen == "arsenal" and codex_return == "menu"):
-		draw_rect(_viewport_rect(), BG)
-		draw_texture_rect(ArtAssets.texture("world/ring"), _viewport_rect(), false, Color(1, 1, 1, 0.55))
-		for i in range(mini(stars.size(),48)):
-			draw_circle(_viewport_rect().position + stars[i] * _viewport_rect().size / Vector2(1280, 720), 1.0 if i % 4 else 1.6, Color(0.25, 0.37, 0.44, 0.42))
+		backdrop.sync(_viewport_rect(), "ring", 0.0 if records.data.reduced_motion else (replay_time if screen == "replay" else clock_time), Vector2.ZERO)
 	if screen in ["menu", "help", "settings", "credits", "hangar", "records"] or (screen == "arsenal" and codex_return == "menu"):
 		if screen == "menu":
 			_draw_motif(Vector2(914, 346))
@@ -1095,7 +1190,7 @@ func _draw() -> void:
 		_draw_boundary_warning()
 	if screen == "playing":
 		_draw_item_status()
-		_draw_expedition(run)
+		if not touch_mode: _draw_expedition(run)
 	if toast_time > 0 and screen == "playing":
 		var width := font.get_string_size(toast, HORIZONTAL_ALIGNMENT_LEFT, -1, 20).x + 48
 		var has_event := run.hazards.any(func(h: Dictionary) -> bool: return RunModel.ENCOUNTERS.has(h.kind))
@@ -1106,21 +1201,12 @@ func _draw() -> void:
 		draw_string(font, pos + Vector2(24, 29), toast, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(INK, 0.60))
 
 func _draw_motif(center: Vector2) -> void:
-	var t := 0.0 if records.data.reduced_motion else clock_time * 0.3
-	for radius in [95, 165, 238]:
-		draw_arc(center, radius, 0, TAU, 100, LINE, 1.0, true)
-	for i in range(4):
-		var angle := t + i * TAU / 4
-		var pos := center + Vector2.from_angle(angle) * 165
-		draw_arc(center, 165, angle - 0.3, angle, 18, Color(CYAN, 0.4), 4, true)
-		ArtAssets.sprite(self, "objects/normal", pos, Vector2.ONE * 28, angle)
-	preload("res://scripts/ui_glyph.gd").ship(self, center, selected_ship, CYAN, 7.0, -PI / 6)
-	draw_arc(center, 270, -0.8, 2.9, 100, Color(CORAL, 0.22), 3, true)
-	for i in range(6):
-		var angle := -t * 0.4 + i * 1.05
-		var pos := center + Vector2.from_angle(angle) * (238 + 12 * sin(t + i))
-		ArtAssets.sprite(self, "enemies/runner" if i % 2 else "enemies/chaser", pos, Vector2.ONE * 37, angle + PI)
-	draw_string(font, center + Vector2(-106, 292), "SURVIVE. EVOLVE. BREAK.", HORIZONTAL_ALIGNMENT_LEFT, -1, 15, MUTED)
+	for radius in [132, 238]:
+		draw_arc(center, radius, -0.8, 2.8, 80, Color(CYAN, 0.12), 1, true)
+	var id := Motion.title(self, center, clock_time, bool(records.data.reduced_motion))
+	draw_string(font, center + Vector2(-130, 270), GameContent.ship_info(id).name.to_upper() + " / FLIGHT SYSTEMS", HORIZONTAL_ALIGNMENT_CENTER, 260, 14, INK)
+	for i in 3:
+		draw_rect(Rect2(center + Vector2(-34 + i * 26, 292), Vector2(18, 3)), CYAN if int(clock_time / 8) % 3 == i else LINE)
 
 func _draw_arena(world: RunModel = null) -> void:
 	var model := run if world == null else world
@@ -1128,34 +1214,43 @@ func _draw_arena(world: RunModel = null) -> void:
 	var world_rect := Rect2(camera_offset + _viewport_rect().position, _viewport_rect().size)
 	var visible_world := world_rect.grow(80.0)
 	draw_set_transform(-camera_offset)
-	draw_rect(world_rect, Color("050c16"))
-	var bg_id: String = "world/" + model.sector_id
-	var bg_size := world_rect.size * 1.18
-	var bg_shift := camera_offset * 0.06
-	draw_texture_rect(ArtAssets.texture(bg_id), Rect2(world_rect.get_center() - bg_size * 0.5 - bg_shift, bg_size), false, Color(1,1,1,0.8))
+	var visual_time: float = 0.0 if records.data.reduced_motion else model.elapsed
+	var gravity := Vector2(-4000, -4000)
+	var gravity_power := 0.0
+	for hazard: Dictionary in model.hazards:
+		if hazard.kind == "black_hole" and hazard.active:
+			gravity = hazard.pos - camera_offset
+			gravity_power = 0.0 if records.data.reduced_motion else 1.0
+	backdrop.sync(_viewport_rect(), model.sector_id, visual_time, Vector2.ZERO if records.data.reduced_motion else model.player, gravity, gravity_power)
 	_draw_orbital_regions(sector_color)
-	_draw_space(sector_color)
-	var center := ARENA.get_center()
-	draw_arc(center, RunModel.ACTIVITY_RADIUS / 3, 0, TAU, 96, Color("203344"), 1, true)
-	draw_arc(center, RunModel.ACTIVITY_RADIUS * 2 / 3, 0, TAU, 128, Color("203344"), 1, true)
+	_draw_space(sector_color, model)
 	for hazard in model.hazards:
 		_draw_hazard(hazard, model.elapsed)
+	var suction := PackedVector2Array()
 	for gem in model.gems:
 		if not visible_world.has_point(gem.pos):
 			continue
 		var pos: Vector2 = gem.pos
 		var is_heal: bool = str(gem.get("kind", "xp")) == "heal"
-		ArtAssets.sprite(self, "objects/heal" if is_heal else "objects/xp", pos, Vector2.ONE * (18 if is_heal else 12), 0, camera_offset)
+		var phase := visual_time * 3.2 + pos.x * 0.01
+		var gem_size := Vector2(1.0 - absf(sin(phase)) * 0.18, 1.0) * (22 if is_heal else 18)
+		ArtAssets.sprite(self, "objects/heal" if is_heal else "objects/xp", pos, gem_size, 0, camera_offset, Color(1.45, 1.55, 1.6))
+		var distance := pos.distance_to(model.player)
+		if not records.data.reduced_motion and distance < 86 + int(model.upgrades.get("magnet", 0)) * 38:
+			var toward := (model.player - pos).normalized()
+			suction.append_array(PackedVector2Array([pos - toward * clampf(24 - distance * 0.08, 4, 20), pos]))
+	if not suction.is_empty(): draw_multiline(suction, Color(CYAN, 0.55), 1.8, true)
 	for item: Dictionary in model.items:
 		if not visible_world.has_point(item.pos):
 			continue
 		var at: Vector2 = item.pos
 		var color := ItemCatalog.grade_color(str(item.grade))
 		ArtAssets.container(self, at, str(item.grade), 25)
-		ItemCatalog.draw_icon(self, at, str(item.id), INK)
+		ItemCatalog.draw_icon(self, at + Vector2(0, sin(visual_time * 2.5) * 2), str(item.id), INK)
 		draw_string(font, at + Vector2(-17, -29), str(item.grade), HORIZONTAL_ALIGNMENT_LEFT, -1, 18, color)
 		draw_string(font, at + Vector2(-17, 40), "%d초" % ceili(float(item.ttl)), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, color)
 	var decorative_effects := 0
+	var damage_flash := 0.0
 	for effect in model.effects:
 		if not visible_world.grow(float(effect.radius)).has_point(effect.pos) and not visible_world.has_point(effect.get("end", effect.pos)):
 			continue
@@ -1166,26 +1261,19 @@ func _draw_arena(world: RunModel = null) -> void:
 			if decorative_effects > 72:
 				continue
 		var life: float = clampf(float(effect.ttl) / maxf(0.01, float(effect.get("max_ttl", 0.5))), 0, 1)
+		if str(effect.kind).begins_with("impact_"):
+			damage_flash = maxf(damage_flash, life)
 		if str(effect.kind).begins_with("risk_"):
+			if effect.kind == "risk_xp" and life > 0.72 and not records.data.reduced_motion:
+				var age := (1.0 - life) / 0.28
+				for i in 3:
+					var angle := TAU * i / 3 + age * 1.2
+					ArtAssets.sprite(self, "objects/xp", model.player + Vector2.from_angle(angle) * (28 * (1 - age)), Vector2.ONE * (9 * (1 - age) + 3), angle, camera_offset, Color(1.5, 1.6, 1.7, 1 - age))
 			continue
 		if str(effect.kind).begins_with("impact_") or str(effect.kind) in ["hit", "death", "meteor_impact", "reward", "hazard_start"]:
 			_draw_impact(effect, life)
 			continue
-		var color := LIME if str(effect.kind) == "dash" else CORAL
-		if str(effect.kind) in ["pickup", "level", "pulse"]:
-			color = CYAN
-		if str(effect.kind) == "lightning":
-			var end: Vector2 = effect.get("end", effect.pos)
-			var start: Vector2 = effect.pos
-			var middle := (start + end) * 0.5 + (end - start).orthogonal().normalized() * 12
-			draw_polyline(PackedVector2Array([start, middle, end]), Color(CYAN, life), 3, true)
-			continue
-		if str(effect.kind) in ["missile", "guard", "arrival"]:
-			color = GOLD
-		if str(effect.kind) in ["pulse","guard","arrival","level"]:
-			var fx_size := maxf(16, float(effect.radius) * (2.0 - life * 0.4))
-			ArtAssets.sprite(self, "fx/wave", effect.pos, Vector2.ONE * fx_size, 0, camera_offset, Color(1,1,1,life*0.3))
-		draw_arc(effect.pos, maxf(2, float(effect.get("radius", 20)) * (1.2 - life * 0.4)), 0, TAU, 22, Color(color, life * 0.65), 2, true)
+		Motion.effect(self, effect, bool(records.data.reduced_motion))
 	var friendly_tails := PackedVector2Array()
 	var hostile_tails := PackedVector2Array()
 	var rail_tails := PackedVector2Array()
@@ -1203,7 +1291,7 @@ func _draw_arena(world: RunModel = null) -> void:
 				ArtAssets.sprite(self, "fx/wave", shot.pos, Vector2.ONE * float(shot.radius) * 2, 0, camera_offset, Color(1,1,1,clampf(float(shot.ttl) / 2.4, 0.2, 0.45)))
 			else:
 				var deploy_scale := 0.6 if kind == "mine" and float(shot.get("armed",0)) > 0 else 1.0
-				ArtAssets.sprite(self, "objects/" + kind, shot.pos, Vector2.ONE * (float(shot.radius) + 4) * 2.4 * deploy_scale, model.elapsed * 5 if kind == "axe" else 0, camera_offset)
+				ArtAssets.sprite(self, "objects/" + kind, shot.pos, Vector2.ONE * (float(shot.radius) + 4) * 2.4 * deploy_scale, visual_time * 5 if kind == "axe" else sin(visual_time * 2) * 0.12, camera_offset, Color(1.3, 1.35, 1.4))
 			continue
 		var velocity: Vector2 = shot.get("velocity", Vector2.ZERO)
 		if kind == "missile":
@@ -1227,24 +1315,61 @@ func _draw_arena(world: RunModel = null) -> void:
 		ArtAssets.sprite(self,"fx/projectile",shot.pos,Vector2.ONE * radius * (64.0/24.0),0,camera_offset,color)
 	if model.buffs.has("shield"):
 		draw_arc(model.player, 36, 0, TAU, 40, CYAN, 3, true)
-	for enemy in model.enemies:
-		if not visible_world.has_point(enemy.pos) and float(enemy.get("warn", 0.0)) <= 0.0:
-			continue
-		_draw_enemy(enemy, model)
+	# GPU instance the shared exhaust quad; rotated canvas primitives submit separately on Web.
+	var engine_count := 0
+	for enemy: Dictionary in model.enemies:
+		if enemy.kind == "tank" or not visible_world.has_point(enemy.pos): continue
+		var a := float(enemy.get("angle", 0))
+		var length := 28.0 if float(enemy.get("warn", 0)) > 0 else 14.0
+		if engine_count < engine_batch.instance_count:
+			engine_batch.set_instance_transform_2d(engine_count, Transform2D(a, Vector2(length, 7), 0, enemy.pos - Vector2.from_angle(a) * (float(enemy.radius) + length * 0.25)))
+			engine_count += 1
+	engine_batch.visible_instance_count = engine_count
+	if engine_count > 0: draw_multimesh(engine_batch, ArtAssets.texture("fx/thrust"))
+	var enemy_batches := {}
+	var health_back := PackedVector2Array()
+	var health_front := PackedVector2Array()
+	for enemy: Dictionary in model.enemies:
+		if not visible_world.has_point(enemy.pos) and float(enemy.get("warn", 0.0)) <= 0.0: continue
+		var key := str(enemy.kind) + str(enemy.get("elite_index", 1))
+		if not enemy_batches.has(key): enemy_batches[key] = []
+		enemy_batches[key].append(enemy)
+		if float(enemy.hp) < float(enemy.max_hp):
+			var left: Vector2 = enemy.pos + Vector2(-float(enemy.radius), -float(enemy.radius) - 7.5)
+			var width := float(enemy.radius) * 2
+			health_back.append_array(PackedVector2Array([left, left + Vector2(width, 0)]))
+			health_front.append_array(PackedVector2Array([left, left + Vector2(width * maxf(0, float(enemy.hp) / float(enemy.max_hp)), 0)]))
+	# Group only draw submissions; model entity order and collision processing stay untouched.
+	for batch: Array in enemy_batches.values():
+		for enemy: Dictionary in batch: _draw_enemy(enemy, model)
+	for batch: Array in enemy_batches.values():
+		for enemy: Dictionary in batch: _draw_enemy_status(enemy, model)
+	if not health_back.is_empty():
+		draw_multiline(health_back, LINE, 3, true)
+		draw_multiline(health_front, CORAL, 3, true)
 	var player: Vector2 = model.player
 	for drop: Dictionary in model.part_drops:
 		var info := Expedition.part(str(drop.id))
 		var color: Color = info.color
 		var at: Vector2 = drop.pos
-		draw_circle(at, 26, BG)
-		_draw_part_icon(at, str(drop.id), color, 1.0, true)
+		ArtAssets.container(self, at, "B", 27)
+		ArtAssets.sprite(self, "objects/" + str(drop.id), at + Vector2(0, sin(visual_time * 2.2) * 2), Vector2.ONE * 34, sin(visual_time * 1.4) * 0.08, camera_offset, Color(1.25, 1.3, 1.35))
 		draw_arc(at, 26, 0, TAU * clampf(float(drop.ttl) / 45.0, 0, 1), 36, color, 2, true)
 		draw_string(font, at + Vector2(-52, -33), str(info.name), HORIZONTAL_ALIGNMENT_CENTER, 104, 13, color)
 		draw_string(font, at + Vector2(-52, 43), "%d초 · %s" % [ceili(float(drop.ttl)), "2층 탐사" if bool(drop.locked) else "회수"], HORIZONTAL_ALIGNMENT_CENTER, 104, 12, INK)
 	var reduced: bool = records.data.reduced_motion
 	var ship_color: Color = GameContent.ship_info(model.ship_id).color
-	if not reduced and speed_gauge > 0.1:
-		ArtAssets.sprite(self, "fx/thrust", player - model.facing * 23, Vector2(23 + speed_gauge * 22,12), model.facing.angle(), camera_offset, Color(1,1,1,0.5))
+	var movement := clampf(model.current_speed / model.base_speed(), 0, 2)
+	var recoil := 0.0
+	var fire_angle := model.facing.angle()
+	for shot: Dictionary in model.shots:
+		if bool(shot.friendly) and str(shot.get("kind", "")).is_empty():
+			var proximity := maxf(0, 1.0 - Vector2(shot.pos).distance_to(player) / 80.0)
+			if proximity > recoil:
+				recoil = proximity
+				fire_angle = Vector2(shot.velocity).angle()
+	for side in [-1, 1]:
+		Motion.engine(self, player - model.facing * 15 + model.facing.orthogonal() * side * 6, model.facing.angle(), 0.18 + movement * 0.8 + (1.2 if model.dash_time > 0 else 0), visual_time, ship_color, 0.75, reduced)
 	if model.overdrive_time > 0:
 		draw_arc(player, 31, 0, TAU, 40, GOLD, 3, true)
 		draw_arc(player, model.orbit_radius + 7, 0, TAU, 64, Color(GOLD, 0.35), 2, true)
@@ -1263,12 +1388,12 @@ func _draw_arena(world: RunModel = null) -> void:
 		var orbit_color: Color = CORAL if kind == "blade" else (CYAN if kind == "frost" else GOLD)
 		if not reduced and not model.evolutions.has("ellipse"):
 			draw_arc(player, model.orbit_radius, angle - 0.45, angle, 16, Color(orbit_color, 0.5), 3, true)
-		ArtAssets.sprite(self, "objects/" + kind, pos, Vector2.ONE * (30 if model.evolutions.has("superorbit") else 23), angle + PI / 2, camera_offset)
-	if model.dash_time > 0:
-		draw_circle(player, 25, Color(LIME, 0.12), true, -1, true)
-		if not reduced:
-			draw_line(player - model.facing * 70, player, Color(LIME, 0.5), 13, true)
-	ArtAssets.sprite(self, "ships/" + model.ship_id, player, Vector2.ONE * 40, model.facing.angle(), camera_offset, Color(1.6,1.6,1.6) if hurt_flash > 0 else Color.WHITE)
+		Motion.orbital(self, pos, kind, angle + PI / 2, 30 if model.evolutions.has("superorbit") else 23, visual_time, reduced)
+	if model.dash_time > 0 and not reduced:
+		for i in [2, 1]:
+			ArtAssets.sprite(self, "ships/" + model.ship_id, player - model.facing * i * 24, Vector2.ONE * 42, model.facing.angle(), camera_offset, Color(CYAN, 0.18 / i))
+	Motion.hull(self, model.ship_id, player, model.facing.angle(), 42, visual_time, movement, recoil, damage_flash, reduced)
+	for side in [-1, 1]: Motion.muzzle(self, player + Vector2.from_angle(fire_angle) * 19 + Vector2.from_angle(fire_angle).orthogonal() * side * 5, fire_angle, recoil, GOLD, 0.5)
 	for i in 3:
 		var id: String = Expedition.PART_IDS[i]
 		if int(model.parts.get(id, 0)) > 0:
@@ -1279,10 +1404,10 @@ func _draw_arena(world: RunModel = null) -> void:
 			var rank := model.hull_rank(form)
 			if form == "battery":
 				for mount in (3 if rank == 2 else 2):
-					var at := player + model.facing * 11 + model.facing.orthogonal() * (mount - (1.0 if rank == 2 else 0.5)) * 13
+					var at := player + model.facing * (11 - recoil * 3) + model.facing.orthogonal() * (mount - (1.0 if rank == 2 else 0.5)) * 13
 					ArtAssets.sprite(self, "objects/missile", at, Vector2(19,10), model.facing.angle(), camera_offset)
 			elif form == "lancer":
-				ArtAssets.sprite(self, "objects/core", player + model.facing * 17, Vector2.ONE * (14 if rank == 2 else 10), model.facing.angle(), camera_offset)
+				ArtAssets.sprite(self, "objects/core", player + model.facing * (17 - recoil * 3), Vector2.ONE * (14 if rank == 2 else 10), model.facing.angle(), camera_offset)
 			elif form == "aegis":
 				for side in [-1,1]:
 					ArtAssets.sprite(self, "objects/shell", player + model.facing.orthogonal() * side * 23, Vector2.ONE * (15 if rank == 2 else 11), model.facing.angle(), camera_offset)
@@ -1297,7 +1422,7 @@ func _draw_arena(world: RunModel = null) -> void:
 			for side: float in [-1.0, 1.0]:
 				var tip := player - model.facing * 12 + wing * side * 22
 				if model.slipstream_time > 0.0:
-					draw_line(tip, tip - model.facing * (24 if reduced else 48), Color(ship_color, 0.65), 3, true)
+					Motion.engine(self, tip, model.facing.angle(), 0.6, visual_time, ship_color, 0.8, reduced)
 		"bastion":
 			draw_arc(player, 29, -PI / 2, -PI / 2 + TAU * maxf(0.01, 1.0 - model.guard_cooldown / 8.0), 40, ship_color, 3 if model.guard_stacks > 0 else 1, true)
 			if model.guard_capacity() > 1:
@@ -1311,19 +1436,20 @@ func _draw_arena(world: RunModel = null) -> void:
 			draw_rect(Rect2(at + Vector2(-3 if side == 0 else 0, -5), Vector2(3, 4)), LIME if side == 0 else GOLD)
 	draw_set_transform(Vector2.ZERO)
 	if screen == "playing":
-		draw_rect(Rect2(_viewport_rect().position, Vector2(_viewport_rect().size.x, 176 - _viewport_rect().position.y)), Color(BG, HUD_ALPHA))
-		_draw_meters()
+		if not touch_mode: draw_rect(Rect2(_viewport_rect().position, Vector2(_viewport_rect().size.x, 176 - _viewport_rect().position.y)), Color(BG, HUD_ALPHA))
+		if not touch_mode: _draw_meters()
 		_draw_invasion_markers()
-		_draw_reward_feedback(model)
-		_draw_progress_notice()
+		if not touch_mode:
+			_draw_reward_feedback(model)
+			_draw_progress_notice()
 		if OS.has_feature("web") and dash_cursor_anchor:
 			var at := run.player - camera_offset
 			draw_arc(at, 17, 0, TAU, 24, INK, 1, true)
 			draw_line(at + Vector2(-22, 0), at + Vector2(-12, 0), INK, 1, true)
 			draw_line(at + Vector2(12, 0), at + Vector2(22, 0), INK, 1, true)
-	if screen in ["playing", "replay"]:
+	if screen == "replay" or (screen == "playing" and not touch_mode):
 		_draw_event_notice(model)
-	if hurt_flash > 0 and not reduced:
+	if screen != "replay" and hurt_flash > 0 and not reduced:
 		draw_rect(_viewport_rect(), Color(CORAL, hurt_flash * 0.17))
 
 func _reward_feedback(model: RunModel, kind: String) -> Dictionary:
@@ -1350,11 +1476,7 @@ func _draw_reward_feedback(model: RunModel) -> void:
 		var pulse := 0.0 if records.data.reduced_motion else pow(life, 6)
 		draw_style_box(_style(Color(BG, HUD_ALPHA), Color(tier, 0.35 + pulse * 0.45)), Rect2(at, Vector2(338, 27)))
 		draw_rect(Rect2(at, Vector2(3 + pulse * 2, 27)), tier)
-		if kind == "risk_xp":
-			_diamond(at + Vector2(17, 14), 6 + pulse, Color(color, alpha), 0)
-		else:
-			_polygon(at + Vector2(17, 14), 7 + pulse, 6, Color(color, alpha))
-			draw_circle(at + Vector2(17, 14), 3, BG)
+		ArtAssets.sprite(self, "objects/xp" if kind == "risk_xp" else "objects/core", at + Vector2(17, 14), Vector2.ONE * (19 + pulse), 0, Vector2.ZERO, Color(1.4, 1.5, 1.6, alpha))
 		var amount := "+%.1f" % float(effect.radius) if kind == "risk_xp" else "+%d" % roundi(float(effect.radius))
 		draw_string(font, at + Vector2(34, 20), amount, HORIZONTAL_ALIGNMENT_LEFT, 158, 18, Color(color, alpha))
 		if multiplier > 1.0:
@@ -1363,16 +1485,8 @@ func _draw_reward_feedback(model: RunModel) -> void:
 			draw_circle(at + Vector2(201 + dot * 8, 14), 2.5, Color(tier if dot < layer else LINE, alpha))
 
 func _draw_orbital_regions(sector_color: Color) -> void:
-	var center := RunModel.CENTER
-	var radius := RunModel.ACTIVITY_RADIUS
-	var colors := [sector_color, GOLD, CORAL, Color("bd81ff")]
-	for layer: int in range(4):
-		var edge := radius + layer * RunModel.LAYER_WIDTH
-		var color: Color = colors[layer]
-		draw_arc(center, edge, 0, TAU, 192, Color(color, 0.5), 1.5, true)
-		for segment in 24:
-			var a := TAU * segment / 24.0
-			draw_arc(center, edge + 5, a, a + 0.06, 4, Color(color, 0.25), 5, true)
+	arena_grid.position = -camera_offset
+	arena_grid.configure(sector_color)
 
 func _draw_invasion_markers() -> void:
 	var occupied: Array[Rect2] = []
@@ -1398,13 +1512,8 @@ func _draw_direction_marker(at: Vector2, direction: Vector2, color: Color, kind:
 	var badge := at - ray * 29
 	draw_circle(badge, 13, BG)
 	match kind:
-		"boss":
-			draw_arc(badge, 9, 0, TAU, 20, color, 2, true)
-			draw_line(badge - Vector2(12, 0), badge + Vector2(12, 0), color, 2, true)
-			draw_line(badge - Vector2(0, 12), badge + Vector2(0, 12), color, 2, true)
-		"elite":
-			_diamond(badge, 10, color)
-			_diamond(badge, 6, BG)
+		"boss", "elite":
+			ArtAssets.sprite(self, "enemies/boss" if kind == "boss" else "enemies/elite_assault", badge, Vector2.ONE * 27, 0, Vector2.ZERO, Color(1.3, 1.3, 1.3))
 		"part":
 			_draw_part_icon(badge, id, color, 0.75)
 		"item":
@@ -1414,25 +1523,36 @@ func _draw_direction_marker(at: Vector2, direction: Vector2, color: Color, kind:
 func _draw_skill_meter(at: Vector2, progress: float, color: Color, ready: bool, triangular: bool = false) -> void:
 	var sides := 3 if triangular else 24
 	_polygon(at, 17 if triangular else 15, sides, Color(BG, 0.88), -PI / 2)
-	var glow := 1.0 if records.data.reduced_motion or not ready else 0.82 + 0.18 * sin(space_time * 4.0)
+	var glow := 1.0 if records.data.reduced_motion or not ready else 0.82 + 0.18 * sin((replay_time if screen == "replay" else run.elapsed) * 4.0)
 	if ready:
 		_polygon(at, 16 if triangular else 14, sides, Color(color, 0.10 * glow), -PI / 2)
+	var charged := PackedVector2Array()
+	var empty := PackedVector2Array()
 	for i: int in range(24):
 		var t := float(i) * sides / 24.0
 		var start := Vector2.from_angle(-PI / 2 + TAU * floorf(t) / sides) * (16 if triangular else 12)
 		var end := Vector2.from_angle(-PI / 2 + TAU * (floorf(t) + 1) / sides) * (16 if triangular else 12)
 		var a := start.lerp(end, fposmod(t, 1.0))
 		var b := start.lerp(end, minf(1.0, fposmod(t, 1.0) + sides / 24.0 * 0.8))
-		draw_line(at + a, at + b, Color(color, glow) if float(i) / 24.0 < progress else LINE, 2, true)
+		if float(i) / 24.0 < progress: charged.append_array(PackedVector2Array([at + a, at + b]))
+		else: empty.append_array(PackedVector2Array([at + a, at + b]))
+	if not charged.is_empty(): draw_multiline(charged, Color(color, glow), 2, true)
+	if not empty.is_empty(): draw_multiline(empty, LINE, 2, true)
 
-func _draw_space(sector_color: Color) -> void:
+func _draw_space(sector_color: Color, model: RunModel) -> void:
 	var bounds := _viewport_rect()
-	for i: int in range(mini(stars.size(), 48)):
-		var depth := 0.2 + float(i % 3) * 0.25
-		var drift := Vector2.ZERO if records.data.reduced_motion else space_offset * depth + Vector2(-space_time * 3.0 * depth, 0)
-		var point := stars[i] - camera_offset * depth + drift
-		point = Vector2(fposmod(point.x - bounds.position.x, bounds.size.x), fposmod(point.y - bounds.position.y, bounds.size.y)) + bounds.position + camera_offset
-		draw_circle(point, 1.0 + float(i % 3) * 0.35, Color(sector_color, 0.2 + depth * 0.3))
+	var reduced: bool = records.data.reduced_motion
+	var t := 0.0 if reduced else model.elapsed
+	for layer in 3:
+		var lines := PackedVector2Array()
+		var depth := 0.1 + layer * 0.2
+		var drift := Vector2.ZERO if reduced else -model.player * depth + Vector2(-t * (2 + layer * 3), t * 0.9)
+		var length := 1.4 if reduced else 1.4 + minf(16, model.current_speed * 0.04 * depth)
+		for i in range(layer, stars.size(), 3):
+			var point := stars[i] + drift
+			point = Vector2(fposmod(point.x - bounds.position.x, bounds.size.x), fposmod(point.y - bounds.position.y, bounds.size.y)) + bounds.position + camera_offset
+			lines.append_array(PackedVector2Array([point, point - model.facing * length]))
+		draw_multiline(lines, Color(sector_color.lightened(0.55), 0.25 + layer * 0.12), 1.0 + layer * 0.3, true)
 
 func _draw_hazard(hazard: Dictionary, visual_time: float = 0.0) -> void:
 	if RunModel.ENCOUNTERS.has(hazard.kind):
@@ -1445,7 +1565,7 @@ func _draw_hazard(hazard: Dictionary, visual_time: float = 0.0) -> void:
 		draw_rect(rect, Color(color, 0.28 if active else 0.09))
 		draw_rect(rect, Color(color, 0.9), false, 2)
 		var center := rect.get_center()
-		draw_string(font, center + Vector2(-7, 7), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, 22, color)
+		ArtAssets.icon(self, center, "chain", color, 0.65)
 		if active:
 			var vertical := rect.size.y > rect.size.x
 			var points := PackedVector2Array()
@@ -1458,10 +1578,9 @@ func _draw_hazard(hazard: Dictionary, visual_time: float = 0.0) -> void:
 	else:
 		var pos: Vector2 = hazard.pos
 		var radius: float = hazard.radius
-		draw_circle(pos, radius, Color(color, 0.28 if active else 0.08), true, -1, true)
+		ArtAssets.sprite(self, "fx/explosion" if active else "fx/wave", pos, Vector2.ONE * radius * 2, 0.0 if records.data.reduced_motion else visual_time * 0.2, camera_offset, Color(color, 0.6 if active else 0.2))
 		draw_arc(pos, radius, 0, TAU, 48, color, 2, true)
-		draw_line(pos - Vector2(10, 0), pos + Vector2(10, 0), color, 2, true)
-		draw_line(pos - Vector2(0, 10), pos + Vector2(0, 10), color, 2, true)
+		ArtAssets.icon(self, pos, "pulse", color, 0.55)
 
 func _draw_encounter(hazard: Dictionary, visual_time: float = 0.0) -> void:
 	var pos: Vector2 = hazard.pos
@@ -1472,35 +1591,35 @@ func _draw_encounter(hazard: Dictionary, visual_time: float = 0.0) -> void:
 	draw_arc(pos, radius, 0, TAU, 96, Color(color, 0.7), 2, true)
 	if not active:
 		draw_arc(pos, radius + 6, -PI / 2, -PI / 2 + TAU * clampf(float(hazard.warn) / 10.0, 0.001, 1.0), 96, color, 4, true)
-		_polygon(pos, 14, 3, color, -PI / 2)
+		ArtAssets.icon(self, pos, {"black_hole": "nova", "planet": "shell", "meteor": "missile", "flare": "pulse"}[str(hazard.kind)], color, 0.8)
 		draw_string(font, pos + Vector2(-100, -28), "%s · %d초" % [RunModel.ENCOUNTERS[hazard.kind].name, ceili(float(hazard.warn))], HORIZONTAL_ALIGNMENT_CENTER, 200, 20, INK)
 	match str(hazard.kind):
 		"black_hole":
 			if active:
 				var turn := 0.0 if records.data.reduced_motion else visual_time * 0.7
 				ArtAssets.sprite(self, "fx/black_hole", pos, Vector2.ONE * 160, turn, camera_offset, Color(1,1,1,0.9))
-				for i in 8:
-					var direction := Vector2.from_angle(TAU * i / 8.0)
-					var tip := pos + direction * 80
-					draw_line(pos + direction * 120, tip, color, 2, true)
-					draw_line(tip, tip + direction.rotated(0.5) * 13, color, 2, true)
+				if not records.data.reduced_motion:
+					for i in 12:
+						var phase := fposmod(visual_time * 0.32 + i / 12.0, 1.0)
+						var bearing := i * 2.399 + phase * 2.8
+						var dust := pos + Vector2.from_angle(bearing) * lerpf(145, 28, phase)
+						ArtAssets.sprite(self, "fx/spark", dust, Vector2(15, 4), bearing + PI * 0.7, camera_offset, Color(color, sin(phase * PI) * 0.7))
 		"planet":
 			if active:
-				ArtAssets.sprite(self, "objects/planet", pos, Vector2.ONE * 90, 0, camera_offset)
+				ArtAssets.sprite(self, "objects/planet", pos, Vector2.ONE * 90, 0.0 if records.data.reduced_motion else sin(visual_time * 0.15) * 0.08, camera_offset, Color(1.2, 1.3, 1.35))
 				draw_arc(pos, radius - 6, -PI / 2, -PI / 2 + TAU * clampf(float(hazard.get("hold", 0.0)) / 12.0, 0.001, 1.0), 96, LIME, 6, true)
 		"meteor":
 			for point: Vector2 in RunModel.meteor_points(hazard):
 				draw_circle(point, 64, Color(color, 0.09), true, -1, true)
 				draw_arc(point, 64, 0, TAU, 40, color, 2, true)
-				draw_line(point - Vector2(9, 9), point + Vector2(9, 9), color, 2, true)
-				draw_line(point - Vector2(-9, 9), point + Vector2(-9, 9), color, 2, true)
+				ArtAssets.icon(self, point, "missile", color, 0.55)
 				if active and not records.data.reduced_motion:
 					var approach := clampf(float(hazard.ttl) / 0.7, 0, 1)
 					ArtAssets.sprite(self, "objects/meteor", point + Vector2(-110,-160) * approach, Vector2.ONE * 28, 0.8, camera_offset, Color(1,1,1,1-approach*0.5))
 		"flare":
 			if active:
 				var front := maxf(2.0, radius * clampf(1.0 - float(hazard.ttl) / 3.0, 0.0, 1.0))
-				draw_arc(pos, front, 0, TAU, 96, Color(color, 0.18), 44, true)
+				ArtAssets.sprite(self, "fx/wave", pos, Vector2.ONE * front * 2.2, 0.0 if records.data.reduced_motion else visual_time * 0.12, camera_offset, Color(color, 0.7))
 				draw_arc(pos, front, 0, TAU, 96, INK, 3, true)
 
 func _draw_event_notice(model: RunModel) -> void:
@@ -1527,12 +1646,7 @@ func _draw_impact(effect: Dictionary, life: float) -> void:
 	var pos: Vector2 = effect.pos
 	var reduced: bool = records.data.reduced_motion
 	var color := GOLD if kind in ["meteor_impact", "impact_meteor", "reward"] else (CYAN if kind == "impact_lane" else CORAL)
-	if kind == "hit":
-		ArtAssets.sprite(self, "fx/spark", pos, Vector2.ONE * (12 + 16 * life), 0, camera_offset, Color(1,1,1,life))
-		return
-	var radius := float(effect.radius) * (0.75 if reduced else 1.3 - life * 0.6)
-	var art := "fx/explosion" if kind in ["death","meteor_impact","hazard_start","impact_blast","impact_meteor"] else "fx/wave"
-	ArtAssets.sprite(self, art, pos, Vector2.ONE * maxf(18,radius * 2), 0, camera_offset, Color(1,1,1,life * (0.3 if reduced else 0.7)))
+	Motion.effect(self, effect, reduced)
 	if kind.begins_with("impact_"):
 		var source: Vector2 = effect.get("end", pos)
 		if source.distance_to(pos) > 1.0:
@@ -1591,27 +1705,44 @@ func _draw_enemy(enemy: Dictionary, model: RunModel = null) -> void:
 	var pos: Vector2 = enemy.pos
 	var radius: float = enemy.radius
 	var kind: String = enemy.kind
+	var angle := float(enemy.get("angle", 0))
+	if kind == "boss": angle = 0.0 if records.data.reduced_motion else (model.elapsed if model != null else run.elapsed) * 0.3
+	var art_id := kind
+	if kind == "elite": art_id = "elite_assault" if int(enemy.get("elite_index", 1)) == 1 else "elite_artillery"
+	var t: float = model.elapsed if model != null else run.elapsed
+	var breath := 0.0 if records.data.reduced_motion else sin(t * (1.8 if kind == "tank" else 4.0) + float(enemy.get("_replay_id", 0))) * 0.035
+	var charge := clampf(float(enemy.get("warn", 0)) / 0.7, 0, 1)
+	var hit := clampf(float(enemy.get("flash", 0)) / 0.12, 0, 1)
+	var attack := maxf(0, 1 - float(enemy.get("shot_timer", 1))) * 0.04
+	var dimensions := Vector2(1 + breath - charge * 0.1 - hit * 0.12, 1 - breath + charge * 0.12 + attack) * radius * 2.3
+	ArtAssets.sprite(self, "enemies/" + art_id, pos - Vector2.from_angle(angle) * hit * 2, dimensions, angle, camera_offset, Color(1.42 + hit, 1.3 + hit, 1.4 + hit))
+	if kind == "boss" and model != null:
+		var phase_color := CORAL if float(enemy.hp) > float(enemy.max_hp) * 0.5 else GOLD
+		var count := 3 if model.sector_id == "forge" else (5 if model.sector_id == "storm" else 6)
+		for organ in count:
+			var bearing := angle + TAU * organ / count
+			var tip := pos + Vector2.from_angle(bearing) * radius * 0.9
+			ArtAssets.sprite(self, "objects/core", tip, Vector2(18 if phase_color == GOLD else 13, 9), bearing, camera_offset, phase_color.lightened(0.5))
+
+func _draw_enemy_status(enemy: Dictionary, model: RunModel) -> void:
+	var pos: Vector2 = enemy.pos
+	var radius: float = enemy.radius
+	var kind: String = enemy.kind
+	var angle := float(enemy.get("angle", 0))
 	var color := CORAL
-	var sides := 4
-	var angle: float = float(enemy.get("angle", 0))
 	match kind:
 		"runner":
-			sides = 3
 			color = Color("f19abf")
 		"tank":
-			sides = 6
 			color = Color("a293f3")
 		"shooter":
-			sides = 4
 			color = GOLD
 		"elite":
-			sides = 5
 			color = GOLD
 			draw_arc(pos, radius + 7, 0, TAU, 32, GOLD, 2, true)
 		"boss":
-			sides = 6
 			color = CORAL if float(enemy.hp) > float(enemy.max_hp) * 0.5 else GOLD
-			angle = (model.elapsed if model != null else run.elapsed) * 0.3
+			angle = 0.0 if records.data.reduced_motion else (model.elapsed if model != null else run.elapsed) * 0.3
 			draw_arc(pos, radius + 10, 0, TAU, 36, Color(CORAL, 0.4), 2, true)
 	if bool(enemy.get("flanker", false)):
 		draw_arc(pos, radius + 5, angle - 1.0, angle + 1.0, 12, Color(color, 0.65), 2, true)
@@ -1626,19 +1757,6 @@ func _draw_enemy(enemy: Dictionary, model: RunModel = null) -> void:
 		ItemCatalog.draw_icon(self, pos + Vector2(0, -radius - 18), "stun", CYAN, 0.7)
 	if float(enemy.get("slow_time", 0)) > 0:
 		draw_arc(pos, radius + 4, 0, TAU, 24, CYAN, 1.5, true)
-	var art_id := kind
-	if kind == "elite": art_id = "elite_assault" if int(enemy.get("elite_index", 1)) == 1 else "elite_artillery"
-	ArtAssets.sprite(self, "enemies/" + art_id, pos, Vector2.ONE * radius * 2.3, angle, camera_offset, Color(1.8,1.8,1.8) if float(enemy.get("flash",0)) > 0 else Color.WHITE)
-	if kind == "boss" and model != null:
-		var phase_color := CORAL if float(enemy.hp) > float(enemy.max_hp) * 0.5 else GOLD
-		var count := 3 if model.sector_id == "forge" else (5 if model.sector_id == "storm" else 6)
-		for organ in count:
-			var bearing := angle + TAU * organ / count
-			var tip := pos + Vector2.from_angle(bearing) * radius * 0.9
-			draw_line(tip, tip + Vector2.from_angle(bearing) * (12 if phase_color == GOLD else 5), phase_color, 3, true)
-	if float(enemy.hp) < float(enemy.max_hp):
-		draw_rect(Rect2(pos + Vector2(-radius, -radius - 9), Vector2(radius * 2, 3)), LINE)
-		draw_rect(Rect2(pos + Vector2(-radius, -radius - 9), Vector2(radius * 2 * maxf(0, float(enemy.hp) / float(enemy.max_hp)), 3)), color)
 
 func _diamond(pos: Vector2, radius: float, color: Color, angle: float = 0) -> void:
 	_polygon(pos, radius, 4, color, angle)
@@ -1651,7 +1769,8 @@ func _polygon(pos: Vector2, radius: float, sides: int, color: Color, angle: floa
 
 func _camera_target(point: Vector2) -> Vector2:
 	var relative := point - ARENA.get_center()
-	return Vector2(relative.x - clampf(relative.x, -240.0, 240.0), relative.y - clampf(relative.y, -100.0, 100.0))
+	var horizontal := minf(240, get_viewport_rect().size.x * 0.2) if touch_mode else 240.0
+	return Vector2(relative.x - clampf(relative.x, -horizontal, horizontal), relative.y - clampf(relative.y, -100.0, 100.0))
 
 func _show_replay(entry: Dictionary) -> void:
 	replay_frames = records.load_ghost(entry)
@@ -1687,6 +1806,10 @@ func _draw_replay() -> void:
 	var frame := GhostReplay.sample(replay_frames, replay_time)
 	if frame.size() == 14:
 		GhostReplay.restore(replay_run, frame)
+		replay_run.elapsed = replay_time
+		var previous_time := maxf(0, replay_time - 0.2)
+		var previous := GhostReplay.sample(replay_frames, previous_time)
+		replay_run.current_speed = Vector2(frame[1], frame[2]).distance_to(Vector2(previous[1], previous[2])) / maxf(0.001, replay_time - previous_time)
 		_draw_arena(replay_run)
 		draw_set_transform(-camera_offset)
 		_draw_replay_path()
@@ -1702,13 +1825,14 @@ func _draw_replay() -> void:
 	draw_set_transform(-camera_offset)
 	_draw_orbital_regions(CYAN)
 	_draw_replay_path()
-	ArtAssets.sprite(self, "ships/" + str(replay_entry.ship), point, Vector2.ONE * 40, float(frame[3]), camera_offset)
+	Motion.engine(self, point - Vector2.from_angle(float(frame[3])) * 16, float(frame[3]), 0.6, replay_time, CYAN, 0.8, bool(records.data.reduced_motion))
+	Motion.hull(self, str(replay_entry.ship), point, float(frame[3]), 42, replay_time, 0.5, 0, 0, bool(records.data.reduced_motion))
 	for i: int in range(int(frame[6])):
 		var angle := float(frame[8]) + TAU * i / float(frame[6])
 		var frost := int(frame[12]) > 0 and i % 3 == 0
-		ArtAssets.sprite(self, "objects/" + ("frost" if frost else ("blade" if int(frame[11]) > 0 else "normal")), point + Vector2.from_angle(angle) * float(frame[7]), Vector2.ONE * 23, angle, camera_offset)
+		Motion.orbital(self, point + Vector2.from_angle(angle) * float(frame[7]), "frost" if frost else ("blade" if int(frame[11]) > 0 else "normal"), angle, 23, replay_time, bool(records.data.reduced_motion))
 	if int(frame[9]) > 0:
-		draw_line(point - Vector2.from_angle(float(frame[3])) * 60, point, CYAN, 5, true)
+		Motion.engine(self, point - Vector2.from_angle(float(frame[3])) * 16, float(frame[3]), 1.5, replay_time, CYAN, 1.0, bool(records.data.reduced_motion))
 	if int(frame[10]) > 0:
 		draw_arc(point, 30, 0, TAU, 32, GOLD, 3, true)
 	draw_set_transform(Vector2.ZERO)
@@ -1848,7 +1972,7 @@ func _draw_expedition(model: RunModel) -> void:
 	draw_string(font, Vector2(438, 151), status, HORIZONTAL_ALIGNMENT_LEFT, 288, 13, INK)
 	if not m.is_empty():
 		for i in int(m.upgrades):
-			_diamond(Vector2(758 + i * 15, 146), 5, color, 0)
+			ArtAssets.icon(self, Vector2(758 + i * 15, 146), "power", color, 0.28)
 		if int(m.parts) > 0:
 			_draw_part_icon(Vector2(824, 146), "shell", GOLD, 0.45)
 	draw_rect(Rect2(438, 162, 404, 4), LINE)
@@ -1875,6 +1999,7 @@ func _draw_expedition(model: RunModel) -> void:
 		var at := Vector2(644, 552)
 		var direction: Vector2 = (Vector2(nearest.pos) - model.player).normalized()
 		_draw_direction_marker(at, direction, info.color, "part", str(nearest.id))
+		draw_style_box(_style(Color(BG, 0.88), Color(info.color, 0.3)), Rect2(at + Vector2(18, -17), Vector2(370, 30)))
 		draw_string(font, at + Vector2(23, 5), "%s %dpx · %d초 · %s" % [info.name, roundi(distance), ceili(float(nearest.ttl)), "2층 직접 탐사" if bool(nearest.locked) else "회수 가능"], HORIZONTAL_ALIGNMENT_LEFT, 550, 14, info.color)
 		var point: Vector2 = Vector2(nearest.pos) - camera_offset
 		var bounds := _viewport_rect().grow(-46)
