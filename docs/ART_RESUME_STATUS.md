@@ -1,10 +1,20 @@
 # 최신 검증 결과: 3.18.2 / mobile-20261013 (2026-10-13)
 
-모바일 Web 드래그 이동·탭 돌진·두 번 탭 오버드라이브, 가로/세로 HUD·카메라, 가로 전체화면 요청과 세로 안내를 구현했다. 기존 미커밋 7영역 모션 개선을 함께 보존했다. 로컬 최신본 교체 완료, GitHub/Pages 배포 준비 중. [모바일 구현·검증 보고](MOBILE_WEB_REPORT.md).
+전체 요청 구현·검증·공개 배포를 완료했다. 자동으로 제작/빌드/승격을 반복하지 말고 최신 manifest와 변경분을 먼저 비교한다.
+
+모바일 Web 드래그 이동·탭 돌진·두 번 탭 오버드라이브, 가로/세로 HUD·카메라, 가로 전체화면 요청과 세로 안내를 구현했다. 기존 미커밋 7영역 모션 개선을 함께 보존했다. 로컬 최신본 교체·GitHub/Pages 공개 및 공개 플레이 검증 완료. [모바일 구현·검증 보고](MOBILE_WEB_REPORT.md).
 
 21묶음2557 회귀, native 터치42, 데스크톱 입력14, 실제16화면2536, 아트325, 모션601/576프레임, WebAssembly 터치5 통과. 최종 Web 부하3회씩 p95 혼합13.8/14.4/13.6ms, 일반10.8/10.3/10.6ms. Windows 정상 실행/종료·프로필 불변 확인. 물리 휴대폰·Safari·저사양 장치 및 전체화면 회전 잠금의 실기기 동작은 미검증이다.
 
 최신본 `build/current`, 증거 `artifacts/current/mobile`와 `verification.json`, 전체 목록 `file-inventory.json`. Windows SHA-256 `8AE93D875BE76E77153E04746729C6A3D3CF24DEEFEE3F3E9D9637CA168F1A99`. Web PCK `DAA90D44EE4253E938674914FD1E30C6018DA52D22C636F7DB378B1C8C3255FF`. 이전 정상본 보존→새본 검증→교체→이전 배포/증거 정리 순서를 지켰다. 과거 정책 차단 임시5경로는 재시도하지 않고 retention-status에 남겼다. 게임 규칙·밸런스·저장·고스트 형식은 3.18을 유지한다.
+
+## 2026-10-13 공개 배포 검증 완료
+
+[웹 플레이](https://libralightluda.github.io/orbit-breaker/)와 [v3.18.2 릴리즈](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.18.2)에 전체 작업을 게시했다. 게임/모션/모바일 소스 커밋은 `42d1118b3076a7f7d4363bef95a65bdec42390d0`, 최종 Web 게시 커밋은 `90323c994f8ab85e1446a3951d8e5245e18f7089`, Pages 작업 `38355587594` 성공. 태그/게임 코드와 생성된 배포 파일을 구분해 기록한다. Git의 HTML CRLF→LF 변환으로 최초 공개 해시가 달라지는 문제를 발견했고 `.gitattributes`로 Web 원본 바이트 보존을 적용했다. 게임 코드·검증 EXE·ZIP은 바꾸지 않았다.
+
+공개 Web9파일과 기본 주소 HTML의 SHA-256이 로컬 검증본과 일치하고, 릴리즈6첨부의 GitHub digest/크기도 모두 일치한다. 공개 Chromium 모바일 크기에서 타이틀·격납고·출격·이동·돌진 버튼 발동·정지·도감 복귀·자연 강화 카드 클릭/전투 재개·세로 강화 버튼·전투 중 회전 자동 정지를 직접 확인했다. 오류·경고 콘솔0. 이는 짧은 공개 smoke 검사이며 물리 휴대폰 터치/성능 또는 장시간 사람 플레이가 아니다.
+
+신규 공개본 검증 후 구버전 릴리즈 첨부6개와 이전 Pages artifact2개를 정리하고 소스 태그/릴리즈 이력은 보존했다. 최종 근거는 `artifacts/current/github-publication.json`, `public-web-hashes.json`, `public-release-assets.json`, `public-retention.json`, `mobile/public-play-status.json`과 공개 화면이다. 기존 정책 차단 임시5경로는 재시도하지 않았다.
 
 ---
 아래는 과거 시점 기록이며 현재 상태는 위 결과가 우선한다.

@@ -1,6 +1,6 @@
 # Orbit Breaker 3.18.2 모바일 Web 지원
 
-2026-10-13. 모바일 구현 및 로컬 검증 완료, 공개 배포 준비 중. 게임 규칙 기준은 SURVIVAL_V3의 3.18을 유지한다. 기존 미커밋 모션 개편을 포함한 전체 소스를 이번 릴리즈에 반영한다.
+2026-10-13. 모바일 구현·로컬 검증·공개 배포와 실제 공개 Web 검증 완료. 게임 규칙 기준은 SURVIVAL_V3의 3.18을 유지한다. 기존 미커밋 모션 개편을 포함한 전체 소스를 이번 릴리즈에 반영한다.
 
 ## 조작과 화면
 
@@ -15,7 +15,7 @@
 
 - 규칙·저장·고스트 등 전체 회귀21묶음2557 통과. 첫 내보내기는 환경의 Get-FileHash 누락 때문에 멈췄다. .NET 체크섬으로 고친 후 회귀 결과를 보존하고 import/Windows/Web export부터 재개했다. 모바일 텍스처 가져오기와 출력 폴더 문제도 수정했다. 실패 로그는 attempt-full-build.log/attempt-web-export.log에 보존한다.
 - Native Godot 터치42검사: 탭/두 번 탭/드래그/두 손가락/취소/메뉴 잔류/마우스 중복/GUI 입력 차단/터치 크기·겹침/고정 출격 버튼, 844×390·667×375·390×844·360×800 실제 렌더.
-- 기존 데스크톱 입력14,16화면 회귀,아트325,모션601/576프레임 통과. 마지막 수정은 모바일 파츠 라벨 배치와 HTML 안내 줄바꿈 두 파일에 한정되어, 영향받지 않는 데스크톱/모션/아트 검사는 재사용하고 모바일42·내보내기·실행을 다시 확인했다. 가로 강화 카드의 이름/효과를 상단에 함께 배치한 뒤 전체 화면·아트 회귀도 다시 확인했다.
+- 기존 데스크톱 입력14,16화면 회귀2536,아트325,모션601/576프레임 통과. 최종 가로 강화 카드의 이름/효과 배치 수정 후 모바일42·데스크톱14·전체16화면·아트325·양 플랫폼 내보내기·실행을 다시 확인했다. 기체/타이틀/전투 애니메이션 소스와 자산은 이 메뉴 수정의 영향을 받지 않아 같은 작업에서 완료한 모션601/576프레임 결과를 유지했다.
 - WebAssembly 엔진의 실제 viewport에 ScreenTouch/ScreenDrag를 전달하는5검사 통과. 물리 손가락/DOM 터치 주입 검사와 구분한다.
 - 실제 Web 화면에서 가로/세로 UI,출격·이동·스킬 버튼·자연 강화·도감·정지,회전 시 자동 정지를 확인했다. 최종 결과는 web-play-status.json.
 - Windows 실행·정상 종료와 플레이어 프로필 해시 불변 확인. 최종 source_hashes,실행 파일 및 Web 동일 소스 manifest로 실행 결과를 연결한다.
@@ -33,4 +33,13 @@ p95≤16.7/p99≤25ms 통과. 두 프로필의 첫 회에 각각33.3ms 초과1�
 
 ## 산출물과 재개
 
-필수 검사·내보내기·실행·로컬 Web 검증 후 build/current 및 artifacts/current를 mobile-20261013으로 교체했다. 준비 도구 prepare_mobile_delivery.py,가드 있는 promote_motion_release.ps1의 Generation/ExpectedPrevious/ReadyName 인자를 사용한다. 이전 정상본을 먼저 보존하고 새 파일·증거 해시 일치 후 교체했다. 최신 Windows SHA-256 `8AE93D875BE76E77153E04746729C6A3D3CF24DEEFEE3F3E9D9637CA168F1A99`, Web PCK `DAA90D44EE4253E938674914FD1E30C6018DA52D22C636F7DB378B1C8C3255FF`. 이전 배포본/대응 증거/전환 백업과 이번 모바일 임시 폴더는 정상 교체 후 정리했다. 기존 차단 임시5경로는 재삭제하지 않는다. 공개 GitHub/Pages 결과와 해시를 마지막으로 추가한다.
+필수 검사·내보내기·실행·로컬 Web 검증 후 build/current 및 artifacts/current를 mobile-20261013으로 교체했다. 준비 도구 prepare_mobile_delivery.py,가드 있는 promote_motion_release.ps1의 Generation/ExpectedPrevious/ReadyName 인자를 사용한다. 이전 정상본을 먼저 보존하고 새 파일·증거 해시 일치 후 교체했다. 최신 Windows SHA-256 `8AE93D875BE76E77153E04746729C6A3D3CF24DEEFEE3F3E9D9637CA168F1A99`, Web PCK `DAA90D44EE4253E938674914FD1E30C6018DA52D22C636F7DB378B1C8C3255FF`. 이전 배포본/대응 증거/전환 백업과 이번 모바일 임시 폴더는 정상 교체 후 정리했다. 기존 차단 임시5경로는 재삭제하지 않는다. 공개 GitHub/Pages 결과와 해시는 아래 최종 기록을 따른다.
+
+
+## 2026-10-13 공개 배포 검증 완료
+
+[웹 플레이](https://libralightluda.github.io/orbit-breaker/)와 [v3.18.2 릴리즈](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.18.2)에 전체 작업을 게시했다. 게임/모션/모바일 소스 커밋은 `42d1118b3076a7f7d4363bef95a65bdec42390d0`, 최종 Web 게시 커밋은 `90323c994f8ab85e1446a3951d8e5245e18f7089`, Pages 작업 `38355587594` 성공. 태그/게임 코드와 생성된 배포 파일을 구분해 기록한다. Git의 HTML CRLF→LF 변환으로 최초 공개 해시가 달라지는 문제를 발견했고 `.gitattributes`로 Web 원본 바이트 보존을 적용했다. 게임 코드·검증 EXE·ZIP은 바꾸지 않았다.
+
+공개 Web9파일과 기본 주소 HTML의 SHA-256이 로컬 검증본과 일치하고, 릴리즈6첨부의 GitHub digest/크기도 모두 일치한다. 공개 Chromium 모바일 크기에서 타이틀·격납고·출격·이동·돌진 버튼 발동·정지·도감 복귀·자연 강화 카드 클릭/전투 재개·세로 강화 버튼·전투 중 회전 자동 정지를 직접 확인했다. 오류·경고 콘솔0. 이는 짧은 공개 smoke 검사이며 물리 휴대폰 터치/성능 또는 장시간 사람 플레이가 아니다.
+
+신규 공개본 검증 후 구버전 릴리즈 첨부6개와 이전 Pages artifact2개를 정리하고 소스 태그/릴리즈 이력은 보존했다. 최종 근거는 `artifacts/current/github-publication.json`, `public-web-hashes.json`, `public-release-assets.json`, `public-retention.json`, `mobile/public-play-status.json`과 공개 화면이다. 기존 정책 차단 임시5경로는 재시도하지 않았다.
