@@ -4,7 +4,7 @@
 
 전체 22묶음 2571개, 최종 모바일 2982개(8개 크기), 실제 viewport 터치 42개, 렌더 16사례 2534개, 아트 316개 통과. 전투·데이터·저장·고스트 원본이 동일함을 확인하고 전체 회귀 결과를 유지했으며, 이후 UI 배치 수정은 모바일·전체 렌더·아트·Windows/Web export·최종 EXE 실행 검사를 다시 통과했다. 실제 플레이어 프로필 불변을 확인했다. 후보 Chromium에서 자연 강화·긴 설명·회전·카드 선택·전투 재개·정지를 확인했고 콘솔 오류/경고0이다.
 
-현재 정상본은 `build/current`, 대응 증거는 `artifacts/current`. Windows SHA-256 `82B7CF017639B020C9922945476F64CB57C9390A996071513AB8BA7206F943AB`. Web PCK `FADD8592B14C972A2129F3BD7CEE23ABF5EECFF5881B714A366CD831568626A1`. 기존 정상본을 보존하고 후보 검증/내보내기/실행/해시 성공 후 교체했으며 이전 최신본과 retiring을 정리했다. 배포본은 최신 한 세대다. 기존 정책 차단 임시5경로에 이번 `artifacts/feedback-candidate` 정리 차단을 더해 임시6경로가 남았다. 삭제 우회/재시도는 하지 않았다. GitHub/Pages 공개 검증은 진행 중이다.
+현재 정상본은 `build/current`, 대응 증거는 `artifacts/current`. Windows SHA-256 `82B7CF017639B020C9922945476F64CB57C9390A996071513AB8BA7206F943AB`. Web PCK `FADD8592B14C972A2129F3BD7CEE23ABF5EECFF5881B714A366CD831568626A1`. 기존 정상본을 보존하고 후보 검증/내보내기/실행/해시 성공 후 교체했으며 이전 최신본과 retiring을 정리했다. 배포본은 최신 한 세대다. 기존 정책 차단 임시5경로에 이번 `artifacts/feedback-candidate` 정리 차단을 더해 임시6개 디렉터리와 진단 로그5개가 남았다. 삭제 우회/재시도는 하지 않았다. [v3.18.3 릴리즈](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.18.3)와 [공개 웹](https://libralightluda.github.io/orbit-breaker/?v=3.18.3) 게시 및 공개 플레이 검증 완료. 소스 커밋 `822b1911a62f6bafe2533245fbd9c17d3aa6216a`, Pages 작업 `38365053828` 성공. 공개9파일/기본 HTML과 릴리즈6첨부 SHA-256이 일치한다. 공개 Chromium에서 기체/전장 선택·전투·자연 강화·회전·카드 선택·정지를 확인했고 콘솔 오류/경고0이다. 신규 공개본 검증 후 이전 릴리즈 첨부6개와 이전 Pages artifact1개를 정리하고 소스 태그/릴리즈 이력을 보존했다.
 
 물리 휴대폰·Safari·저사양 성능·장시간 사람 플레이는 미검증이다.
 
