@@ -1,0 +1,3 @@
+
+# Keep generated web export bytes identical to validated release archives.
+web/** -text whitespace=cr-at-eol
