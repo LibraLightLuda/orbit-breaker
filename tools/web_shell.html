@@ -28,6 +28,7 @@ body {
 
 #game-frame { position: fixed; inset: 0; }
 #canvas { width: 100%; height: 100%; touch-action: none; -webkit-user-select: none; user-select: none; }
+#rotate-tip { display: none !important; }
 #mobile-bar { display: none; position: fixed; top: env(safe-area-inset-top, 0px); left: env(safe-area-inset-left, 0px); right: env(safe-area-inset-right, 0px); height: 34px; align-items: center; justify-content: space-between; background: #09121f; font: 12px system-ui; color: #72dce6; padding: 0 10px; }
 #mobile-bar button, #rotate-tip button { border: 1px solid #355a6b; border-radius: 6px; background: #142b3c; color: #eef3e7; padding: 7px 12px; font: inherit; }
 #mobile-bar span { flex: 1; min-width: 0; font-size: 11px; line-height: 14px; }
@@ -104,7 +105,7 @@ body {
 		$GODOT_HEAD_INCLUDE
 	</head>
 	<body>
-		<div id="mobile-bar"><span>드래그 이동 · 탭 돌진 · 두 번 탭 오버드라이브</span><button id="landscape">가로 전체화면</button></div>
+		<div id="mobile-bar"><span>드래그 이동 · 길게 끌어 놓기 돌진 · 두 번 탭 오버드라이브</span><button id="landscape">가로 전체화면</button></div>
 		<div id="rotate-tip"><p>기기를 가로로 돌리면 전장을 넓게 볼 수 있습니다.</p><button id="continue-portrait">지금 플레이</button></div>
 		<div id="game-frame">
 		<canvas id="canvas">

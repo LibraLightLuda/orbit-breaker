@@ -37,6 +37,9 @@ New-Item -ItemType Directory -Path $buildDirectory -Force | Out-Null
 
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--editor', '--quit')
 
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_feedback_mobile.gd') `
+    -SuccessPattern '(?m)^MOBILEFEEDBACK SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_mobile.gd') `
     -SuccessPattern '(?m)^MOBILE SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 

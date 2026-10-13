@@ -1,6 +1,8 @@
 extends RefCounted
 
 const TAP_WINDOW := 0.24
+const DASH_HOLD := 0.3
+const DASH_DRAG := 48.0
 var contacts := {}
 var drag_id := -1
 var direction := Vector2.ZERO
@@ -11,6 +13,7 @@ var remaining := 0.0
 var tap_position := Vector2.ZERO
 var tap_scale := 1.0
 var dash_position := Vector2.ZERO
+var dash_direction := Vector2.ZERO
 
 func reset() -> void:
 	contacts.clear()
@@ -18,6 +21,7 @@ func reset() -> void:
 	direction = Vector2.ZERO
 	pending = false
 	remaining = 0.0
+	dash_direction = Vector2.ZERO
 
 func press(index: int, at: Vector2, pixels: float) -> void:
 	contacts[index] = {"start": at, "at": at, "age": 0.0, "moved": false, "pixels": pixels}
@@ -43,18 +47,24 @@ func release(index: int, at: Vector2, canceled: bool = false) -> String:
 	if drag_id == index:
 		drag_id = -1
 		direction = Vector2.ZERO
-	if canceled or contact.moved or float(contact.age) > 0.3 or at.distance_to(contact.start) * float(contact.pixels) >= 12: return ""
+	if canceled: return ""
+	var offset: Vector2 = at - contact.start
+	if contact.moved:
+		pending = false
+		if float(contact.age) >= DASH_HOLD and offset.length() * float(contact.pixels) >= DASH_DRAG:
+			dash_direction = offset.normalized()
+			return "dash"
+		return ""
+	if float(contact.age) > 0.3 or offset.length() * float(contact.pixels) >= 12: return ""
 	if pending and remaining > 0 and at.distance_to(tap_position) * tap_scale <= 52:
 		pending = false
 		return "overdrive"
-	# The first tap waits briefly so a double tap never spends both skills.
-	var previous := "dash" if pending else ""
-	dash_position = tap_position
+	# Single taps are inert; only a second nearby tap spends overdrive.
 	pending = true
 	remaining = TAP_WINDOW
 	tap_position = at
 	tap_scale = float(contact.pixels)
-	return previous
+	return ""
 
 func advance(delta: float) -> String:
 	for contact: Dictionary in contacts.values(): contact.age += delta
@@ -62,5 +72,4 @@ func advance(delta: float) -> String:
 	remaining -= delta
 	if remaining > 0: return ""
 	pending = false
-	dash_position = tap_position
-	return "dash"
+	return ""

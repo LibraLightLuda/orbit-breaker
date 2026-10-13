@@ -3,7 +3,7 @@ extends SceneTree
 var checks := 0
 var failures := 0
 var game: Node2D
-var folder := "res://artifacts/mobile-candidate"
+var folder := "res://artifacts/feedback-candidate"
 
 func _initialize() -> void:
 	call_deferred("run_checks")
@@ -34,7 +34,7 @@ func run_checks() -> void:
 	gesture.press(0, Vector2(100, 100), 1)
 	check(gesture.release(0, Vector2(100, 100)) == "", "single tap waits for possible second tap")
 	check(gesture.advance(0.2) == "", "tap window remains open")
-	check(gesture.advance(0.05) == "dash" and gesture.dash_position == Vector2(100, 100), "single tap emits exactly one aimed dash")
+	check(gesture.advance(0.05) == "" and not gesture.pending, "single tap never spends dash")
 	check(gesture.advance(1) == "", "tap never repeats")
 	gesture.press(0, Vector2(100, 100), 1)
 	gesture.release(0, Vector2(100, 100))
@@ -47,8 +47,9 @@ func run_checks() -> void:
 	gesture.press(1, Vector2(500, 150), 1)
 	gesture.release(1, Vector2(500, 150))
 	gesture.drag(0, Vector2(150, 102))
-	check(gesture.advance(0.25) == "dash" and not gesture.direction.is_zero_approx(), "second finger can tap while first continues steering")
-	check(gesture.release(0, Vector2(150, 102)) == "" and gesture.direction == Vector2.ZERO, "drag release stops steering without skill")
+	check(gesture.advance(0.25) == "" and not gesture.direction.is_zero_approx(), "second finger tap preserves steering without dash")
+	gesture.advance(0.1)
+	check(gesture.release(0, Vector2(150, 102)) == "dash" and gesture.direction == Vector2.ZERO and gesture.dash_direction.x > 0.99, "long drag release dashes along finger vector")
 	gesture.press(0, Vector2.ZERO, 1)
 	gesture.advance(0.4)
 	check(gesture.release(0, Vector2.ZERO) == "", "long hold is not a tap")
@@ -74,9 +75,14 @@ func run_checks() -> void:
 	check(game.ui.has_node("MobileHUD"), "touch mode creates physical-size HUD")
 	var point: Vector2 = game.position + game.run.player + Vector2(130, 50)
 	touch_event(0, point, true)
-	touch_event(0, point, false)
-	game._physics_process(0.25)
-	check(game.run.dash_time > 0 and game.run.dash_cooldown > 0, "real viewport tap activates existing dash")
+	var swipe := InputEventScreenDrag.new()
+	swipe.index = 0
+	swipe.position = point + Vector2(110, 0)
+	root.push_input(swipe, true)
+	game._physics_process(0.31)
+	touch_event(0, swipe.position, false)
+	game._physics_process(0.01)
+	check(game.run.dash_time > 0 and game.run.dash_cooldown > 0 and game.run._dash_direction.x > 0.99, "viewport long drag releases an aimed dash")
 	game._start_run()
 	game.run.overdrive_meter = 100
 	touch_event(0, point, true)
@@ -129,7 +135,7 @@ func run_checks() -> void:
 		game._show_hangar()
 		await process_frame
 		await process_frame
-		check(game.ui.has_node("CompactScroll") or DisplayServer.get_name() == "headless", "small screen menu uses readable scrolling layout")
+		check(not game.ui.has_node("CompactScroll") and game.ui.has_meta("fitted_menu"), "hangar fits without scrolling")
 		var launch: Array = game.ui.find_children("*", "Button", true, false).filter(func(b: Button) -> bool: return int(b.get_meta("flow_order", 0)) == 750)
 		check(launch.size() == 1 and launch[0].get_parent() == game.ui, "mobile launch stays accessible while cards scroll")
 		await capture("hangar-%dx%d" % [resolution.x, resolution.y])
@@ -138,9 +144,9 @@ func run_checks() -> void:
 		await process_frame
 		await process_frame
 		if resolution.x >= 800:
-			var content: Control = game.ui.get_node("CompactScroll").get_child(0)
+			var content: Control = game.ui
 			var card: Button = content.get_children().filter(func(c: Node) -> bool: return c is Button and c.text.is_empty())[0]
-			check(card.get_child(2).position.y < 64 and card.get_child(3).position.y < 96, "landscape upgrade name and effect are visible together")
+			check(card.get_child(2).position.y < 34 and card.get_child(3).position.y < 96, "landscape upgrade name and effect are visible together")
 		await capture("upgrade-%dx%d" % [resolution.x, resolution.y])
 	game.queue_free()
 	await process_frame

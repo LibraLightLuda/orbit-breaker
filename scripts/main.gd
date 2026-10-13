@@ -147,7 +147,7 @@ func _fit_viewport() -> void:
 	ui.get_parent().offset = position
 	if screen == "playing" and ui.has_node("MobileHUD"):
 		ui.get_node("MobileHUD").fit()
-	if ui.has_node("CompactScroll"):
+	if ui.has_node("CompactScroll") or ui.has_meta("fitted_menu"):
 		call_deferred("_refresh_menu_layout")
 	else:
 		preload("res://scripts/menu_flow.gd").apply.call_deferred(self)
@@ -155,7 +155,6 @@ func _fit_viewport() -> void:
 	if shade != null:
 		shade.position = _viewport_rect().position
 		shade.size = _viewport_rect().size
-	_animate_menu.call_deferred()
 	queue_redraw()
 
 func _animate_menu() -> void:
@@ -171,7 +170,7 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch and not event.pressed and touch.contacts.has(event.index):
 		var at: Vector2 = get_global_transform_with_canvas().affine_inverse() * event.position
 		var action: String = touch.release(event.index, at, event.canceled)
-		_touch_skill(action, touch.dash_position)
+		_touch_skill(action, at)
 		touch_mouse_guard = 0.6
 		get_viewport().set_input_as_handled()
 		return
@@ -231,7 +230,8 @@ func _touch_skill(action: String, at: Vector2) -> void:
 	if screen != "playing": return
 	if action == "dash":
 		dash_queued = true
-		dash_aim = (at + camera_offset - run.player).normalized()
+		dash_aim = touch.dash_direction if not touch.dash_direction.is_zero_approx() else (at + camera_offset - run.player).normalized()
+		touch.dash_direction = Vector2.ZERO
 	elif action == "overdrive":
 		run.activate_overdrive()
 
@@ -463,7 +463,7 @@ func _exit_tree() -> void:
 	for job: Dictionary in ghost_jobs:
 		job.writer.cancel_write()
 
-func _clear_ui() -> void:
+func _clear_ui(animate: bool = true) -> void:
 	touch.reset()
 	if dash_cursor_anchor and OS.has_feature("web"):
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -473,12 +473,15 @@ func _clear_ui() -> void:
 	ui.position = Vector2.ZERO
 	ui.modulate = Color.WHITE
 	ui.scale = Vector2.ONE
+	ui.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	ui.size = Vector2(1280, 720)
+	if ui.has_meta("fitted_menu"): ui.remove_meta("fitted_menu")
 	ui.get_parent().offset = position
 	for child in ui.get_children():
 		ui.remove_child(child)
 		child.queue_free()
 	preload("res://scripts/menu_flow.gd").apply.call_deferred(self)
-	_animate_menu.call_deferred()
+	if animate: _animate_menu.call_deferred()
 
 func _refresh_menu_layout() -> void:
 	match screen:
@@ -578,7 +581,7 @@ func _show_menu() -> void:
 	_button("설정", Rect2(410, 468, 148, 50), _show_settings)
 	_label("최고 %s   /   돌파 %d회   /   업적 %d점" % [_number(int(records.data.best_score)), int(records.data.wins), Achievements.points(records.data.achievements)], Rect2(80, 565, 660, 30), 18, MUTED)
 	_label("마우스 / WASD 이동    좌클릭 / SPACE 돌진    우클릭 / E 오버드라이브", Rect2(80, 642, 850, 30), 16, MUTED)
-	_label("VERSION 3.18.2  /  MADE WITH GODOT", Rect2(922, 650, 350, 24), 13, MUTED)
+	_label("VERSION 3.18.3  /  MADE WITH GODOT", Rect2(922, 650, 350, 24), 13, MUTED)
 
 func _wrap_label(text: String, rect: Rect2, size: int = 18, color: Color = MUTED, parent: Control = null) -> Label:
 	return _label(text, rect, size, color, parent, true)
@@ -594,8 +597,9 @@ func _glyph(kind: String, id: String, rect: Rect2, color: Color = CYAN, parent: 
 	return glyph
 
 func _show_hangar() -> void:
+	var refresh := screen == "hangar"
 	screen = "hangar"
-	_clear_ui()
+	_clear_ui(not refresh)
 	_label("LAUNCH BAY / FLIGHT SYSTEMS", Rect2(64, 32, 740, 28), 16, CYAN)
 	_label("출격 준비", Rect2(60, 76, 700, 56), 42)
 	_label("파일럿 이름", Rect2(720, 87, 130, 30), 17, MUTED)
@@ -1074,7 +1078,7 @@ func _upgrade_delta(id: String) -> String:
 		"orbit": return "위성 %d → %d기" % [run.orbit_count, run.orbit_count + 1]
 		_: return "즉시 적용" if int(RunModel.upgrade_info(id).cap) == 0 else "출격 중 유지 · 일시 보급과 별개"
 
-func _upgrade_links(id: String) -> String:
+func _upgrade_links(id: String, compact: bool = false) -> String:
 	var links: Array[String] = []
 	for evolution_id in GameContent.EVOLUTION_IDS:
 		var info: Dictionary = GameContent.evolution_info(evolution_id)
@@ -1089,8 +1093,10 @@ func _upgrade_links(id: String) -> String:
 			var current := int(run.upgrades.get(required, 0)) + (1 if required == id else 0)
 			var target := int(info.requirements[required])
 			complete = complete and current >= target
-			requirements.append("%s %d/%d" % [str(RunModel.upgrade_info(required).name).replace("고출력 코어", "코어").replace("위성 증설", "위성").replace("속사 회로", "속사"), mini(current, target), target])
-		links.append("%s%s\n%s" % [info.name, " · 선택 시 완성" if complete else "", " + ".join(requirements)])
+			var name_text := str(RunModel.upgrade_info(required).name).replace("고출력 코어", "코어").replace("위성 증설", "위성").replace("속사 회로", "속사")
+			if compact: name_text = {"orbit":"위성", "blade":"절삭", "range":"궤도", "missile":"유도", "chain":"전격", "pulse":"충격", "frost":"냉각", "dash":"점멸", "speed":"추진", "magnet":"수집", "vitality":"선체"}.get(required, name_text)
+			requirements.append("%s%d/%d" % [name_text, mini(current, target), target])
+		links.append("%s%s%s%s" % [info.name, (" ✓" if compact else " · 선택 시 완성") if complete else "", " · " if compact else "\n", (" " if compact else " + ").join(requirements)])
 	return "\n".join(links) if not links.is_empty() else "독립 강화 · 모든 빌드에 적용"
 
 func _pick_upgrade(index: int) -> void:
@@ -1179,7 +1185,7 @@ func _draw() -> void:
 	if screen in ["menu", "help", "settings", "credits", "hangar", "records", "replay"] or (screen == "arsenal" and codex_return == "menu"):
 		backdrop.sync(_viewport_rect(), "ring", 0.0 if records.data.reduced_motion else (replay_time if screen == "replay" else clock_time), Vector2.ZERO)
 	if screen in ["menu", "help", "settings", "credits", "hangar", "records"] or (screen == "arsenal" and codex_return == "menu"):
-		if screen == "menu":
+		if screen == "menu" and not ui.has_meta("fitted_menu"):
 			_draw_motif(Vector2(914, 346))
 		return
 	if screen == "replay":
@@ -1189,7 +1195,8 @@ func _draw() -> void:
 	if screen == "playing" and run.boundary_depth(run.player) > 0.0:
 		_draw_boundary_warning()
 	if screen == "playing":
-		_draw_item_status()
+		if not touch_mode: _draw_item_status()
+		_draw_pickup_guides(run)
 		if not touch_mode: _draw_expedition(run)
 	if toast_time > 0 and screen == "playing":
 		var width := font.get_string_size(toast, HORIZONTAL_ALIGNMENT_LEFT, -1, 20).x + 48
@@ -1519,6 +1526,41 @@ func _draw_direction_marker(at: Vector2, direction: Vector2, color: Color, kind:
 		"item":
 			draw_rect(Rect2(badge - Vector2(9, 9), Vector2(18, 18)), color, false, 2)
 			ItemCatalog.draw_icon(self, badge, id, color, 0.6)
+
+func _pickup_guides(model: RunModel) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	var pixels := get_viewport().get_final_transform().get_scale().x
+	var view := _viewport_rect()
+	var bounds := Rect2(view.position * pixels + Vector2(40, 104), view.size * pixels - Vector2(80, 180))
+	var occupied: Array[Rect2] = []
+	for kind in ["part", "item"]:
+		for drop: Dictionary in (model.part_drops if kind == "part" else model.items):
+			var point: Vector2 = drop.pos - camera_offset
+			if view.grow(-24 / pixels).has_point(point): continue
+			var direction := (point - (model.player - camera_offset)).normalized()
+			var edge := bounds.get_center() + direction * minf(bounds.size.x * 0.5 / maxf(0.001, absf(direction.x)), bounds.size.y * 0.5 / maxf(0.001, absf(direction.y)))
+			var color: Color = Expedition.part(str(drop.id)).color if kind == "part" else ItemCatalog.grade_color(str(drop.grade))
+			var title: String = str(Expedition.part(str(drop.id)).name) if kind == "part" else str(drop.grade) + " " + str(ItemCatalog.info(str(drop.id)).name)
+			var text := "%s · %dm · %ds%s" % [title, roundi(model.player.distance_to(drop.pos)), ceili(float(drop.ttl)), " · 잠금" if bool(drop.get("locked", false)) else ""]
+			var label_size := Vector2(minf(font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x + 16, view.size.x * pixels - 24), 26)
+			var label := Rect2(Vector2(clampf(edge.x - label_size.x * 0.5, view.position.x * pixels + 12, view.end.x * pixels - label_size.x - 12), edge.y + (20 if direction.y < 0 else -44)), label_size)
+			var base := label.position
+			for attempt in range(1, 25):
+				if not occupied.any(func(r: Rect2) -> bool: return r.intersects(label)): break
+				label.position.y = clampf(base.y + ceili(attempt / 2.0) * 28 * (1 if attempt % 2 else -1), bounds.position.y, bounds.end.y - 26)
+			occupied.append(label)
+			result.append({"at":edge, "direction":direction, "color":color, "kind":kind, "id":str(drop.id), "text":text, "label":label})
+	return result
+
+func _draw_pickup_guides(model: RunModel) -> void:
+	var pixels := get_viewport().get_final_transform().get_scale().x
+	draw_set_transform(Vector2.ZERO, 0, Vector2.ONE / pixels)
+	for guide in _pickup_guides(model):
+		draw_line(guide.at, guide.label.get_center(), Color(guide.color, 0.5), 1, true)
+		_draw_direction_marker(guide.at, guide.direction, guide.color, guide.kind, guide.id)
+		draw_style_box(_style(Color(BG, 0.86), Color(guide.color, 0.5)), guide.label)
+		draw_string(font, guide.label.position + Vector2(8, 18), guide.text, HORIZONTAL_ALIGNMENT_LEFT, guide.label.size.x - 16, 12, guide.color)
+	draw_set_transform(Vector2.ZERO)
 
 func _draw_skill_meter(at: Vector2, progress: float, color: Color, ready: bool, triangular: bool = false) -> void:
 	var sides := 3 if triangular else 24
@@ -1905,26 +1947,6 @@ func _draw_item_status(world: RunModel = null, y: float = 586.0) -> void:
 		index += 1
 	if screen == "replay":
 		return
-	var nearest: Dictionary = {}
-	var distance := INF
-	for item: Dictionary in model.items:
-		var candidate := model.player.distance_to(item.pos)
-		if candidate < distance:
-			nearest = item
-			distance = candidate
-	if not nearest.is_empty():
-		var item_point: Vector2 = nearest.pos
-		var at := Vector2(640, 508 if model.buffs.size() > 6 else 550)
-		var direction := (item_point - model.player).normalized()
-		var color := ItemCatalog.grade_color(str(nearest.grade))
-		_draw_direction_marker(at, direction, color, "item", str(nearest.id))
-		draw_string(font, at + Vector2(38, 6), "%s등급 보급 %dpx · %d초 · %s" % [nearest.grade, roundi(distance), ceili(float(nearest.ttl)), "위험 경계" if model.boundary_layer(item_point) > 0 else "안전 구역"], HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
-		var bounds := _viewport_rect().grow(-48)
-		var point: Vector2 = item_point - camera_offset
-		if not bounds.has_point(point):
-			var ray := (point - bounds.get_center()).normalized()
-			var edge := bounds.get_center() + ray * minf(bounds.size.x * 0.5 / maxf(0.001, absf(ray.x)), bounds.size.y * 0.5 / maxf(0.001, absf(ray.y)))
-			_draw_direction_marker(edge, ray, color, "item", str(nearest.id))
 
 func _draw_part_icon(at: Vector2, id: String, _color: Color, scale: float = 1.0, world: bool = false) -> void:
 	ArtAssets.sprite(self, "objects/" + id, at, Vector2.ONE * 34 * scale, 0, camera_offset if world else Vector2.ZERO)
@@ -1987,26 +2009,6 @@ func _draw_expedition(model: RunModel) -> void:
 		var id: String = "trinity" if model.hull_rank("trinity") > 0 else str(model.hull_forms.back())
 		form = "%s %s · TAB 조합법" % [Expedition.recipe(id).name, "II" if model.hull_rank(id) == 2 else "I"]
 	draw_string(font, Vector2(470, 670), form, HORIZONTAL_ALIGNMENT_LEFT, 570, 13, LIME)
-	var nearest: Dictionary = {}
-	var distance := INF
-	for drop: Dictionary in model.part_drops:
-		var candidate := model.player.distance_to(drop.pos)
-		if candidate < distance:
-			nearest = drop
-			distance = candidate
-	if not nearest.is_empty():
-		var info := Expedition.part(str(nearest.id))
-		var at := Vector2(644, 552)
-		var direction: Vector2 = (Vector2(nearest.pos) - model.player).normalized()
-		_draw_direction_marker(at, direction, info.color, "part", str(nearest.id))
-		draw_style_box(_style(Color(BG, 0.88), Color(info.color, 0.3)), Rect2(at + Vector2(18, -17), Vector2(370, 30)))
-		draw_string(font, at + Vector2(23, 5), "%s %dpx · %d초 · %s" % [info.name, roundi(distance), ceili(float(nearest.ttl)), "2층 직접 탐사" if bool(nearest.locked) else "회수 가능"], HORIZONTAL_ALIGNMENT_LEFT, 550, 14, info.color)
-		var point: Vector2 = Vector2(nearest.pos) - camera_offset
-		var bounds := _viewport_rect().grow(-46)
-		if not bounds.has_point(point):
-			var ray := (point - bounds.get_center()).normalized()
-			var edge := bounds.get_center() + ray * minf(bounds.size.x * 0.5 / maxf(0.001, absf(ray.x)), bounds.size.y * 0.5 / maxf(0.001, absf(ray.y)))
-			_draw_direction_marker(edge, ray, info.color, "part", str(nearest.id))
 
 func mission_progress_text(model: RunModel) -> String:
 	var m := model.mission

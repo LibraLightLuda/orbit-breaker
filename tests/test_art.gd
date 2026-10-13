@@ -153,20 +153,13 @@ func run_checks() -> void:
 			for i in 3: await process_frame
 			game._show_upgrades(true)
 			for i in 3: await process_frame
-			var compact: ScrollContainer=game.ui.get_node("CompactScroll")
-			var sequence: Array=[]
-			for child in compact.get_child(0).get_children():
-				if child is Button: sequence.append(child)
-			check(sequence.size()==6,"three compact cards and selection targets")
-			for i in 3:
-				check(sequence[i*2].text.is_empty() and sequence[i*2+1].text.contains("[%d]" % (i+1)),"compact selection follows its card")
-			var links: ScrollContainer=sequence[0].find_children("*","ScrollContainer",true,false)[0]
-			check(links.get_child(0).text==game._upgrade_links("power"),"compact retains all power evolution links")
-			check(links.get_child(0).get_theme_font_size("font_size")>=18,"compact links readable font")
-			await capture("upgrade-%dx%d-top" % [dimensions.x,dimensions.y])
-			links.scroll_vertical=int(links.get_v_scroll_bar().max_value)
-			compact.scroll_vertical=maxi(0,int(sequence[1].position.y)-dimensions.y+90)
-			await capture("upgrade-%dx%d-links-bottom" % [dimensions.x,dimensions.y])
+			check(not game.ui.has_node("CompactScroll"),"upgrade choices require no page scroll")
+			var cards: Array=game.ui.get_children().filter(func(c: Node)->bool: return c is Button and c.text.is_empty())
+			check(cards.size()==3,"all three cards remain accessible")
+			var links: ScrollContainer=cards[0].get_child(5)
+			check(links.get_child(0).text==game._upgrade_links("power",true),"compact retains all power evolution links")
+			check(links.vertical_scroll_mode==ScrollContainer.SCROLL_MODE_SHOW_NEVER,"compact links require no scrolling")
+			await capture("upgrade-%dx%d" % [dimensions.x,dimensions.y])
 		root.size=original_size
 		for i in 3: await process_frame
 	game._show_menu()

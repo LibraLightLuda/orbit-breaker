@@ -45,3 +45,8 @@ Windows SHA-256: `15D4D4098BD767B8B8D63C5550749387DC57FC091651285BCB7BA5F37FF779
 ## 2026-10-13 모바일 세대 전환
 
 최신은 **3.18.2 / mobile-20261013**. 기존 정상 EXE·체크섬·안내·대응 증거를 retiring에 먼저 보존하고 새 필수 검사/Windows·Web export/실행/해시 검증 후 current를 교체했다. 교체 후 retiring3폴더와 이번 mobile-candidate를 정리했다. 최신 Windows SHA-256 `8AE93D875BE76E77153E04746729C6A3D3CF24DEEFEE3F3E9D9637CA168F1A99`. 로컬 정상 배포본은 한 세대다. 기존 정책 차단 임시5경로는 재시도하지 않았으며 retained_scratch에 남아 있다. 신규 공개본 검증 후 GitHub 구버전 첨부6개와 이전 Pages artifact2개를 정리했고 최신 릴리즈6첨부/Pages artifact1개를 확인했다. 소스·설계 이력·플레이어 데이터는 보존했다.
+
+
+## 2026-10-13 모바일 피드백 세대 전환
+
+최신 로컬 세대는 **3.18.3 / feedback-20261013**. 필수 검사·Windows/Web 내보내기·최종 실행·해시 검증 후 current를 교체했다. 이전 실행 파일·체크섬·안내·증거를 retiring에 보존하고 새 정상본 확인 후 정리했다. Windows SHA-256 `82B7CF017639B020C9922945476F64CB57C9390A996071513AB8BA7206F943AB`. 배포본은 최신 한 세대다. 기존 정책 차단 임시5경로와 이번 `artifacts/feedback-candidate` 삭제 차단으로 임시6경로가 남았다. 자동 승인 검토가 복합 삭제 명령을 blocked by policy로 거부했으며 해당 삭제를 우회/재시도하지 않았다. 소스/설계/플레이어 데이터는 보존했다. GitHub/Pages 검증은 진행 중이다.

@@ -156,7 +156,7 @@ func feature_checks() -> void:
 				await process_frame
 				await process_frame
 				var scroll: ScrollContainer = game.ui.get_node_or_null("CompactScroll")
-				check(scroll != null and scroll.get_child(0).custom_minimum_size.y > dimensions.y, "small menu scroll %s" % dimensions)
+				check(scroll == null and game.ui.has_meta("fitted_menu"), "hangar fits without scroll %s" % dimensions)
 				await shot("hangar-%dx%d" % [dimensions.x, dimensions.y])
 				if scroll != null:
 					scroll.scroll_vertical = int(scroll.get_v_scroll_bar().max_value)
@@ -220,11 +220,11 @@ func _text(node: Node) -> String:
 
 func _compact_fits(node: Node) -> bool:
 	for child in node.get_children():
-		if child is Label and child.get_parent() is Control:
-			if child.position.x + child.size.x > child.get_parent().size.x + 1 or child.get_theme_font_size("font_size") < 18:
+		if child is Label and child.is_visible_in_tree() and child.get_parent() is Control:
+			if child.position.x + child.size.x > child.get_parent().size.x + 1 or child.get_theme_font_size("font_size") < (10 if game.ui.has_meta("fitted_menu") else 18):
 				push_error("Compact overflow: " + child.text)
 				return false
-		if child is Button and child.size.y < 44:
+		if child is Button and child.is_visible_in_tree() and child.size.y < (36 if game.ui.has_meta("fitted_menu") else 44):
 			return false
 		if not _compact_fits(child):
 			return false
