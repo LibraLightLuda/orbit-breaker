@@ -166,6 +166,7 @@ func record_run(score: int, time: float, won: bool, details: Dictionary = {}) ->
 		for key: String in ["blade", "frost", "missile", "chain"]:
 			if _integer(upgrades.get(key)) >= 3:
 				progress[key] = 1
+	if entry.finale == "success": progress.final_op = 1
 	_award_achievements()
 	# Keep one personal best per name and difficulty, ten names per difficulty.
 	var previous: Array = data.leaderboard.duplicate(true)
@@ -324,7 +325,10 @@ func _validated(source: Dictionary) -> Dictionary:
 func _run_entry(score: int, time: float, won: bool, details: Dictionary) -> Dictionary:
 	return {
 		"name": clean_name(details.get("name", data.player_name)),
-		"ghost": _ghost_id(details.get("ghost")), "rules": "3.1",
+		"ghost": _ghost_id(details.get("ghost")), "rules": "combat-v1" if details.get("rules") == "combat-v1" else "3.1",
+		"branch": details.get("branch") if details.get("branch") is String and details.branch in GameContent.BRANCH_IDS and GameContent.branch_info(details.branch).ship == details.get("ship") else "",
+		"finale": "success" if _finale_success(details) else ("failed" if details.get("finale") == "failed" else "none"),
+		"finale_time": float(details.finale_time) if _finale_success(details) else -1.0,
 		"score": clampi(score, 0, 1_000_000_000), "time": _duration(time), "won": won,
 		"ship": details.get("ship") if details.get("ship") is String and details.get("ship") in SHIP_IDS else "striker",
 		"sector": details.get("sector") if details.get("sector") is String and details.get("sector") in SECTOR_IDS else "ring",
@@ -420,6 +424,7 @@ func record_live_achievements(details: Dictionary) -> bool:
 	var progress: Dictionary = data.achievement_progress.duplicate()
 	progress.kills = int(data.total_kills) + _integer(details.get("kills"))
 	progress.time = maxi(int(data.best_time), int(details.get("elapsed", 0)))
+	if _finale_success(details): progress.final_op = 1
 	progress.combo = maxi(int(progress.get("combo", 0)), _integer(details.get("combo")))
 	for key: String in ["dashes", "overdrives", "returns", "elites"]:
 		progress[key] = int(progress.get(key, 0)) + _integer(details.get(key))
@@ -507,3 +512,8 @@ func record_tech(pickups: Array[Dictionary]) -> bool:
 	data = before
 	new_achievements = previous_notices
 	return false
+
+func _finale_success(details: Dictionary) -> bool:
+	var at: Variant = details.get("finale_time")
+	var time: Variant = details.get("time", details.get("elapsed"))
+	return details.get("finale") == "success" and details.get("rules") == "combat-v1" and _is_number(at) and _is_number(time) and float(at) >= 540.0 and float(at) < 600.0 and float(at) <= float(time)

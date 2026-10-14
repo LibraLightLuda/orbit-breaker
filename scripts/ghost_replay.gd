@@ -173,6 +173,9 @@ static func valid(value: Variant, first_time: float = 0.0, previous_time: float 
 		if not frame is Array or not frame.size() in [13, 14] or (width != 0 and frame.size() != width):
 			return false
 		width = frame.size()
+		for number: Variant in frame.slice(0, 13):
+			if not (number is int or number is float) or not is_finite(float(number)):
+				return false
 		if width == 14:
 			if not _valid_world(frame[13]):
 				return false
@@ -181,9 +184,6 @@ static func valid(value: Variant, first_time: float = 0.0, previous_time: float 
 				if float(event[0]) < event_time or float(event[0]) > float(frame[0]):
 					return false
 				event_time = float(event[0])
-		for number: Variant in frame.slice(0, 13):
-			if not (number is int or number is float) or not is_finite(float(number)):
-				return false
 		if float(frame[0]) <= last or float(frame[0]) > 600.01 or absf(float(frame[1])) > 10000 or absf(float(frame[2])) > 10000 or float(frame[6]) < 1 or float(frame[6]) > 12 or float(frame[7]) < 0 or float(frame[7]) > 200:
 			return false
 		last = float(frame[0])
@@ -253,7 +253,7 @@ static func _read_stream(file: FileAccess) -> Array:
 		result.append_array(chunk)
 	return []
 
-static func sample(value: Array, time: float) -> Array:
+static func _frame_index(value: Array, time: float) -> int:
 	var low := 0
 	var high := value.size() - 1
 	while low < high:
@@ -262,6 +262,17 @@ static func sample(value: Array, time: float) -> Array:
 			low = middle
 		else:
 			high = middle - 1
+	return low
+
+static func sample_position(value: Array, time: float) -> Vector2:
+	var index := _frame_index(value, time)
+	var a: Array = value[index]
+	var b: Array = value[mini(index + 1, value.size() - 1)]
+	var weight := clampf((time - float(a[0])) / maxf(0.0001, float(b[0]) - float(a[0])), 0.0, 1.0)
+	return Vector2(a[1], a[2]).lerp(Vector2(b[1], b[2]), weight)
+
+static func sample(value: Array, time: float) -> Array:
+	var low := _frame_index(value, time)
 	var a: Array = value[low]
 	var b: Array = value[mini(low + 1, value.size() - 1)]
 	var result := a.duplicate()
@@ -289,6 +300,12 @@ func _world(run: RunModel) -> Dictionary:
 		for entity: Dictionary in run.get(key):
 			rows.append(_row(key, entity))
 		result[key] = rows
+	var statuses: Array = []
+	for i in run.enemies.size():
+		var enemy: Dictionary = run.enemies[i]
+		if float(enemy.get("weakpoint", 0.0)) <= 0.0 and float(enemy.get("env_vulnerable", 0.0)) <= 0.0 and not bool(enemy.get("final_commander", false)): continue
+		statuses.append([result.enemies[i][0], float(enemy.get("weakpoint", 0.0)), float(enemy.get("env_vulnerable", 0.0)), bool(enemy.get("final_commander", false)), float(enemy.get("relay_max", 0.0)), enemy.get("relays", []).duplicate(), _pack(enemy.get("relay_axis", Vector2.RIGHT))])
+	result.combat = {"schema": 1, "branch": run.branch_id, "finale": run.finale_status, "finale_time": run.finale_success_at, "selected": run.finale_selected, "offered": run.finale_offered, "statuses": statuses}
 	return result
 
 static func _pack(value: Variant) -> Variant:
@@ -316,7 +333,8 @@ static func _matches(value: Variant, example: Variant) -> bool:
 	return _number(value)
 
 static func _valid_world(value: Variant) -> bool:
-	if not value is Dictionary or value.size() != COLLECTIONS.size() + (6 if value.has("expedition") else 5):
+	if value is Dictionary and value.has("combat") and not _valid_combat(value.combat): return false
+	if not value is Dictionary or value.size() != COLLECTIONS.size() + ((6 if value.has("expedition") else 5) + (1 if value.has("combat") else 0)):
 		return false
 	if value.has("expedition") and not Expedition.valid_snapshot(value.expedition):
 		return false
@@ -363,6 +381,14 @@ static func _valid_world(value: Variant) -> bool:
 
 static func _interpolate_world(a: Dictionary, b: Dictionary, weight: float, start: float, end: float, time: float) -> Dictionary:
 	var world := a.duplicate()
+	if world.has("combat"):
+		world.combat = a.combat.duplicate(true)
+		if weight >= 1.0:
+			world.combat = b.get("combat", {}).duplicate(true)
+		else:
+			for status: Array in world.combat.statuses:
+				status[1] = maxf(0.0, float(status[1]) - (time - start))
+				status[2] = maxf(0.0, float(status[2]) - (time - start))
 	for key: String in COLLECTIONS:
 		var next := {}
 		for row: Array in b[key]:
@@ -446,6 +472,7 @@ static func restore(run: RunModel, frame: Array) -> void:
 				entity[COLLECTIONS[key][i][0]] = value
 			entities.append(entity)
 		run.set(key, entities)
+	_restore_combat(run, world.get("combat", {}))
 
 func _row(key: String, entity: Dictionary) -> Array:
 	var row: Array = [entity._replay_id]
@@ -478,4 +505,50 @@ static func _valid_row(key: String, row: Variant) -> bool:
 	for i: int in range(row.size() - 1):
 		if not _matches(row[i + 1], COLLECTIONS[key][i][1]):
 			return false
+	if key == "enemies" and not row[1] in ["chaser", "runner", "tank", "shooter", "elite", "boss"]:
+		return false
 	return key != "items" or (row[2] in ItemCatalog.IDS and row[3] in ItemCatalog.GRADES)
+
+static func _valid_combat(value: Variant) -> bool:
+	if not value is Dictionary or value.size() != 7 or value.get("schema") != 1: return false
+	if not value.get("branch") is String or (value.branch != "" and not value.branch in GameContent.BRANCH_IDS): return false
+	if not value.get("finale") is String or not value.finale in ["none", "preview", "declined", "active", "success", "failed"]: return false
+	if not _number(value.get("finale_time")) or float(value.finale_time) < -1.0 or float(value.finale_time) >= 600.0: return false
+	if value.finale == "success" and float(value.finale_time) < 540.0: return false
+	if not value.get("selected") is bool or not value.get("offered") is bool or not value.get("statuses") is Array or value.statuses.size() > 240: return false
+	var seen := {}
+	for row: Variant in value.statuses:
+		if not row is Array or row.size() != 7: return false
+		for i: int in [0, 1, 2, 4]:
+			if not _number(row[i]) or float(row[i]) < 0.0: return false
+		if float(row[0]) <= 0.0 or float(row[0]) != floor(float(row[0])) or seen.has(row[0]) or float(row[1]) > 3.0 or float(row[2]) > 4.0 or not row[3] is bool: return false
+		seen[row[0]] = true
+		if not row[5] is Array or not row[5].size() in [0, 2] or not row[6] is Array or row[6].size() != 2: return false
+		for hp: Variant in row[5]:
+			if not _number(hp) or float(hp) < 0.0 or float(hp) > float(row[4]): return false
+		for axis: Variant in row[6]:
+			if not _number(axis) or absf(float(axis)) > 1.001: return false
+		if bool(row[3]) and (row[5].size() != 2 or float(row[4]) <= 0.0): return false
+	return true
+
+static func _restore_combat(run: RunModel, value: Dictionary) -> void:
+	run.branch_id = str(value.get("branch", ""))
+	run.branch_pending = false
+	run.finale_status = str(value.get("finale", "none"))
+	run.finale_success_at = float(value.get("finale_time", -1.0))
+	run.finale_selected = bool(value.get("selected", false))
+	run.finale_offered = bool(value.get("offered", false))
+	run.finale_boss_id = -1
+	var by_id := {}
+	for row: Array in value.get("statuses", []): by_id[row[0]] = row
+	for enemy: Dictionary in run.enemies:
+		var id := int(enemy.get("_replay_id", -1))
+		if not by_id.has(id): continue
+		var row: Array = by_id[id]
+		enemy.weakpoint = float(row[1])
+		enemy.env_vulnerable = float(row[2])
+		enemy.final_commander = bool(row[3])
+		if bool(row[3]):
+			enemy.relay_max = float(row[4])
+			enemy.relays = row[5].duplicate()
+			enemy.relay_axis = Vector2(float(row[6][0]), float(row[6][1]))

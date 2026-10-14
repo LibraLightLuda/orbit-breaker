@@ -210,7 +210,7 @@ func _test_store() -> void:
 	var failed := SaveStore.new()
 	failed.load_data("user://missing_item_dir_%d/records.json" % Time.get_ticks_usec())
 	check(not failed.record_items(pickups) and failed.data.discovered_items.is_empty() and failed.data.achievements.is_empty(), "failed write rolls back discoveries and awards")
-	check(Achievements.catalog().size() == 61, "existing fifty achievements plus eleven expedition achievements")
+	check(Achievements.catalog().size() == 62, "existing achievements plus final operation medal")
 	check(store.record_run(100, 1, false) and store.data.achievement_progress.items == ItemCatalog.IDS.size(), "run result does not double count immediate pickups")
 	for suffix: String in ["", ".bak", ".tmp"]:
 		if FileAccess.file_exists(path + suffix):

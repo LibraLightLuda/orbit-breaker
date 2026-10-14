@@ -14,3 +14,4 @@ art_source/memory_baseline_project/
 art_source/motion_baseline_project/
 docs/**/*.import
 tools/__pycache__/
+tests/__pycache__/

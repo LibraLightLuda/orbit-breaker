@@ -46,3 +46,17 @@ static func evolution_info(id: String) -> Dictionary:
 		"minefield": {"id": "minefield", "name": "성운 지뢰밭", "description": "4분 이후 · 2초마다 지뢰 설치 / 최대8개\n0.6초 후 접근 감지 · 145px 폭발 · 18초 수명", "requirements": {"missile": 3, "pulse": 2}, "mastery": "missile", "after": 240.0},
 	}
 	return evolutions.get(id, {}).duplicate(true)
+
+const BRANCH_IDS := ["focus", "field", "trail", "pierce", "heavy", "cycle"]
+
+const BRANCHES := {
+		"focus": {"ship": "striker", "name": "집중 포대", "description": "포대 1기 · 피해 ×2.4 · 사거리 520\n5초마다 재배치 · 보스/정예 우선", "tradeoff": "동시에 여러 방향을 막기 어렵습니다", "sentry_damage": 2.4, "sentry_range": 520.0, "sentry_life": 6.0, "sentry_period": 5.0},
+		"field": {"ship": "striker", "name": "방어 진지", "description": "포대 3기 · 사거리 620 · 18초 유지\n6초마다 설치 · 넓은 구역 방어", "tradeoff": "포대별 피해 ×0.85 · 재배치가 느립니다", "sentry_damage": 0.85, "sentry_range": 620.0, "sentry_life": 18.0, "sentry_period": 6.0},
+		"trail": {"ship": "scout", "name": "지속 항적", "description": "항적 3.6초 · 피해 ×0.85\n경로 위로 적을 유도해 반복 타격", "tradeoff": "직접 돌진 피해 ×0.85", "wake_life": 3.6, "wake_damage": 0.85, "dash_damage": 0.85},
+		"pierce": {"ship": "scout", "name": "관통 돌격", "description": "직접 돌진 피해 ×1.35\n적과 지휘체를 관통하는 순간 화력", "tradeoff": "항적 1.2초 · 항적 피해 ×0.75", "wake_life": 1.2, "wake_damage": 0.75, "dash_damage": 1.35},
+		"heavy": {"ship": "bastion", "name": "중량 반격", "description": "반격 피해 ×1.65\n저장한 방벽으로 강한 반격", "tradeoff": "방벽 1스택 충전 10초", "guard_period": 10.0, "guard_damage": 1.65},
+		"cycle": {"ship": "bastion", "name": "순환 방벽", "description": "방벽 1스택 충전 6초\n방어와 적탄 제거를 자주 활용", "tradeoff": "반격 피해 ×0.80", "guard_period": 6.0, "guard_damage": 0.8},
+}
+
+static func branch_info(id: String) -> Dictionary:
+	return BRANCHES.get(id, {})

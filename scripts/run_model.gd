@@ -130,6 +130,13 @@ var _wake_timer := 0.0
 var loot_notices: Array[String] = []
 var audio_events: Dictionary = {}
 var audio_enabled := false
+var branch_id := ""
+var branch_pending := false
+var finale_offered := false
+var finale_selected := false
+var finale_status := "none"
+var finale_success_at := -1.0
+var finale_boss_id := -1
 
 func _audio(cue: String, at: Vector2 = Vector2.INF) -> void:
 	# Presentation-only, one nearest event per family per frame; no game RNG.
@@ -145,6 +152,13 @@ func reset(seed_value: int = 0, difficulty: String = "normal", selected_ship: St
 	_next_elite_at = 300.0
 	relief_until = 0.0
 	_boss_wave = 0
+	branch_id = ""
+	branch_pending = false
+	finale_offered = false
+	finale_selected = false
+	finale_status = "none"
+	finale_success_at = -1.0
+	finale_boss_id = -1
 	_shot_grid.clear()
 	_enemy_serial = 0
 	_ship = Content.ship_info(selected_ship)
@@ -367,6 +381,7 @@ func choose_upgrade(id: String) -> bool:
 	state = "playing"
 	events.append("upgrade")
 	_check_evolutions()
+	_finish_deaths()
 	_check_level()
 	_update_run_stats()
 	return true
@@ -383,13 +398,14 @@ func step(delta: float, move: Vector2, dash_pressed: bool, dash_aim: Vector2 = V
 	_update_vitals(dt)
 	if state != "playing":
 		return
+	_tick_finale()
 	_tick_mission_clock()
 	overdrive_time = maxf(0.0, overdrive_time - dt)
 	slipstream_time = maxf(0.0, slipstream_time - dt)
 	guard_cooldown = maxf(0.0, guard_cooldown - dt)
 	if ship_id == "bastion" and guard_cooldown <= 0.0 and guard_stacks < guard_capacity():
 		guard_stacks += 1
-		guard_cooldown = 8.0 if guard_stacks < guard_capacity() else 0.0
+		guard_cooldown = branch_value("guard_period", 8.0) if guard_stacks < guard_capacity() else 0.0
 	event_remaining = maxf(0.0, event_remaining - dt)
 	dash_cooldown = maxf(0.0, dash_cooldown - dt * (1.0 + buff_value("haste") / 100.0))
 	if dash_pressed and dash_cooldown > 0.0: _audio("ui_denied")
@@ -434,7 +450,7 @@ func step(delta: float, move: Vector2, dash_pressed: bool, dash_aim: Vector2 = V
 	player += _dash_direction * 940.0 * dash_distance_multiplier() * dash_dt + direction * speed * (dt - dash_dt)
 	_wake_timer = maxf(0.0, _wake_timer - dt)
 	if dash_dt > 0.0 and evolutions.has("wake") and _wake_timer <= 0.0:
-		_deploy("wake", old_position, 2.4, 44.0)
+		_deploy("wake", old_position, branch_value("wake_life", 2.4), 44.0)
 		_wake_timer = 0.04
 	if dash_dt > 0.0:
 		facing = _dash_direction
@@ -477,15 +493,7 @@ func step(delta: float, move: Vector2, dash_pressed: bool, dash_aim: Vector2 = V
 			elite.speed *= 1.18 if int(elite.elite_index) == 1 else 0.9
 			_announce("증원 정예 · " + ("돌격형" if int(elite.elite_index) == 1 else "포격형"), "elite")
 	if elapsed >= next_boss_at and enemies.filter(func(e: Dictionary) -> bool: return e.kind == "boss" and float(e.hp) > 0.0).size() < 2:
-		_boss_wave += 1
-		var boss := spawn_enemy("boss")
-		boss.boss_wave = _boss_wave
-		boss.hp *= 1.0 + 0.35 * _boss_wave
-		boss.max_hp = boss.hp
-		boss.speed *= 1.0 + 0.08 * _boss_wave
-		boss.damage *= 1.0 + 0.12 * _boss_wave
-		next_boss_at = elapsed + maxf(35.0, 50.0 - (elapsed - 300.0) * 0.05)
-		_announce("추격 지휘체 %d · 격파 시 붕괴 완화 / 점수 보상" % _boss_wave, "boss")
+		_spawn_pursuit_boss()
 	_shot_timer -= dt
 	if _shot_timer <= 0.0:
 		_fire_player_shot()
@@ -494,6 +502,7 @@ func step(delta: float, move: Vector2, dash_pressed: bool, dash_aim: Vector2 = V
 	_update_enemies(dt, old_position)
 	_update_shots(dt)
 	_update_hazards(dt)
+	_finish_deaths()
 	if state != "playing":
 		_update_run_stats()
 		return
@@ -632,6 +641,9 @@ func base_speed() -> float:
 func _finish_run(reason: String) -> void:
 	if not mission.is_empty() and mission.status == "active":
 		_finish_mission(false)
+	branch_pending = false
+	if finale_status == "active":
+		finale_status = "failed"
 	end_reason = reason
 	state = "won" if survival_cleared else "lost"
 	events.append(state)
@@ -720,6 +732,12 @@ func _update_enemies(dt: float, old_position: Vector2) -> void:
 			enemies.remove_at(i)
 			continue
 		_scale_enemy(enemy, strength)
+		var exposed := false
+		if enemy.kind == "boss":
+			enemy.weakpoint = maxf(0.0, float(enemy.get("weakpoint", 0.0)) - dt)
+			exposed = float(enemy.weakpoint) > 0.0
+		if enemy.has("env_vulnerable"):
+			enemy.env_vulnerable = maxf(0.0, float(enemy.env_vulnerable) - dt)
 		enemy.flash = maxf(0.0, float(enemy.flash) - dt)
 		enemy.orbit_timer = maxf(0.0, float(enemy.orbit_timer) - dt)
 		var toward: Vector2 = player - Vector2(enemy.pos)
@@ -732,7 +750,7 @@ func _update_enemies(dt: float, old_position: Vector2) -> void:
 			if enemy.kind == "boss" and int(enemy.phase) == 1 and float(enemy.hp) <= float(enemy.max_hp) * 0.5 and float(enemy.hp) > 0.0:
 				enemy.phase = 2
 				_audio("boss_phase", enemy.pos)
-				enemy.shot_timer = 0.8
+				if not exposed: enemy.shot_timer = 0.8
 				_announce("지휘체 격앙 · 탄막 강화", "phase")
 			var tangent := direction.orthogonal() * float(enemy.flank_side)
 			if bool(enemy.flanker) and toward.length() > 110.0:
@@ -742,7 +760,9 @@ func _update_enemies(dt: float, old_position: Vector2) -> void:
 			elif enemy.kind == "shooter":
 				var approach := 0.8 if toward.length() > 340.0 else (-0.9 if toward.length() < 240.0 else 0.0)
 				movement = (direction * approach + tangent * 0.55).limit_length(1.0)
-			if float(enemy.warn) > 0.0:
+			if exposed:
+				movement *= 0.4
+			elif float(enemy.warn) > 0.0:
 				enemy.warn = maxf(0.0, float(enemy.warn) - dt)
 				movement *= 0.2
 				if float(enemy.warn) <= 0.0:
@@ -767,20 +787,20 @@ func _update_enemies(dt: float, old_position: Vector2) -> void:
 			enemy.pos += movement * float(enemy.speed) * approach * (float(enemy.get("slow_factor", 1.0)) if float(enemy.slow_time) > 0.0 else 1.0) * dt
 		enemy.pos += gravity_pull(enemy.pos) * dt
 		if dash_time > 0.0 and int(enemy.dash_id) != _dash_id:
-			var closest := Geometry2D.get_closest_point_to_segment(enemy.pos, old_position, player)
-			if closest.distance_to(enemy.pos) < float(enemy.radius) + 28.0:
+			var part := _segment_part(enemy, old_position, player, 28.0)
+			if part != -2:
 				enemy.dash_id = _dash_id
 				_mission_add("dash_hits", 1.0)
-				_hit_enemy(enemy, (52.0 + float(upgrades.get("dash", 0)) * 15.0) * power * (1.75 * (1.0 + 0.25 * int(upgrades.get("scout_lance", 0))) if ship_id == "scout" else 1.0))
+				_hit_enemy(enemy, (52.0 + float(upgrades.get("dash", 0)) * 15.0) * power * (1.75 * (1.0 + 0.25 * int(upgrades.get("scout_lance", 0))) if ship_id == "scout" else 1.0) * branch_value("dash_damage", 1.0), part)
 		var orbit_distance := player.distance_squared_to(enemy.pos)
-		var orbit_contact := float(enemy.radius) + 17.0
+		var orbit_contact := combat_radius(enemy) + 17.0
 		if float(enemy.orbit_timer) <= 0.0 and orbit_distance <= pow(orbit_radius * (1.8 if evolutions.has("ellipse") else 1.0) + orbit_contact, 2) and orbit_distance >= pow(maxf(0.0, orbit_radius * (0.7 if evolutions.has("ellipse") else 1.0) - orbit_contact), 2):
 			for j in orbit_count:
 				var orb := _orbit_positions[j]
-				if orb.distance_squared_to(enemy.pos) <= pow(float(enemy.radius) + (17.0 if evolutions.has("superorbit") else 10.0), 2):
+				if _area_part(enemy, orb, 17.0 if evolutions.has("superorbit") else 10.0) != -2:
 					var kind := orbit_kind(j)
 					_audio("weapon_orbit_" + (kind if kind in ["blade", "frost"] else "normal"), enemy.pos)
-					_hit_enemy(enemy, 25.0 * power * (1.2 if evolutions.has("ellipse") else 1.0) * (1.6 + 0.15 * evolution_mastery("superorbit") if evolutions.has("superorbit") else 1.0) * (1.0 + 0.35 * float(upgrades.get("blade", 0))) * ((1.12 + 0.12 * evolution_mastery("blizzard") if evolutions.has("blizzard") else 0.8) if kind == "frost" else 1.0))
+					_hit_enemy(enemy, 25.0 * power * (1.2 if evolutions.has("ellipse") else 1.0) * (1.6 + 0.15 * evolution_mastery("superorbit") if evolutions.has("superorbit") else 1.0) * (1.0 + 0.35 * float(upgrades.get("blade", 0))) * ((1.12 + 0.12 * evolution_mastery("blizzard") if evolutions.has("blizzard") else 0.8) if kind == "frost" else 1.0), _area_part(enemy, orb, 17.0 if evolutions.has("superorbit") else 10.0))
 					if kind == "frost":
 						var rank := float(upgrades.get("frost", 0))
 						enemy.slow_time = 0.7 + 0.4 * rank + 0.3 * evolution_mastery("blizzard")
@@ -801,13 +821,13 @@ func _fire_player_shot() -> void:
 	var nearest: Dictionary = {}
 	var distance := 740.0
 	for enemy: Dictionary in enemies:
-		var candidate := player.distance_to(enemy.pos)
+		var candidate := player.distance_to(target_position(enemy, player) if enemy.has("relays") else Vector2(enemy.pos))
 		if candidate < distance and float(enemy.hp) > 0.0:
 			nearest = enemy
 			distance = candidate
 	if nearest.is_empty() or shots.size() >= 240:
 		return
-	var direction := (Vector2(nearest.pos) - player).normalized()
+	var direction := (target_position(nearest, player) - player).normalized()
 	var mastery := evolution_mastery("rail")
 	var battery := hull_rank("battery")
 	for barrel in (1 if battery == 0 else battery + 1):
@@ -818,13 +838,13 @@ func _fire_player_shot() -> void:
 	events.append("shot")
 	_audio("weapon_rail" if evolutions.has("rail") else "weapon_cannon", player)
 
-func _fire_enemy_shots(enemy: Dictionary) -> void:
+func _fire_enemy_shots(enemy: Dictionary) -> bool:
 	if enemy.kind == "elite" and int(enemy.elite_index) == 1:
 		enemy.charge_time = 0.6
 		_audio("enemy_attack_charge", enemy.pos)
-		return
+		return true
 	if shots.size() >= 220:
-		return
+		return false
 	var is_boss: bool = enemy.kind == "boss"
 	var phase: int = int(enemy.phase)
 	var count := (12 if phase == 2 else 9) if is_boss else (5 if enemy.kind == "elite" else 1)
@@ -841,6 +861,13 @@ func _fire_enemy_shots(enemy: Dictionary) -> void:
 		var direction: Vector2 = Vector2(enemy.aim).rotated(angle)
 		shots.append({"pos": Vector2(enemy.pos) + direction * float(enemy.radius), "velocity": direction * (148.0 if is_boss else 185.0) * (0.82 if mode == "relaxed" else 1.0) * (1.0 + 0.08 * float(enemy.get("boss_wave", 0))) * (1.0 + 0.025 * float(enemy.get("late_pressure", 0.0))), "friendly": false, "radius": 7.0, "damage": (13.0 if is_boss else 10.0) * (1.0 + 0.12 * float(enemy.get("boss_wave", 0))) * (1.0 + 0.08 * float(enemy.get("late_pressure", 0.0))), "ttl": 5.0})
 	_effect(enemy.pos, "fire", float(enemy.radius) + 10.0, 0.25)
+	if is_boss:
+		enemy.volleys = int(enemy.get("volleys", 0)) + 1
+		if int(enemy.volleys) >= 3:
+			enemy.volleys = 0
+			if not _shielded(enemy):
+				_open_core(enemy, 3.0 if bool(enemy.get("final_commander", false)) else (1.8 if phase == 2 else 2.25))
+	return true
 
 func _update_shots(dt: float) -> void:
 	_shot_grid.clear()
@@ -854,7 +881,7 @@ func _update_shots(dt: float) -> void:
 		if not _shot_grid.has(cell):
 			_shot_grid[cell] = []
 		_shot_grid[cell].append(index)
-		_collision_radius = maxf(_collision_radius, float(enemy.radius))
+		_collision_radius = maxf(_collision_radius, combat_radius(enemy) if enemy.has("relays") else float(enemy.radius))
 	for i in range(shots.size() - 1, -1, -1):
 		var shot: Dictionary = shots[i]
 		var kind: String = str(shot.get("kind", ""))
@@ -873,7 +900,7 @@ func _update_shots(dt: float) -> void:
 		if shot.get("kind", "") == "missile":
 			var target := _nearest_enemy(shot.pos, 700.0)
 			if not target.is_empty():
-				shot.velocity = Vector2(shot.velocity).move_toward((Vector2(target.pos) - Vector2(shot.pos)).normalized() * 350.0, 1700.0 * dt)
+				shot.velocity = Vector2(shot.velocity).move_toward((target_position(target, shot.pos) - Vector2(shot.pos)).normalized() * 350.0, 1700.0 * dt)
 		shot.velocity += gravity_pull(shot.pos) * 4.0 * dt
 		shot.pos += Vector2(shot.velocity) * dt
 		shot.ttl -= dt
@@ -888,21 +915,27 @@ func _update_shots(dt: float) -> void:
 			var swept := Rect2(previous.min(shot.pos), (previous - Vector2(shot.pos)).abs()).grow(float(shot.radius))
 			for index: int in _shot_candidates(previous, shot.pos, float(shot.radius)):
 				var enemy: Dictionary = enemies[index]
-				if not swept.grow(float(enemy.radius)).has_point(enemy.pos):
+				var enemy_radius := combat_radius(enemy) if enemy.has("relays") else float(enemy.radius)
+				if not swept.grow(enemy_radius).has_point(enemy.pos):
 					continue
 				if shot.get("hit_ids", []).has(enemy.get("_combat_id", index)):
 					continue
 				collision_candidates += 1
-				var closest := Geometry2D.get_closest_point_to_segment(enemy.pos, previous, shot.pos)
-				if float(enemy.hp) > 0.0 and closest.distance_squared_to(enemy.pos) < pow(float(enemy.radius) + float(shot.radius), 2):
+				var part := -2
+				if enemy.has("relays") and _shielded(enemy):
+					part = _segment_part(enemy, previous, shot.pos, float(shot.radius))
+				else:
+					var closest := Geometry2D.get_closest_point_to_segment(enemy.pos, previous, shot.pos)
+					if closest.distance_squared_to(enemy.pos) < pow(float(enemy.radius) + float(shot.radius), 2): part = -1
+				if float(enemy.hp) > 0.0 and part != -2:
 					if shot.get("kind", "") == "missile":
+						var impact := relay_position(enemy, part) if part >= 0 else Vector2(enemy.pos)
 						for splash: Dictionary in enemies:
-							if Vector2(splash.pos).distance_to(enemy.pos) < float(shot.blast_radius) + float(splash.radius):
-								_hit_enemy(splash, float(shot.damage))
+							_hit_area(splash, float(shot.damage), impact, float(shot.blast_radius))
 						_effect(enemy.pos, "pulse", float(shot.blast_radius), 0.30)
 						_audio("weapon_missile_impact", enemy.pos)
 					else:
-						_hit_enemy(enemy, float(shot.damage))
+						_hit_enemy(enemy, float(shot.damage), part)
 					shot.pierce = int(shot.get("pierce", 1)) - 1
 					if shot.has("hit_ids"):
 						shot.hit_ids.append(enemy.get("_combat_id", index))
@@ -939,11 +972,11 @@ func take_damage(amount: float, source: String = "combat", origin: Vector2 = Vec
 		amount *= 0.4
 		guard_stacks -= 1
 		if guard_cooldown <= 0.0:
-			guard_cooldown = 8.0
+			guard_cooldown = branch_value("guard_period", 8.0)
 		var radius := 195.0 if evolutions.has("citadel") else 125.0
 		for enemy: Dictionary in enemies:
-			if float(enemy.hp) > 0.0 and player.distance_to(enemy.pos) <= radius + float(enemy.radius):
-				_hit_enemy(enemy, 40.0 * _power() * (1.0 + 0.35 * int(upgrades.get("guard_pulse", 0))) * (2.0 + 0.15 * evolution_mastery("citadel") if evolutions.has("citadel") else 1.0))
+			if float(enemy.hp) > 0.0 and _area_part(enemy, player, radius) != -2:
+				_hit_area(enemy, 40.0 * _power() * (1.0 + 0.35 * int(upgrades.get("guard_pulse", 0))) * (2.0 + 0.15 * evolution_mastery("citadel") if evolutions.has("citadel") else 1.0) * branch_value("guard_damage", 1.0), player, radius)
 				enemy.pos += (Vector2(enemy.pos) - player).normalized() * 45.0
 		if evolutions.has("citadel"):
 			for shot: Dictionary in shots:
@@ -964,9 +997,26 @@ func take_damage(amount: float, source: String = "combat", origin: Vector2 = Vec
 	if hp <= 0.0:
 		_finish_run("combat")
 
-func _hit_enemy(enemy: Dictionary, damage: float) -> void:
-	if float(enemy.hp) <= 0.0:
+func _hit_enemy(enemy: Dictionary, damage: float, part: int = -1, environmental: bool = false) -> void:
+	if float(enemy.hp) <= 0.0 or state in ["won", "lost"] or damage <= 0.0:
 		return
+	if enemy.has("relays") and _shielded(enemy):
+		if environmental: return
+		if part < 0: part = _target_part(enemy, player)
+		if part < 0 or part >= 2 or float(enemy.relays[part]) <= 0.0: return
+		enemy.relays[part] = maxf(0.0, float(enemy.relays[part]) - damage)
+		_effect(relay_position(enemy, part), "hit", 26.0, 0.2)
+		if float(enemy.relays[part]) <= 0.0:
+			_audio("combat_relay_down", enemy.pos)
+			_effect(relay_position(enemy, part), "pulse", 65.0, 0.4)
+			if not _shielded(enemy): _open_core(enemy, 3.0)
+		return
+	if environmental:
+		damage = minf(damage, maxf(0.0, float(enemy.hp) - 1.0))
+	elif enemy.has("weakpoint") or enemy.has("env_vulnerable"):
+		var vulnerability := (1.1 if enemy.kind == "boss" else 1.2) if float(enemy.get("env_vulnerable", 0.0)) > 0.0 else 1.0
+		damage *= maxf(vulnerability, 1.5 if float(enemy.get("weakpoint", 0.0)) > 0.0 else 1.0)
+	if damage <= 0.0: return
 	enemy.hp -= damage
 	_audio("enemy_hit_heavy" if enemy.kind in ["tank", "elite", "boss"] else "enemy_hit_light", enemy.pos)
 	enemy.flash = 0.12
@@ -997,6 +1047,11 @@ func _kill_enemy(enemy: Dictionary) -> void:
 	else:
 		_grant_xp(float(enemy.value))
 	if enemy.kind == "boss":
+		if bool(enemy.get("final_commander", false)) and finale_status == "active" and elapsed < duration and hp > 0.0:
+			finale_status = "success"
+			finale_success_at = elapsed
+			_audio("combat_final_success")
+			_announce("최종 작전 성공 · 지휘 핵 파괴", "final_success")
 		boss_defeated = true
 		bosses_killed += 1
 		if elapsed >= 300.0:
@@ -1034,6 +1089,11 @@ func _collect_gems(dt: float) -> void:
 			gems.remove_at(i)
 
 func _check_level() -> void:
+	if state != "playing" or hp <= 0.0:
+		return
+	if branch_pending and branch_id.is_empty():
+		state = "branch"
+		return
 	if mission_bonus_choices > 0:
 		mission_bonus_choices -= 1
 		upgrade_source = "mission"
@@ -1082,6 +1142,7 @@ func _check_evolutions() -> void:
 				ready = false
 		if ready:
 			evolutions.append(id)
+			if info.has("ship") and branch_id.is_empty(): branch_pending = true
 			_effect(player, "pulse", 155.0, 0.7)
 			_announce("무기 진화 · " + str(info.name), "evolution")
 
@@ -1102,7 +1163,7 @@ func _nearest_enemy(origin: Vector2, distance: float, excluded: Array[Dictionary
 	var nearest: Dictionary = {}
 	distance *= distance
 	for enemy: Dictionary in enemies:
-		var candidate := origin.distance_squared_to(enemy.pos)
+		var candidate := origin.distance_squared_to(target_position(enemy, origin) if enemy.has("relays") else Vector2(enemy.pos))
 		if float(enemy.hp) > 0.0 and candidate < distance and not excluded.has(enemy):
 			nearest = enemy
 			distance = candidate
@@ -1124,7 +1185,7 @@ func _update_weapons(dt: float) -> void:
 			for i in count:
 				if shots.size() >= 240:
 					break
-				var direction := (Vector2(target.pos) - player).normalized().rotated((float(i) - float(count - 1) * 0.5) * 0.4)
+				var direction := (target_position(target, player) - player).normalized().rotated((float(i) - float(count - 1) * 0.5) * 0.4)
 				shots.append({"pos": player, "velocity": direction * 350.0, "friendly": true, "radius": 8.0, "damage": (40.0 + 18.0 * missile_rank) * _power(), "ttl": 3.0, "kind": "missile", "blast_radius": 38.0 + float(missile_rank) * 10.0 + (25.0 if count == 3 else 0.0) + 8.0 * evolution_mastery("salvo")})
 				_effect(player, "missile", 8.0, 0.18, player + direction * 38.0)
 	if chain_rank > 0 and _chain_timer <= 0.0:
@@ -1136,10 +1197,10 @@ func _update_weapons(dt: float) -> void:
 			var target := _nearest_enemy(cursor, 335.0 if i == 0 else 190.0, visited)
 			if target.is_empty():
 				break
-			_hit_enemy(target, (15.0 + 10.0 * chain_rank) * _power() * (1.4 if evolutions.has("storm") else 1.0))
-			_effect(cursor, "lightning", 7.0, 0.25, target.pos)
+			_hit_enemy(target, (15.0 + 10.0 * chain_rank) * _power() * (1.4 if evolutions.has("storm") else 1.0), _target_part(target, cursor))
+			_effect(cursor, "lightning", 7.0, 0.25, target_position(target, cursor))
 			visited.append(target)
-			cursor = target.pos
+			cursor = target_position(target, cursor)
 	if pulse_rank > 0 and _pulse_timer <= 0.0:
 		_pulse_timer = 4.3 * (1.0 - 0.12 * evolution_mastery("nova"))
 		var radius := 125.0 + float(pulse_rank) * 25.0 + (55.0 + 15.0 * evolution_mastery("nova") if evolutions.has("nova") else 0.0)
@@ -1150,18 +1211,18 @@ func _update_weapons(dt: float) -> void:
 				if not bool(shots[i].friendly) and player.distance_squared_to(shots[i].pos) <= radius * radius:
 					shots.remove_at(i)
 		for enemy: Dictionary in enemies:
-			if player.distance_to(enemy.pos) < radius + float(enemy.radius):
-				_hit_enemy(enemy, (12.0 + float(pulse_rank) * 8.0) * _power() * (2.0 if evolutions.has("nova") else 1.0))
+			if player.distance_to(enemy.pos) < radius + combat_radius(enemy):
+				_hit_area(enemy, (12.0 + float(pulse_rank) * 8.0) * _power() * (2.0 if evolutions.has("nova") else 1.0), player, radius)
 				if enemy.kind != "boss":
 					enemy.pos += (Vector2(enemy.pos) - player).normalized() * 36.0
 
-func _add_blast(position: Vector2, radius: float) -> void:
+func _add_blast(position: Vector2, radius: float, source: String = "enemy") -> void:
 	if hazards.size() >= 6:
 		return
 	radius *= 1.0 + 0.35 * hazard_pressure()
 	var point := CENTER + (position - CENTER).limit_length(ACTIVITY_RADIUS - radius)
 	_audio("hazard_charge_blast", point)
-	hazards.append({"kind": "blast", "pos": point, "radius": radius, "rect": Rect2(), "warn": 1.6, "ttl": 0.35, "active": false})
+	hazards.append({"kind": "blast", "pos": point, "radius": radius, "rect": Rect2(), "warn": 1.6, "ttl": 0.35, "active": false, "source": source})
 
 func focus_bonus() -> float:
 	if ship_id != "striker":
@@ -1191,7 +1252,14 @@ func _deploy(kind: String, at: Vector2, lifetime: float, radius: float) -> void:
 	var count := 0
 	for shot: Dictionary in shots:
 		count += int(shot.get("kind", "") == kind)
-	if shots.size() >= 240 or count >= (3 if kind == "sentry" else (8 if kind == "mine" else 6)):
+	var cap := (1 if branch_id == "focus" else 3) if kind == "sentry" else (8 if kind == "mine" else 6)
+	if count >= cap and ((kind == "sentry" and branch_id == "focus") or (kind == "wake" and not branch_id.is_empty())):
+		for i in shots.size():
+			if shots[i].get("kind", "") == kind:
+				shots.remove_at(i)
+				count -= 1
+				break
+	if shots.size() >= 240 or count >= cap:
 		return
 	_audio({"sentry":"weapon_sentry_place", "mine":"weapon_mine_place", "wake":"weapon_wake"}[kind], at)
 	shots.append({"kind": kind, "pos": at, "velocity": Vector2.ZERO, "radius": radius, "friendly": true, "damage": 0.0, "ttl": lifetime, "armed": 0.6 if kind == "mine" else 0.0, "fire_timer": 0.0})
@@ -1201,8 +1269,8 @@ func _update_evolved_weapons(dt: float) -> void:
 	_mine_timer -= dt
 	_axe_timer -= dt
 	if evolutions.has("sentry") and _sentry_timer <= 0.0:
-		_sentry_timer = 5.0
-		_deploy("sentry", player, 14.0, 14.0)
+		_sentry_timer = branch_value("sentry_period", 5.0)
+		_deploy("sentry", player, branch_value("sentry_life", 14.0), 14.0)
 	if evolutions.has("minefield") and _mine_timer <= 0.0:
 		_mine_timer = 2.0
 		_deploy("mine", player, 18.0, 13.0)
@@ -1211,7 +1279,7 @@ func _update_evolved_weapons(dt: float) -> void:
 		if not target.is_empty():
 			_axe_timer = 2.8
 			_audio("weapon_hatchet_throw", player)
-			shots.append({"kind": "axe", "pos": player, "velocity": (Vector2(target.pos) - player).normalized() * 390.0, "friendly": true, "radius": 12.0, "damage": 58.0 * _power() * (1.0 + 0.15 * axe_catches + 0.1 * evolution_mastery("hatchet")), "ttl": 4.0, "pierce": 64, "hit_ids": [], "returning": false})
+			shots.append({"kind": "axe", "pos": player, "velocity": (target_position(target, player) - player).normalized() * 390.0, "friendly": true, "radius": 12.0, "damage": 58.0 * _power() * (1.0 + 0.15 * axe_catches + 0.1 * evolution_mastery("hatchet")), "ttl": 4.0, "pierce": 64, "hit_ids": [], "returning": false})
 
 func _update_deployed(shot: Dictionary, dt: float) -> void:
 	shot.ttl -= dt
@@ -1223,10 +1291,22 @@ func _update_deployed(shot: Dictionary, dt: float) -> void:
 		return
 	var origin: Vector2 = shot.pos
 	if shot.kind == "sentry":
-		var target := _nearest_enemy(origin, 460.0)
+		var target := _nearest_enemy(origin, branch_value("sentry_range", 460.0))
+		if branch_id == "focus":
+			for priority: String in ["boss", "elite"]:
+				var priority_target: Dictionary = {}
+				var distance := branch_value("sentry_range", 460.0)
+				for enemy: Dictionary in enemies:
+					var candidate := origin.distance_to(target_position(enemy, origin))
+					if enemy.kind == priority and float(enemy.hp) > 0.0 and candidate < distance:
+						distance = candidate
+						priority_target = enemy
+				if not priority_target.is_empty():
+					target = priority_target
+					break
 		if not target.is_empty():
-			_hit_enemy(target, 32.0 * _power() * (1.0 + focus_bonus()) * (1.0 + 0.15 * evolution_mastery("sentry")))
-			_effect(origin, "lightning", 4.0, 0.12, target.pos)
+			_hit_enemy(target, 32.0 * _power() * (1.0 + focus_bonus()) * (1.0 + 0.15 * evolution_mastery("sentry")) * branch_value("sentry_damage", 1.0), _target_part(target, origin))
+			_effect(origin, "lightning", 4.0, 0.12, target_position(target, origin))
 		shot.fire_timer = 0.65
 		return
 	var radius := 145.0 if shot.kind == "mine" else 44.0
@@ -1234,8 +1314,8 @@ func _update_deployed(shot: Dictionary, dt: float) -> void:
 		return
 	var damage := (100.0 + 15.0 * evolution_mastery("minefield")) if shot.kind == "mine" else (28.0 + 8.0 * int(upgrades.get("dash", 0)))
 	for enemy: Dictionary in enemies:
-		if origin.distance_squared_to(enemy.pos) <= pow(radius + float(enemy.radius), 2):
-			_hit_enemy(enemy, damage * _power())
+		if origin.distance_squared_to(enemy.pos) <= pow(radius + combat_radius(enemy), 2):
+			_hit_area(enemy, damage * _power() * (branch_value("wake_damage", 1.0) if shot.kind == "wake" else 1.0), origin, radius)
 	_effect(origin, "pulse", radius, 0.28)
 	shot.fire_timer = 0.35
 	if shot.kind == "mine":
@@ -1256,7 +1336,7 @@ func _add_lane(lateral: float = 0.0) -> void:
 	var half_length := radius
 	var rect := Rect2(CENTER + Vector2(offset - width * 0.5, -half_length), Vector2(width, half_length * 2.0)) if vertical else Rect2(CENTER + Vector2(-half_length, offset - width * 0.5), Vector2(half_length * 2.0, width))
 	_audio("hazard_charge_lane", rect.get_center())
-	hazards.append({"kind": "lane", "pos": rect.get_center(), "radius": 0.0, "rect": rect, "warn": 1.5, "ttl": 1.1, "active": false})
+	hazards.append({"kind": "lane", "pos": rect.get_center(), "radius": 0.0, "rect": rect, "warn": 1.5, "ttl": 1.1, "active": false, "source": "sector"})
 
 func _update_hazards(dt: float) -> void:
 	if state != "playing":
@@ -1268,10 +1348,10 @@ func _update_hazards(dt: float) -> void:
 			for lane in mini(5, 1 + floori(elapsed / 120.0)):
 				_add_lane([0.0, 190.0, -190.0, 380.0, -380.0][lane])
 		else:
-			_add_blast(player, 72.0)
-			_add_blast(CENTER + Vector2.from_angle(rng.randf_range(0.0, TAU)) * sqrt(rng.randf()) * (ACTIVITY_RADIUS - 68.0), 68.0)
+			_add_blast(player, 72.0, "sector")
+			_add_blast(CENTER + Vector2.from_angle(rng.randf_range(0.0, TAU)) * sqrt(rng.randf()) * (ACTIVITY_RADIUS - 68.0), 68.0, "sector")
 			if elapsed >= 300.0:
-				_add_blast(CENTER - (player - CENTER).limit_length(ACTIVITY_RADIUS - 80.0), 68.0)
+				_add_blast(CENTER - (player - CENTER).limit_length(ACTIVITY_RADIUS - 80.0), 68.0, "sector")
 		_announce("전기 통로 충전 · 표시 구역 이탈" if sector_id == "storm" else "포격 경보 · 노란 예고 원 이탈", "hazard")
 	for i in range(hazards.size() - 1, -1, -1):
 		var hazard: Dictionary = hazards[i]
@@ -1295,6 +1375,7 @@ func _update_hazards(dt: float) -> void:
 				_audio("event_end_" + str(hazard.kind))
 				hazards.remove_at(i)
 			continue
+		_apply_environment(hazard)
 		var overlaps: bool = Rect2(hazard.rect).grow(PLAYER_RADIUS * 0.65).has_point(player) if hazard.kind == "lane" else player.distance_to(hazard.pos) < float(hazard.radius) + PLAYER_RADIUS
 		if overlaps:
 			take_damage((13.0 if hazard.kind == "lane" else 20.0) * (1.0 + 0.25 * hazard_pressure()), str(hazard.kind), hazard.pos)
@@ -1384,7 +1465,7 @@ func _announce(title: String, event: String) -> void:
 	events.append(event)
 
 func _update_run_stats() -> void:
-	run_stats = {"kills": kills, "score": ranked_score(), "time": elapsed, "winner": state == "won", "level": level, "elites": elites_killed, "ship": ship_id, "sector": sector_id, "mode": mode, "evolutions": evolutions.duplicate(), "overdrives": _overdrives, "dashes": _dash_id, "returns": boundary_returns, "combo": peak_combo, "upgrades": upgrades.duplicate(), "items": items_collected}
+	run_stats = {"kills": kills, "score": ranked_score(), "time": elapsed, "winner": state == "won", "level": level, "elites": elites_killed, "ship": ship_id, "sector": sector_id, "mode": mode, "evolutions": evolutions.duplicate(), "overdrives": _overdrives, "dashes": _dash_id, "returns": boundary_returns, "combo": peak_combo, "upgrades": upgrades.duplicate(), "items": items_collected, "branch": branch_id, "rules": "combat-v1", "finale": finale_status, "finale_time": finale_success_at}
 	run_stats["missions"] = missions_completed
 	run_stats["hull_forms"] = hull_forms.duplicate()
 
@@ -1497,6 +1578,8 @@ func _drift_loot(position: Vector2, dt: float, speed: float = LOOT_DRIFT_SPEED) 
 	return position.move_toward(target, speed * dt)
 
 func _tick_mission_clock() -> void:
+	if finale_status in ["active", "success"]:
+		return
 	if not mission.is_empty():
 		if mission.status == "preview" and elapsed >= float(mission.start):
 			mission.status = "active"
@@ -1639,3 +1722,169 @@ func restore_expedition(value: Dictionary) -> void:
 	for id: String in Expedition.RECIPE_IDS:
 		if hull_rank(id) > 0:
 			hull_forms.append(id)
+
+func branch_value(key: String, fallback: float) -> float:
+	return float(Content.branch_info(branch_id).get(key, fallback))
+
+func choose_branch(id: String) -> bool:
+	var info := Content.branch_info(id)
+	if state != "branch" or not branch_pending or not branch_id.is_empty() or info.is_empty() or info.ship != ship_id:
+		return false
+	branch_id = id
+	branch_pending = false
+	guard_cooldown *= branch_value("guard_period", 8.0) / 8.0
+	if ship_id == "striker":
+		for i in range(shots.size() - 1, -1, -1):
+			if shots[i].get("kind", "") == "sentry": shots.remove_at(i)
+		_sentry_timer = 0.0
+	state = "playing"
+	_audio("combat_branch")
+	_announce("전투 분기 · " + str(info.name), "branch")
+	_check_level()
+	_update_run_stats()
+	return true
+
+func _finish_deaths() -> void:
+	if state != "playing": return
+	for i in range(enemies.size() - 1, -1, -1):
+		if float(enemies[i].hp) <= 0.0:
+			_kill_enemy(enemies[i])
+			enemies.remove_at(i)
+
+func _open_core(enemy: Dictionary, seconds: float) -> void:
+	enemy.weakpoint = seconds
+	enemy.warn = 0.0
+	enemy.volleys = 0
+	enemy.shot_timer = 1.35 if int(enemy.phase) == 2 else 1.8
+	_audio("combat_core_open", enemy.pos)
+	_effect(enemy.pos, "pulse", 75.0, 0.4)
+
+func _shielded(enemy: Dictionary) -> bool:
+	return enemy.has("relays") and (float(enemy.relays[0]) > 0.0 or float(enemy.relays[1]) > 0.0)
+
+func relay_position(enemy: Dictionary, index: int) -> Vector2:
+	return Vector2(enemy.pos) + Vector2(enemy.get("relay_axis", Vector2.RIGHT)) * (70.0 if index == 0 else -70.0)
+
+func _target_part(enemy: Dictionary, origin: Vector2) -> int:
+	if not _shielded(enemy): return -1
+	var found := -1
+	var distance := INF
+	for i in 2:
+		var candidate := origin.distance_squared_to(relay_position(enemy, i))
+		if float(enemy.relays[i]) > 0.0 and candidate < distance:
+			distance = candidate
+			found = i
+	return found
+
+func target_position(enemy: Dictionary, origin: Vector2) -> Vector2:
+	if not enemy.has("relays"): return Vector2(enemy.pos)
+	var part := _target_part(enemy, origin)
+	return relay_position(enemy, part) if part >= 0 else Vector2(enemy.pos)
+
+func combat_radius(enemy: Dictionary) -> float:
+	if not enemy.has("relays"): return float(enemy.radius)
+	return 88.0 if _shielded(enemy) else float(enemy.radius)
+
+func _area_part(enemy: Dictionary, origin: Vector2, radius: float) -> int:
+	var part := _target_part(enemy, origin)
+	var at := relay_position(enemy, part) if part >= 0 else Vector2(enemy.pos)
+	return part if origin.distance_squared_to(at) <= pow(radius + (18.0 if part >= 0 else float(enemy.radius)), 2) else -2
+
+func _hit_area(enemy: Dictionary, damage: float, origin: Vector2, radius: float) -> bool:
+	var part := _area_part(enemy, origin, radius)
+	if part == -2 or float(enemy.hp) <= 0.0: return false
+	_hit_enemy(enemy, damage, part)
+	return true
+
+func _segment_part(enemy: Dictionary, start: Vector2, end: Vector2, radius: float) -> int:
+	if not _shielded(enemy):
+		return -1 if Geometry2D.get_closest_point_to_segment(enemy.pos, start, end).distance_squared_to(enemy.pos) < pow(float(enemy.radius) + radius, 2) else -2
+	var found := -2
+	var first := INF
+	var delta := end - start
+	for i in 2:
+		if float(enemy.relays[i]) <= 0.0: continue
+		var offset := start - relay_position(enemy, i)
+		var c := offset.length_squared() - pow(18.0 + radius, 2)
+		var t := 0.0
+		if c > 0.0:
+			var a := delta.length_squared()
+			if a <= 0.00001: continue
+			var b := offset.dot(delta)
+			var discriminant := b * b - a * c
+			if discriminant < 0.0: continue
+			t = (-b - sqrt(discriminant)) / a
+			if t < 0.0 or t > 1.0: continue
+		if t < first:
+			first = t
+			found = i
+	return found
+
+func _apply_environment(hazard: Dictionary) -> void:
+	if hazard.get("source", "") != "sector" or not bool(hazard.active) or float(hazard.ttl) <= 0.0: return
+	if not hazard.has("affected"): hazard.affected = {}
+	for enemy: Dictionary in enemies:
+		if float(enemy.hp) <= 0.0 or _shielded(enemy): continue
+		var id := int(enemy.get("_combat_id", -1))
+		if hazard.affected.has(id): continue
+		var overlaps := Rect2(hazard.rect).grow(float(enemy.radius)).has_point(enemy.pos) if hazard.kind == "lane" else Vector2(hazard.pos).distance_to(enemy.pos) <= float(hazard.radius) + float(enemy.radius)
+		if not overlaps: continue
+		hazard.affected[id] = true
+		if hazard.kind == "lane":
+			_hit_enemy(enemy, float(enemy.max_hp) * (0.02 if enemy.kind == "boss" else (0.05 if enemy.kind == "elite" else 0.2)), -1, true)
+			_effect(enemy.pos, "lightning", 4.0, 0.25, Vector2(enemy.pos) + Vector2(0, -35))
+		else:
+			enemy.env_vulnerable = 4.0
+			_effect(enemy.pos, "hit", 35.0, 0.3)
+
+func select_finale(selected: bool) -> bool:
+	if state != "playing" or not finale_offered or elapsed < 530.0 or elapsed >= 540.0: return false
+	finale_selected = selected
+	return true
+
+func _spawn_pursuit_boss() -> Dictionary:
+	_boss_wave += 1
+	var boss := spawn_enemy("boss")
+	boss.boss_wave = _boss_wave
+	boss.hp *= 1.0 + 0.35 * _boss_wave
+	boss.max_hp = boss.hp
+	boss.speed *= 1.0 + 0.08 * _boss_wave
+	boss.damage *= 1.0 + 0.12 * _boss_wave
+	next_boss_at = elapsed + maxf(35.0, 50.0 - (elapsed - 300.0) * 0.05)
+	_announce("추격 지휘체 %d · 격파 시 붕괴 완화 / 점수 보상" % _boss_wave, "boss")
+	return boss
+
+func _tick_finale() -> void:
+	if finale_status == "none" and elapsed >= 530.0:
+		finale_status = "preview" if elapsed < 540.0 and survival_cleared else "declined"
+		finale_offered = finale_status == "preview"
+		if finale_offered: _audio("combat_final_offer")
+	if finale_status == "preview" and elapsed >= 540.0:
+		finale_status = "active" if finale_selected else "declined"
+		if finale_selected:
+			mission.clear()
+			_audio("combat_final_start")
+	if finale_status != "active" or finale_boss_id >= 0: return
+	var boss: Dictionary = {}
+	var distance := INF
+	for enemy: Dictionary in enemies:
+		var candidate := player.distance_squared_to(enemy.pos)
+		if enemy.kind == "boss" and float(enemy.hp) > 0.0 and candidate < distance:
+			boss = enemy
+			distance = candidate
+	if boss.is_empty():
+		if enemies.size() >= 240: return
+		boss = _spawn_pursuit_boss()
+	finale_boss_id = int(boss._combat_id)
+	boss.final_commander = true
+	boss.relay_max = maxf(1.0, float(boss.max_hp) * 0.08)
+	boss.relays = [boss.relay_max, boss.relay_max]
+	var axis := (player - Vector2(boss.pos)).normalized().orthogonal()
+	boss.relay_axis = axis if not axis.is_zero_approx() else Vector2.RIGHT
+	boss.weakpoint = 0.0
+	_announce("최종 작전 · 보호 장치 2개 → 지휘 핵", "final_start")
+
+func final_commander() -> Dictionary:
+	for enemy: Dictionary in enemies:
+		if bool(enemy.get("final_commander", false)) and float(enemy.hp) > 0.0: return enemy
+	return {}

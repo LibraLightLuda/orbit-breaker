@@ -202,7 +202,7 @@ func feature_checks() -> void:
 		game.records_tab = "missions"
 		game.achievement_page = 2
 		game._show_records()
-		check(game.achievement_page == 2 and Achievements.catalog().size() == 61, "achievement structure preserved")
+		check(game.achievement_page == 2 and Achievements.catalog().size() == 62, "achievement structure and final operation medal preserved")
 		game.records.data.discovered_items.clear()
 		game._show_item_detail("power")
 		check(not _text(game.ui).contains(ItemCatalog.info("power").description), "unknown detail hides effects")

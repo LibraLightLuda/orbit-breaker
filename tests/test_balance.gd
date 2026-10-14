@@ -41,6 +41,9 @@ func _run_case(ship_id: String, sector_id: String, difficulty: String) -> Dictio
 	var finite := true
 	while model.state not in ["won", "lost"] and iterations < 40000:
 		iterations += 1
+		if model.state == "branch":
+			if not model.choose_branch({"striker":"focus", "scout":"pierce", "bastion":"cycle"}[ship_id]): break
+			continue
 		if model.state == "upgrade":
 			if not model.choose_upgrade(_choose_upgrade(model, ship_id)):
 				break

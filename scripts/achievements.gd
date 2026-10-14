@@ -33,6 +33,7 @@ static func catalog() -> Array[Dictionary]:
 	result.append({"id": "part_types", "name": "세 가지 설계", "stat": "part_types", "target": 3, "points": 30, "description": "파츠 3종 모두 발견"})
 	for id: String in Expedition.RECIPE_IDS:
 		result.append({"id": "hull_" + id, "name": Expedition.recipe(id).name, "stat": "hull_" + id, "target": 1, "points": 30, "description": "해당 기체 조합 진화 달성"})
+	result.append({"id": "final_op", "name": "붕괴의 끝에서", "stat": "final_op", "target": 1, "points": 100, "description": "최종 작전의 보호 장치와 지휘 핵 파괴"})
 	return result
 
 static func points(unlocked: Array) -> int:

@@ -5,7 +5,7 @@ const Catalog = preload("res://scripts/audio_catalog.gd")
 const CUES: Dictionary = Catalog.CUES
 const SAMPLE_RATE := 48000
 const VOICE_LIMIT := 16
-const ALIASES := {"shoot":"weapon_cannon", "hit":"enemy_hit_light", "hurt":"player_hurt", "dash":"ship_dash", "pickup":"loot_xp", "select":"ui_confirm", "level":"ui_upgrade_open", "win":"run_end_cleared", "lose":"run_end_lost", "boss":"boss_arrive", "event_warning":"event_warn_black_hole", "event_start":"event_active_black_hole", "hazard_start":"hazard_strike_blast", "boundary_hit":"warn_boundary_deep"}
+const ALIASES := {"shoot":"weapon_cannon", "hit":"enemy_hit_light", "hurt":"player_hurt", "dash":"ship_dash", "pickup":"loot_xp", "select":"ui_confirm", "level":"ui_upgrade_open", "win":"run_end_cleared", "lose":"run_end_lost", "boss":"boss_arrive", "event_warning":"event_warn_black_hole", "event_start":"event_active_black_hole", "hazard_start":"hazard_strike_blast", "boundary_hit":"warn_boundary_deep", "combat_branch":"growth_weapon", "combat_core_open":"boss_phase", "combat_relay_down":"enemy_destroy_elite", "combat_final_offer":"mission_preview", "combat_final_start":"boss_arrive", "combat_final_success":"planet_success"}
 const FAMILIES := {"power":"power", "rapid":"power", "frenzy":"power", "speed":"drive", "haste":"drive", "repair":"repair", "heal":"repair", "stun":"stun", "emp":"emp", "insight":"data", "bounty":"bounty", "shield":"shield"}
 
 var muted := false
@@ -145,7 +145,7 @@ func set_screen(view: String) -> void:
 	var previous := _view
 	_view = view
 	_active = view == "playing"
-	_battle_context = view in ["playing", "pause", "upgrade"] or (view == "arsenal" and previous in ["playing", "pause", "upgrade", "arsenal"] and _battle_context)
+	_battle_context = view in ["playing", "pause", "upgrade", "branch"] or (view == "arsenal" and previous in ["playing", "pause", "upgrade", "branch", "arsenal"] and _battle_context)
 	_pending.clear()
 	for voice in _voices:
 		if voice.bus not in ["UI", "Feedback"]: voice.stop()
@@ -166,12 +166,12 @@ func _sync_loops() -> void:
 	else: _music.stop()
 	for player in _stems:
 		if music_ok and battle:
-			if not player.playing: player.play()
+			if not player.has_stream_playback(): player.play()
 			player.stream_paused = not _active
 		else: player.stop()
 	for player in [_ambience, _engine, _decay]:
 		if not muted and _active:
-			if not player.playing: player.play()
+			if not player.has_stream_playback(): player.play()
 			player.stream_paused = false
 		elif muted: player.stop()
 		else: player.stream_paused = true
@@ -266,7 +266,7 @@ func consume(model: RunModel, camera: Vector2) -> void:
 	_powered = model.overdrive_time > 0
 	var queue: Array[Dictionary] = []
 	for source: String in model.audio_events:
-		var cue := source
+		var cue := str(ALIASES.get(source, source))
 		if source.begins_with("loot_item_"):
 			var fields := source.trim_prefix("loot_item_").split("_")
 			cue = "loot_item_" + str(FAMILIES[fields[0]]) + "_" + fields[1]

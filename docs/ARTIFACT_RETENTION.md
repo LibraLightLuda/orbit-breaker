@@ -2,7 +2,19 @@
 
 적용일: 2026-10-11. 사용자가 최신 배포 버전만 보관하도록 변경했다. 기존의 최신·직전 두 세대 보관 규칙보다 이 규칙이 우선한다.
 
-## 현재 최신 로컬본: pregame-20261014 (2026-10-14)
+## 현재 최신 로컬본: audit-20261014 (2026-10-14)
+
+3.19 코드 검수 보완 세대. `build/current`·`artifacts/current`·`web/`가 대응한다. Windows SHA-256 `DCC4FE1CFF548FBF778E1D808972B98ED559A023C3A5B9041205E5D6F0D2BC88`, Web PCK `E63EA3688FA094A03387F3011E0124578DA79A879949C5613A6CD84C17B98807`. 후보 전체 검사·내보내기·실제 실행·브라우저 확인 후 기존 정상본을 보존하면서 교체했고, 교체 후 배포/소스/증거 해시와 ZIP 내용을 확인했다. 이전 정상본·대응 증거·교체용 백업은 정리했다. 공개 게시/원격 push는 수행하지 않았다.
+
+현재 정상 배포 경로의 세대는 하나지만 **전체 자료 정리는 미완료**다. 과거 자동 승인 검토로 삭제가 차단된 12개 항목은 재시도하지 않았다. 이번 `artifacts/audit-work`, `artifacts/combat-work`, `artifacts/pregame-candidate`의 삭제도 자동 승인 검토가 실행 전에 `blocked by policy`로 거부했다. 이 3개도 재시도하지 않으며 총 15개 잔여의 정확한 경로·사유를 `artifacts/current/retention-status.json`에 기록한다. 실제 최신본 목록은 `file-inventory.json`을 따른다. 정리 성공이나 공간 회수를 주장하지 않는다.
+
+## 이전 로컬본: combat-20261014 (2026-10-14)
+
+3.19 전투 확장 세대. build/current·artifacts/current·web/가 대응한다. Windows SHA-256 3A8D00DE5960846F6DFED49F7FA8E14DDEE5DD0E57F4BA3387FADD11BB230130. 후보 검사/실행 후 guarded promotion으로 교체했다. 최신 한 세대와 차단 잔여의 실제 목록은 retention-status.json·file-inventory.json이다. 공개 게시하지 않았다.
+
+정상 배포 경로의 최신본은 한 세대이며 이번 작업의 비교용 소스·임시 후보 폴더는 정리했다. 과거 자동 승인 검토가 삭제를 `blocked by policy`로 거부한 디렉터리 7개와 진단 로그 5개는 재삭제하지 않았다. 전체 산출물 정리는 미완료로 기록하고, 차단 잔여 12개의 경로와 사유를 `artifacts/current/retention-status.json`에 보존한다.
+
+## 이전 로컬본: pregame-20261014 (2026-10-14)
 
 3.18.3 시작 전 UI 세대. `build/current`·`artifacts/current`·`web/`가 대응한다. Windows SHA-256 `8AFC0A2BAE31F3221EF4C7F05566F676D41DB9476E393143B93055E79BFEB40A`. 후보 검증 후 guarded promotion으로 교체했다. 이전 배포본·증거는 정리하고 기존 정책 차단 자료는 최종 retention-status/file-inventory에 기록한다. [v3.18.3-audio-ui](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.18.3-audio-ui)와 공개 Web 게시를 완료했다. 공개본 해시 확인 후 이전 첨부 6개와 Pages artifact 1개를 정리했다.
 

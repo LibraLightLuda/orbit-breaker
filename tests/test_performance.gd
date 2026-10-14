@@ -63,4 +63,9 @@ func _init() -> void:
 	for sample in samples:
 		total += sample
 	print("PERFORMANCE: 600 moving frames, 240 enemies/shots, 300 gems; mean %.3fms p95 %.3fms max %.3fms; ghost write %.3fms" % [total / 600000.0, samples[569] / 1000.0, samples.back() / 1000.0, write_us / 1000.0])
+	var frame_budget_ms := 1000.0 / Engine.physics_ticks_per_second
+	if samples[569] / 1000.0 > frame_budget_ms or not is_equal_approx(model.elapsed, 600.0 / 60.0):
+		push_error("Performance exceeds the %.3fms physics-frame budget or simulation did not advance" % frame_budget_ms)
+		quit(1)
+		return
 	quit()

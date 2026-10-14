@@ -120,6 +120,13 @@ func run_checks() -> void:
 	check(positions.max()-positions.min() < .03, "Three music stems remain phase-aligned")
 	sound.set_screen("pause")
 	check(sound._stems[0].stream_paused and sound._decay.stream_paused, "Pause freezes all battle loops")
+	for view: String in ["branch", "arsenal", "branch"]:
+		sound.set_screen(view)
+		check(sound._battle_context and sound._stems[0].stream_paused and not sound._music.playing, "Tactic selection and its codex preserve paused battle music: " + view)
+		for i in sound._stems.size():
+			check(absf(sound._stems[i].get_playback_position() - positions[i]) < .03, "Paused tactic music does not restart: " + view)
+	sound.set_screen("playing")
+	check(sound._battle_context and sound._stems[0].playing and not sound._stems[0].stream_paused and not sound._music.playing, "Tactic selection resumes the existing battle music")
 	sound.set_screen("replay")
 	check(not sound._stems[0].playing and sound._music.playing, "Replay uses music without synthetic combat events")
 	sound.set_volumes(0,1,1)
@@ -134,6 +141,7 @@ func run_checks() -> void:
 	await create_timer(.2).timeout
 	sound.queue_free()
 	await process_frame
+	await create_timer(.15).timeout
 	print("AUDIO SELF-CHECK: %d / %d assertions passed" % [checks-failures,checks])
 	quit(0 if failures == 0 else 1)
 
@@ -181,8 +189,9 @@ func _test_ui() -> void:
 	await process_frame
 
 func _test_model_invariance() -> void:
+	# Compare current audio ON/OFF; the historical migration fixture requires an explicit flag.
 	var path := "res://artifacts/audio-candidate/model-baseline.txt"
-	if not FileAccess.file_exists(path):
+	if not "--audio-legacy-baseline" in OS.get_cmdline_user_args() or not FileAccess.file_exists(path):
 		path = "res://scripts/run_model.gd"
 	var original := GDScript.new()
 	original.source_code = FileAccess.get_file_as_string(path).replace("class_name RunModel", "")
@@ -200,11 +209,18 @@ func _test_model_invariance() -> void:
 					model.upgrades = {"missile":3,"chain":3,"pulse":3,"rapid":4,"power":3,"blade":3,"frost":3,"magnet":3,"orbit":3,"orbit_range":3,"dash":3,"speed":3}
 					model._check_evolutions()
 					model.spawn_enemy("boss",RunModel.CENTER+Vector2(200,0))
+				var initial_elapsed: float = after.elapsed
 				for frame in 240:
 					for model in [before,after]:
-						if model.state == "upgrade":
-							var choice: Variant = model.get_upgrade_choices()[0]
-							model.choose_upgrade(str(choice.id) if choice is Dictionary else str(choice))
+						while model.state in ["upgrade", "branch"]:
+							var accepted: bool
+							if model.state == "branch":
+								accepted = model.choose_branch({"striker":"focus", "scout":"pierce", "bastion":"cycle"}[ship])
+							else:
+								var choice: Variant = model.get_upgrade_choices()[0]
+								accepted = model.choose_upgrade(str(choice.id) if choice is Dictionary else str(choice))
+							check(accepted, "Invariance fixture accepts its offered choice")
+							if not accepted: break
 						if frame % 60 == 0:
 							model.apply_item("shield","B")
 							model.collect_part(["core","drive","shell"][floori(frame/60.0)%3])
@@ -218,3 +234,4 @@ func _test_model_invariance() -> void:
 							if a is RandomNumberGenerator: same = same and a.state == b.state and a.seed == b.seed
 							else: same = same and a == b
 						check(same, "Audio leaves all model values/RNG unchanged: %s/%s/%s/%d" % [ship,sector,mode,frame])
+				check((before.state in ["won", "lost"] or is_equal_approx(before.elapsed, initial_elapsed + 240 * .05)) and (after.state in ["won", "lost"] or is_equal_approx(after.elapsed, initial_elapsed + 240 * .05)), "Both audio fixtures simulate the full interval or finish the run: %s/%s/%s" % [ship,sector,mode])

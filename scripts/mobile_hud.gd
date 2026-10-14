@@ -5,10 +5,12 @@ var pause: Button
 var codex: Button
 var dash: Button
 var overdrive: Button
+var final_accept: Button
+var final_decline: Button
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for title in ["Ⅱ", "도감", "돌진", "오버드라이브"]:
+	for title in ["Ⅱ", "도감", "돌진", "오버드라이브", "최종 작전 도전", "생존 계속"]:
 		var button := preload("res://scripts/motion_button.gd").new()
 		button.text = title
 		button.focus_mode = Control.FOCUS_NONE
@@ -26,6 +28,12 @@ func _ready() -> void:
 	codex = get_child(1)
 	dash = get_child(2)
 	overdrive = get_child(3)
+	final_accept = get_child(4)
+	final_decline = get_child(5)
+	final_accept.visible = false
+	final_decline.visible = false
+	final_accept.pressed.connect(func() -> void: game.run.select_finale(true))
+	final_decline.pressed.connect(func() -> void: game.run.select_finale(false))
 	pause.pressed.connect(game._show_pause)
 	codex.pressed.connect(func() -> void: game._open_arsenal("pause"))
 	dash.pressed.connect(func() -> void: game._touch_skill("dash", game.run.player - game.camera_offset + game.run.facing * 80))
@@ -45,8 +53,16 @@ func fit() -> void:
 	dash.size = Vector2(96, 48)
 	overdrive.position = Vector2(window.x - 120, window.y - 58)
 	overdrive.size = Vector2(112, 48)
+	final_accept.position = Vector2(12, 61)
+	final_accept.size = Vector2(window.x / 2 - 18, 44)
+	final_decline.position = Vector2(window.x / 2 + 6, 61)
+	final_decline.size = Vector2(window.x / 2 - 18, 44)
 
 func _process(_delta: float) -> void:
+	final_accept.visible = game.run.finale_status == "preview"
+	final_decline.visible = final_accept.visible
+	final_accept.text = ("✓ " if game.run.finale_selected else "") + "최종 작전 도전"
+	final_decline.text = ("✓ " if not game.run.finale_selected else "") + "생존 계속"
 	queue_redraw()
 
 func _draw() -> void:
@@ -71,10 +87,14 @@ func _draw() -> void:
 			break
 	draw_string(font, Vector2(w * 0.42, 47), status, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, game.GOLD)
 	var mission: Dictionary = model.mission
-	if not mission.is_empty() and game.notices.is_empty():
+	if not mission.is_empty() and game.notices.is_empty() and not model.finale_status in ["preview", "active", "success"]:
 		draw_string(font, Vector2(12, 75), str(mission.name) + " · " + (game.mission_progress_text(model) if mission.status == "active" else str({"preview":"곧 시작", "success":"완료", "failed":"종료"}.get(mission.status, ""))), HORIZONTAL_ALIGNMENT_LEFT, w - 24, 13, cyan)
-	if not game.notices.is_empty():
+	if not game.notices.is_empty() and not model.finale_status in ["preview", "active", "success"]:
 		draw_string(font, Vector2(12, 75), str(game.notices[0].title) + " · " + str(game.notices[0].name), HORIZONTAL_ALIGNMENT_LEFT, w - 24, 13, game.GOLD)
+	if model.finale_status in ["active", "success"]:
+		draw_string(font, Vector2(12, 75), game.finale_text(model), HORIZONTAL_ALIGNMENT_LEFT, w - 24, 13, game.GOLD)
+	if not model.branch_id.is_empty():
+		draw_string(font, Vector2(12, h - 92), str(GameContent.branch_info(model.branch_id).name), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, cyan)
 	draw_rect(Rect2(0, h - 30, maxf(100, w - 238), 30), Color(game.BG, 0.8))
 	draw_string(font, Vector2(12, h - 12), "LV.%d · %d/%d EXP" % [model.level, int(model.xp), int(model.xp_needed)], HORIZONTAL_ALIGNMENT_LEFT, -1, 13, cyan)
 	for i in Expedition.PART_IDS.size():

@@ -61,7 +61,12 @@ var net_gauge := 0.0
 var speed_gauge := 0.0
 var camera_offset := Vector2.ZERO
 var ghost := GhostReplay.new()
-var replay_frames: Array = []
+var _cached_replay_frame: Array = []
+var _cached_replay_time := -1.0
+var replay_frames: Array = []:
+	set(value):
+		replay_frames = value
+		_cached_replay_frame = []
 var replay_run := RunModel.new()
 var replay_entry: Dictionary = {}
 var replay_time := 0.0
@@ -172,6 +177,11 @@ func _animate_menu() -> void:
 	menu_tween.tween_property(ui, "modulate:a", 1.0, 0.13)
 
 func _input(event: InputEvent) -> void:
+	# Keep the documented codex hotkey ahead of GUI focus traversal.
+	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_TAB and not event.shift_pressed and screen in ["playing", "pause", "branch"]:
+		get_viewport().set_input_as_handled()
+		_open_arsenal("branch" if screen == "branch" else "pause")
+		return
 	if event is InputEventScreenTouch and not event.pressed and touch.contacts.has(event.index):
 		var at: Vector2 = get_global_transform_with_canvas().affine_inverse() * event.position
 		var action: String = touch.release(event.index, at, event.canceled)
@@ -292,10 +302,14 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			if screen == "playing":
 				run.activate_overdrive()
 		KEY_TAB:
-			if screen in ["playing", "pause"]:
+			if screen == "branch": _open_arsenal("branch")
+			elif screen in ["playing", "pause"]:
 				_open_arsenal("pause")
 		KEY_1, KEY_2, KEY_3:
-			if screen == "upgrade":
+			if screen == "branch": _pick_branch(event.physical_keycode - KEY_1)
+			elif screen == "playing" and run.finale_status == "preview" and event.physical_keycode in [KEY_1, KEY_2]:
+				run.select_finale(event.physical_keycode == KEY_1)
+			elif screen == "upgrade":
 				_pick_upgrade(event.physical_keycode - KEY_1)
 	get_viewport().set_input_as_handled()
 
@@ -325,7 +339,7 @@ func _physics_process(delta: float) -> void:
 			replay_slider.set_value_no_signal(replay_time)
 			if replay_time >= float(replay_frames.back()[0]):
 				replay_paused = true
-		var frame := GhostReplay.sample(replay_frames, replay_time)
+		var frame := _sample_replay()
 		camera_offset = _camera_target(Vector2(frame[1], frame[2]))
 		hud.replay.text = "%s / %s    %.0f배속    %s" % [_time(replay_time), _time(float(replay_frames.back()[0])), replay_speed, "일시정지" if replay_paused else "재생 중"]
 	toast_time = maxf(0.0, toast_time - delta)
@@ -374,6 +388,9 @@ func _physics_process(delta: float) -> void:
 			if cue == "boss_down":
 				toast = "보스 격파! " + ("25초 붕괴 완화 · 공격 강화로 다음 지휘체에 도전하세요" if run.elapsed >= 300.0 else "5분 돌파 후 추격 지휘체가 나타납니다")
 				toast_time = 4.0
+			if cue in ["final_start", "final_success", "branch"]:
+				toast = "최종 작전 성공 · 지휘 핵 파괴" if cue == "final_success" else run.event_title
+				toast_time = 3.0
 			if cue == "milestone":
 				toast = "5분 돌파! 정예·지휘체 증원 가속 · 매분 20초 붕괴 완화"
 				toast_time = 5.0
@@ -396,7 +413,9 @@ func _physics_process(delta: float) -> void:
 			_collect_progress_notices()
 			_update_hud()
 			_hud_timer = 0.1
-		if run.state == "upgrade":
+		if run.state == "branch":
+			_show_branch()
+		elif run.state == "upgrade":
 			_show_upgrades()
 		elif run.state in ["won", "lost"]:
 			_show_result()
@@ -519,6 +538,9 @@ func _refresh_menu_layout() -> void:
 		"credits": _show_credits()
 		"pause": _resume(); _show_pause()
 		"upgrade": _show_upgrades(true)
+		"branch":
+			if ui.get_meta("branch_window", Vector2.ZERO) != Vector2(DisplayServer.window_get_size()): _show_branch()
+			else: ui.get_parent().offset = Vector2.ZERO
 		"result": _show_result()
 	if typing_name:
 		_restore_name_focus.call_deferred(caret)
@@ -625,7 +647,7 @@ func _show_menu() -> void:
 	_button("설정", Rect2(410, 468, 148, 50), _show_settings)
 	_label("최고 %s   /   돌파 %d회   /   업적 %d점" % [_number(int(records.data.best_score)), int(records.data.wins), Achievements.points(records.data.achievements)], Rect2(80, 565, 660, 30), 18, MUTED)
 	_label("마우스 / WASD 이동    좌클릭 / SPACE 돌진    우클릭 / E 오버드라이브", Rect2(80, 642, 850, 30), 16, MUTED)
-	_label("VERSION 3.18.3  /  MADE WITH GODOT", Rect2(922, 650, 350, 24), 13, MUTED)
+	_label("VERSION 3.19  /  MADE WITH GODOT", Rect2(922, 650, 350, 24), 13, MUTED)
 
 func _wrap_label(text: String, rect: Rect2, size: int = 18, color: Color = MUTED, parent: Control = null) -> Label:
 	return _label(text, rect, size, color, parent, true)
@@ -814,6 +836,9 @@ func _open_arsenal(return_to: String) -> void:
 	_button("전투로 돌아가기" if return_to == "pause" else "돌아가기", Rect2(64, 624, 310, 60), _close_arsenal, true, true)
 
 func _close_arsenal() -> void:
+	if codex_return == "branch":
+		_show_branch()
+		return
 	if codex_return == "pause":
 		_resume()
 	else:
@@ -905,6 +930,12 @@ func _resume() -> void:
 	pause.focus_mode = Control.FOCUS_NONE
 	hud.level = _label("", Rect2(48, 684, 270, 27), 14, CYAN)
 	_label("TAB 도감   ESC 정지", Rect2(1060, 684, 210, 27), 14, MUTED)
+	hud.final_accept = _button("최종 작전 도전", Rect2(438, 109, 198, 44), func() -> void: run.select_finale(true))
+	hud.final_decline = _button("생존 계속", Rect2(644, 109, 198, 44), func() -> void: run.select_finale(false))
+	hud.final_accept.visible = false
+	hud.final_decline.visible = false
+	hud.final_accept.tooltip_text = "1: 최종 작전 도전"
+	hud.final_decline.tooltip_text = "2: 생존 계속"
 	if touch_mode:
 		for child: Control in ui.get_children(): child.visible = false
 		var mobile := preload("res://scripts/mobile_hud.gd").new()
@@ -927,6 +958,15 @@ func _update_hud() -> void:
 			hud.trait.text = "가속 %.1fs" % maxf(0.0, run.slipstream_time - run.dash_time) if run.slipstream_time > 0.0 else "돌진 ×1.75"
 		"bastion":
 			hud.trait.text = "방벽 %d/%d · %.1fs" % [run.guard_stacks, run.guard_capacity(), run.guard_cooldown]
+	if not run.branch_id.is_empty():
+		hud.trait.text = ("Ⅰ " if run.branch_id in ["focus", "trail", "heavy"] else "Ⅱ ") + hud.trait.text
+		hud.trait.tooltip_text = str(GameContent.branch_info(run.branch_id).name)
+	if hud.has("final_accept"):
+		var offer := run.finale_status == "preview" and screen == "playing" and not touch_mode
+		hud.final_accept.visible = offer
+		hud.final_decline.visible = offer
+		hud.final_accept.text = ("✓ " if run.finale_selected else "") + "최종 작전 도전"
+		hud.final_decline.text = ("✓ " if not run.finale_selected else "") + "생존 계속"
 	hud.time.text = "%s / %s" % [_time(run.elapsed), "05:00" if run.elapsed < 300.0 else "10:00"]
 	var net := run.net_hull_rate()
 	hud.vitals.text = "%s %+.2f/s" % ["▼" if net < 0.0 else ("▲" if net > 0.0 else "−"), net]
@@ -1174,7 +1214,9 @@ func _pick_upgrade(index: int) -> void:
 	if run.choose_upgrade(id):
 		_collect_progress_notices()
 		sound.play("ui_upgrade_apply")
-		if run.state == "upgrade":
+		if run.state == "branch":
+			_show_branch()
+		elif run.state == "upgrade":
 			_show_upgrades()
 		else:
 			_resume()
@@ -1221,7 +1263,7 @@ func _show_result() -> void:
 	var evolution_names: Array[String] = []
 	for id in run.evolutions:
 		evolution_names.append(GameContent.evolution_info(id).name)
-	_wrap_label("지휘체 %d / 정예 %d / 진화 %s" % [run.bosses_killed, run.elites_killed, " · ".join(evolution_names) if not evolution_names.is_empty() else "없음 — 다음 출격에서 조합에 도전하세요"], Rect2(123, 460, 1080, 49), 17, CYAN)
+	_wrap_label("지휘체 %d / 정예 %d / 진화 %s" % [run.bosses_killed, run.elites_killed, " · ".join(evolution_names) if not evolution_names.is_empty() else "없음 — 다음 출격에서 조합에 도전하세요"] + (" · 분기: " + str(GameContent.branch_info(run.branch_id).get("name", "없음"))) + (" · " + finale_text(run) if run.finale_status in ["success", "failed"] else ""), Rect2(123, 455, 1080, 56), 17, CYAN)
 	_panel(Rect2(110, 512, 1070, 68), PANEL, CORAL if save_failed else GOLD)
 	if save_failed:
 		_wrap_label("기록 저장 실패 · 이 기기/브라우저의 저장 공간과 접근 권한을 확인하세요.", Rect2(129, 526, 1030, 44), 18, CORAL)
@@ -1364,10 +1406,12 @@ func _draw_arena(world: RunModel = null) -> void:
 		if kind in ["sentry", "mine", "wake", "axe"]:
 			color = {"sentry": CYAN, "mine": GOLD, "wake": SPEED_BLUE, "axe": CORAL}[kind]
 			if kind == "wake":
-				ArtAssets.sprite(self, "fx/wave", shot.pos, Vector2.ONE * float(shot.radius) * 2, 0, camera_offset, Color(1,1,1,clampf(float(shot.ttl) / 2.4, 0.2, 0.45)))
+				ArtAssets.sprite(self, "fx/wave", shot.pos, Vector2.ONE * float(shot.radius) * 2, 0, camera_offset, Color(CORAL if model.branch_id == "pierce" else (SPEED_BLUE if model.branch_id == "trail" else Color.WHITE), clampf(float(shot.ttl) / model.branch_value("wake_life", 2.4), 0.2, 0.45)))
 			else:
 				var deploy_scale := 0.6 if kind == "mine" and float(shot.get("armed",0)) > 0 else 1.0
 				ArtAssets.sprite(self, "objects/" + kind, shot.pos, Vector2.ONE * (float(shot.radius) + 4) * 2.4 * deploy_scale, visual_time * 5 if kind == "axe" else sin(visual_time * 2) * 0.12, camera_offset, Color(1.3, 1.35, 1.4))
+				if kind == "sentry" and not model.branch_id.is_empty():
+					draw_arc(shot.pos, 23, 0, TAU, 20, GOLD if model.branch_id == "focus" else CYAN, 3 if model.branch_id == "focus" else 1, true)
 			continue
 		var velocity: Vector2 = shot.get("velocity", Vector2.ZERO)
 		if kind == "missile":
@@ -1500,7 +1544,7 @@ func _draw_arena(world: RunModel = null) -> void:
 				if model.slipstream_time > 0.0:
 					Motion.engine(self, tip, model.facing.angle(), 0.6, visual_time, ship_color, 0.8, reduced)
 		"bastion":
-			draw_arc(player, 29, -PI / 2, -PI / 2 + TAU * maxf(0.01, 1.0 - model.guard_cooldown / 8.0), 40, ship_color, 3 if model.guard_stacks > 0 else 1, true)
+			draw_arc(player, 29, -PI / 2, -PI / 2 + TAU * maxf(0.01, 1.0 - model.guard_cooldown / model.branch_value("guard_period", 8.0)), 40, ship_color, 3 if model.guard_stacks > 0 else 1, true)
 			if model.guard_capacity() > 1:
 				draw_string(font, player + Vector2(-18, -40), "%d/%d" % [model.guard_stacks, model.guard_capacity()], HORIZONTAL_ALIGNMENT_CENTER, 36, 13, ship_color)
 	if screen in ["playing", "replay"]:
@@ -1841,6 +1885,27 @@ func _draw_enemy_status(enemy: Dictionary, model: RunModel) -> void:
 	var kind: String = enemy.kind
 	var angle := float(enemy.get("angle", 0))
 	var color := CORAL
+	var exposed := float(enemy.get("weakpoint", 0.0))
+	if exposed > 0.0:
+		draw_circle(pos, radius * 0.44, GOLD, false, 3, true)
+		draw_line(pos + Vector2(-9, -9), pos + Vector2(9, 9), INK, 3, true)
+		draw_line(pos + Vector2(-9, 9), pos + Vector2(9, -9), INK, 3, true)
+		draw_arc(pos, radius + 16, -PI / 2, -PI / 2 + TAU * minf(1.0, exposed / (3.0 if bool(enemy.get("final_commander", false)) else (1.8 if int(enemy.get("phase", 1)) == 2 else 2.25))), 48, GOLD, 3, true)
+	if float(enemy.get("env_vulnerable", 0.0)) > 0.0:
+		var at := pos + Vector2(radius + 8, -radius)
+		draw_polyline(PackedVector2Array([at + Vector2(-7, -7), at + Vector2(3, -2), at + Vector2(-3, 3), at + Vector2(7, 7)]), CORAL, 3, true)
+		draw_arc(at, 12, -PI / 2, -PI / 2 + TAU * float(enemy.env_vulnerable) / 4.0, 20, CORAL, 1.5, true)
+	if bool(enemy.get("final_commander", false)):
+		for i in 2:
+			var at := model.relay_position(enemy, i)
+			var alive := float(enemy.relays[i]) > 0.0
+			draw_line(pos, at, Color(GOLD, 0.6 if alive else 0.15), 2, true)
+			draw_rect(Rect2(at - Vector2.ONE * 13, Vector2.ONE * 26), GOLD if alive else MUTED, false, 3)
+			if alive:
+				ArtAssets.sprite(self, "objects/core", at, Vector2.ONE * 23, 0, camera_offset, GOLD)
+				draw_arc(at, 21, -PI / 2, -PI / 2 + TAU * float(enemy.relays[i]) / float(enemy.relay_max), 28, CYAN, 3, true)
+			else:
+				draw_line(at - Vector2.ONE * 7, at + Vector2.ONE * 7, MUTED, 2, true)
 	match kind:
 		"runner":
 			color = Color("f19abf")
@@ -1913,14 +1978,20 @@ func _show_replay(entry: Dictionary) -> void:
 	_button("처음부터", Rect2(474, 655, 180, 48), func() -> void: replay_time = 0.0; replay_paused = false)
 	_button("랭킹으로", Rect2(965, 655, 235, 48), _show_records, true, true)
 
+func _sample_replay() -> Array:
+	if _cached_replay_frame.is_empty() or _cached_replay_time != replay_time:
+		_cached_replay_frame = GhostReplay.sample(replay_frames, replay_time)
+		_cached_replay_time = replay_time
+	return _cached_replay_frame
+
 func _draw_replay() -> void:
-	var frame := GhostReplay.sample(replay_frames, replay_time)
+	var frame := _sample_replay()
 	if frame.size() == 14:
 		GhostReplay.restore(replay_run, frame)
 		replay_run.elapsed = replay_time
 		var previous_time := maxf(0, replay_time - 0.2)
-		var previous := GhostReplay.sample(replay_frames, previous_time)
-		replay_run.current_speed = Vector2(frame[1], frame[2]).distance_to(Vector2(previous[1], previous[2])) / maxf(0.001, replay_time - previous_time)
+		var previous := GhostReplay.sample_position(replay_frames, previous_time)
+		replay_run.current_speed = Vector2(frame[1], frame[2]).distance_to(previous) / maxf(0.001, replay_time - previous_time)
 		_draw_arena(replay_run)
 		draw_set_transform(-camera_offset)
 		_draw_replay_path()
@@ -2021,6 +2092,17 @@ func _draw_part_icon(at: Vector2, id: String, _color: Color, scale: float = 1.0,
 	ArtAssets.sprite(self, "objects/" + id, at, Vector2.ONE * 34 * scale, 0, camera_offset if world else Vector2.ZERO)
 
 func _draw_expedition(model: RunModel) -> void:
+	if model.finale_status == "preview": return
+	if model.finale_status in ["active", "success"]:
+		draw_line(Vector2(438, 102), Vector2(842, 102), LINE, 1)
+		draw_string(font, Vector2(438, 127), finale_text(model), HORIZONTAL_ALIGNMENT_LEFT, 404, 16, GOLD)
+		var boss := model.final_commander()
+		var progress := 1.0 if model.finale_status == "success" else 0.0
+		if not boss.is_empty():
+			progress = 1.0 - (float(boss.relays[0]) + float(boss.relays[1])) / (float(boss.relay_max) * 2.0) if model._shielded(boss) else 1.0 - float(boss.hp) / float(boss.max_hp)
+		draw_line(Vector2(438, 147), Vector2(842, 147), LINE, 4)
+		draw_line(Vector2(438, 147), Vector2(438 + 404 * clampf(progress, 0, 1), 147), GOLD, 4)
+		return
 	var m := model.mission
 	var color := CYAN
 	var heading := "선택 미션"
@@ -2085,10 +2167,14 @@ func mission_progress_text(model: RunModel) -> String:
 	return "%s / %d%s" % [count, int(m.target), "회 미만 · 생존" if m.id == "survive" else ("초 · 복귀" if m.id == "outer" else "")]
 
 func _show_tech_codex() -> void:
+	if tech_page == 2:
+		_show_combat_codex()
+		return
 	if tech_page == 1:
 		_show_ship_parts()
 		return
 	_button("전용 파츠 →", Rect2(912, 650, 304, 48), func() -> void: tech_page = 1; _open_arsenal(codex_return))
+	_button("전투 분기", Rect2(590, 650, 304, 48), func() -> void: tech_page = 2; _open_arsenal(codex_return))
 	_label("HULL / TECH TREE", Rect2(64, 35, 600, 30), 16, CYAN)
 	_label("3종 파츠로 기체를 진화시키세요.", Rect2(64, 82, 1150, 50), 34)
 	_wrap_label("파츠: A급 미션 1개 / 90초부터 105초 간격 외곽 2층 깊은 탐사 · C/B급·강적은 파츠 없음", Rect2(64, 141, 1152, 38), 16)
@@ -2132,6 +2218,7 @@ func _show_ship_parts() -> void:
 		_wrap_label(info.description, Rect2(at + Vector2(16, 46), Vector2(530, 62)), 17)
 	_button("전투로 돌아가기" if codex_return == "pause" else "돌아가기", Rect2(64, 650, 310, 48), _close_arsenal, true, true)
 	_button("공통 조합 ←", Rect2(912, 650, 304, 48), func() -> void: tech_page = 0; _open_arsenal(codex_return))
+	_button("전투 분기", Rect2(590, 650, 304, 48), func() -> void: tech_page = 2; _open_arsenal(codex_return))
 
 func _draw_replay_path() -> void:
 	var path := PackedVector2Array()
@@ -2142,3 +2229,69 @@ func _draw_replay_path() -> void:
 			path.append(Vector2(sample[1], sample[2]))
 	if path.size() > 1:
 		draw_polyline(path, Color(CYAN, 0.4), 2.0, true)
+
+func _show_branch() -> void:
+	screen = "branch"
+	_clear_ui(false)
+	_shade()
+	var window := Vector2(DisplayServer.window_get_size())
+	if window.x < 1: window = get_viewport_rect().size
+	ui.set_meta("fitted_menu", true)
+	ui.set_meta("branch_window", window)
+	ui.size = window
+	ui.scale = Vector2.ONE * get_viewport_rect().size.x / window.x
+	ui.get_parent().offset = Vector2.ZERO
+	ui.get_node("Shade").position = Vector2.ZERO
+	ui.get_node("Shade").size = window
+	_label("전투 분기 · 이번 출격의 전술", Rect2(18, 16, window.x - 36, 36), 24, CYAN)
+	_label("전투 정지 · 1 / 2 선택 · TAB 도감", Rect2(18, 55, window.x - 36, 24), 14, MUTED)
+	var ids: Array = GameContent.BRANCH_IDS.filter(func(id: String) -> bool: return GameContent.branch_info(id).ship == run.ship_id)
+	var portrait := window.y > window.x
+	for i in 2:
+		var rect := Rect2(18, 90 + i * ((window.y - 122) / 2.0 + 12), window.x - 36, (window.y - 122) / 2.0) if portrait else Rect2(18 + i * (window.x / 2.0), 90, window.x / 2.0 - 36, window.y - 116)
+		var selected := i
+		var info := GameContent.branch_info(ids[i])
+		var compact := rect.size.y < 230
+		var description: String = str(info.description)
+		var tradeoff: String = str(info.tradeoff)
+		if compact:
+			description = {"focus":"포대 1기 · 피해 ×2.4\n사거리 520 · 5초 재배치\n보스/정예 우선", "field":"포대 3기 · 사거리 620\n18초 유지 · 6초마다 설치", "trail":"항적 3.6초 · 피해 ×0.85\n경로 위로 적을 유도", "pierce":"돌진 피해 ×1.35\n항적 1.2초 · 피해 ×0.75", "heavy":"반격 피해 ×1.65\n방벽 충전 10초", "cycle":"방벽 충전 6초\n반격 피해 ×0.80"}[ids[i]]
+			tradeoff = {"focus":"다방향 방어 약화", "field":"포대 피해 ×0.85", "trail":"돌진 피해 ×0.85", "pierce":"항적 지속 화력 감소", "heavy":"방벽 충전 10초", "cycle":"반격 피해 ×0.80"}[ids[i]]
+		var card := _button("", rect, func() -> void: _pick_branch(selected), false, i == 0)
+		card.name = "Branch" + str(i + 1)
+		card.set_meta("branch_id", ids[i])
+		_label("%d · %s" % [i + 1, info.name], Rect2(16, 16, rect.size.x - 32, 34), 22, INK, card)
+		_wrap_label(description, Rect2(16, 58 if compact else 64, rect.size.x - 32, 66 if compact else 70), 14 if compact else 17, CYAN, card)
+		_wrap_label(tradeoff, Rect2(16, 132 if compact else 142, rect.size.x - 32, 24 if compact else 50), 13 if compact else 15, GOLD, card)
+		_label("이 전술 선택 →", Rect2(16, rect.size.y - 40, rect.size.x - 32, 26), 17, LIME, card)
+
+func _pick_branch(index: int) -> void:
+	if screen != "branch" or index < 0 or index > 1: return
+	var ids: Array = GameContent.BRANCH_IDS.filter(func(id: String) -> bool: return GameContent.branch_info(id).ship == run.ship_id)
+	if not run.choose_branch(ids[index]): return
+	sound.consume(run, camera_offset)
+	if run.state == "upgrade": _show_upgrades()
+	else: _resume()
+
+func finale_text(model: RunModel) -> String:
+	if model.finale_status == "success": return "✓ 최종 작전 성공 · " + _time(model.finale_success_at)
+	if model.finale_status == "failed": return "최종 작전 종료 · 돌파 기록 유지"
+	if model.finale_status == "preview": return "최종 작전 선택 · %ds" % maxi(0, ceili(540.0 - model.elapsed))
+	var boss := model.final_commander()
+	var objective := "접근 중"
+	if not boss.is_empty():
+		objective = "보호 장치 %d/2" % [int(float(boss.relays[0]) <= 0.0) + int(float(boss.relays[1]) <= 0.0)] if model._shielded(boss) else "지휘 핵 %d%%" % ceili(float(boss.hp) / float(boss.max_hp) * 100)
+	return "최종 작전 · %s · %ds" % [objective, maxi(0, ceili(600.0 - model.elapsed))]
+
+func _show_combat_codex() -> void:
+	_label("COMBAT / 전투 분기", Rect2(64, 35, 600, 30), 16, CYAN)
+	_label("전용 진화 이후, 전술을 선택하세요.", Rect2(64, 82, 1150, 50), 34)
+	_wrap_label("보스: 공격 3회 뒤 코어 노출 ×1.5 · 번개로 적 약화 / 용광로로 장갑 노출 · 08:50 최종 작전 선택", Rect2(64, 141, 1152, 40), 16)
+	for i in GameContent.BRANCH_IDS.size():
+		var info := GameContent.branch_info(GameContent.BRANCH_IDS[i])
+		var at := Vector2(64 + (i % 2) * 584, 198 + floori(i / 2.0) * 132)
+		_panel(Rect2(at, Vector2(568, 120)), PANEL, GameContent.ship_info(info.ship).color)
+		_label(GameContent.ship_info(info.ship).name + " · " + info.name, Rect2(at + Vector2(16, 8), Vector2(530, 30)), 21)
+		_wrap_label(str(info.description) + "\n" + str(info.tradeoff), Rect2(at + Vector2(16, 43), Vector2(530, 72)), 16)
+	_button("돌아가기", Rect2(64, 650, 310, 48), _close_arsenal, true, true)
+	_button("공통 조합 ←", Rect2(912, 650, 304, 48), func() -> void: tech_page = 0; _open_arsenal(codex_return))

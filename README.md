@@ -1,6 +1,10 @@
-# ORBIT BREAKER 3.18.3 · 사운드·모바일 시작 전 UI
+# ORBIT BREAKER 3.19 · 전투 진화와 최종 작전
 
-[지금 웹에서 플레이](https://libralightluda.github.io/orbit-breaker/) · [Windows/Web 다운로드](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.18.3-audio-ui)
+## 3.19 전투 확장과 코드 검수 보완
+
+아래 웹 플레이 또는 Windows/Web 다운로드로 실행합니다. `audit-20261014`는 진화 이후 6개 전술 분기·보스 코어 공략·환경 역이용·선택형 최종 작전에 더해, 테스트의 실제 진행·터치 경로, 성능 회귀 판정, 빌드 소스/출력 연결, 손상 고스트 방어, 전술 선택 음악과 리플레이 계산을 보완한 세대입니다. [코드 검수 보완·검증 보고서](docs/CODE_AUDIT_IMPLEMENTATION_REPORT.md)와 [전투 확장 보고서](docs/COMBAT_IMPLEMENTATION_REPORT.md)를 참고하세요.
+
+[지금 웹에서 플레이](https://libralightluda.github.io/orbit-breaker/) · [Windows/Web 다운로드](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.19.0)
 
 세라믹·흑연 기체, 흑요석 침공체,3개 우주 전장과 실물 장비/FX,61개 정보 도해를 전체 메뉴·전투·신구고스트에 적용했습니다.125개 제작 대상과95개 아트+2개 브랜딩 리소스이며, 게임 규칙·저장·고스트 형식은3.18을 유지합니다. 모바일 드래그 이동·길게 끌어 놓는 방향 돌진·두 번 탭 오버드라이브와 가로/세로 UI를 지원하며, 데스크톱 키보드/마우스도 유지합니다. 기록은 해당 기기·브라우저에 로컬 저장됩니다.
 

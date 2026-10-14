@@ -84,11 +84,7 @@ func audit(context: String) -> void:
 			root.get_texture().get_image().save_png(folder + "/" + context + "-first.png")
 		for c in visible_controls(game.ui): reached[c.get_instance_id()] = true
 		if page + 1 < pages:
-			if game.screen == "credits" and page > 1:
-				game.ui.get_node("PregameNext").pressed.emit()
-				await process_frame
-			else:
-				await tap(game.ui.get_node("PregameNext"))
+			await tap(game.ui.get_node("PregameNext"))
 			check(int(game.ui.get_meta("pregame_page", -1)) == page + 1, context + " real viewport tap advances page")
 	if game.ui.has_node("PregameNext"):
 		for c in game.ui.get_children():

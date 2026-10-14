@@ -32,11 +32,39 @@ function Invoke-GodotChecked {
     }
 }
 
+function Get-SourceHashes {
+    $hashes = [ordered]@{}
+    foreach ($base in @('scripts','assets','tests','tools')) {
+        foreach ($file in Get-ChildItem -LiteralPath (Join-Path $projectRoot $base) -File -Recurse | Sort-Object FullName) {
+            if ($file.Extension -in @('.uid','.pyc')) { continue }
+            $relative = $file.FullName.Substring($projectRoot.Length + 1).Replace('\','/')
+            $hashes[$relative] = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash
+        }
+    }
+    foreach ($relative in @('project.godot','main.tscn','export_presets.cfg','icon.svg')) {
+        $hashes[$relative] = (Get-FileHash -LiteralPath (Join-Path $projectRoot $relative) -Algorithm SHA256).Hash
+    }
+    return $hashes
+}
+
 $buildDirectory = Join-Path $projectRoot 'build\candidate'
 $outputPath = Join-Path $buildDirectory 'OrbitBreaker.exe'
 New-Item -ItemType Directory -Path $buildDirectory -Force | Out-Null
 
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--editor', '--quit')
+$sourceHashes = Get-SourceHashes
+$validationStarted = (Get-Date).ToUniversalTime().ToString('o')
+$ErrorActionPreference = 'Continue'
+& python -m unittest discover -s (Join-Path $projectRoot 'tests') -p test_validation.py 2>&1 | ForEach-Object { Write-Host $_ }
+$validationExit = $LASTEXITCODE
+$ErrorActionPreference = 'Stop'
+if ($validationExit -ne 0) { throw 'Build validation regression tests failed.' }
+
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_combat_expansion.gd') `
+    -SuccessPattern '(?m)^COMBAT SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_performance.gd') `
+    -SuccessPattern '(?m)^PERFORMANCE: 600 moving frames, 240 enemies/shots, 300 gems;.*p95 [0-9.]+ms'
 
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_audio.gd') `
     -SuccessPattern '(?m)^AUDIO SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
@@ -104,4 +132,14 @@ $webDirectory = Join-Path $buildDirectory 'web'
 New-Item -ItemType Directory -Path $webDirectory -Force | Out-Null
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--export-release', 'Web', (Join-Path $webDirectory 'index.html'))
 Invoke-GodotChecked -Arguments @('--path', $projectRoot, '--audio-driver', 'Dummy', '--script', 'res://tests/audio_smoke.gd') -SuccessPattern 'AUDIO SMOKE COMPLETE'
+$finalSources = Get-SourceHashes
+if ($sourceHashes.Count -ne $finalSources.Count) { throw 'Source inventory changed during validation.' }
+foreach ($entry in $sourceHashes.GetEnumerator()) {
+    if ($finalSources[$entry.Key] -ne $entry.Value) { throw "Source changed during validation: $($entry.Key)" }
+}
+$outputs = [ordered]@{'OrbitBreaker.exe' = (Get-FileHash -LiteralPath $outputPath -Algorithm SHA256).Hash}
+foreach ($file in Get-ChildItem -LiteralPath $webDirectory -File) {
+    $outputs['web/' + $file.Name] = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash
+}
+@{complete=$true;started=$validationStarted;source_hashes=$sourceHashes;outputs=$outputs} | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $buildDirectory 'candidate-validation.json') -Encoding UTF8
 Write-Host 'Candidate exported. Promote only after the exported executable and browser checks pass. Existing release remains untouched.'

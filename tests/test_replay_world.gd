@@ -83,6 +83,10 @@ func run_checks() -> void:
 	for frame: Array in ghost.frames:
 		legacy.append(frame.slice(0, 13))
 	check(GhostReplay.valid(legacy) and GhostReplay.sample(legacy, 0.2).size() == 13, "legacy thirteen-number frames still play")
+	for recording: Array in [ghost.frames, legacy]:
+		for time: float in [-1.0, 0.0, 0.2, 0.4, 0.7, 0.8, 600.0]:
+			var sample := GhostReplay.sample(recording, time)
+			check(GhostReplay.sample_position(recording, time).is_equal_approx(Vector2(sample[1], sample[2])), "Position-only sampling matches world sampling across seeks and legacy frames")
 	var path := "user://world_replay_test_%d.json" % Time.get_ticks_usec()
 	check(GhostReplay.write(path, ghost.frames), "world replay writes compressed file atomically")
 	var file := FileAccess.open(path, FileAccess.READ)
@@ -99,6 +103,15 @@ func run_checks() -> void:
 		bad[0][13][key] = "invalid"
 		check(not GhostReplay.valid(bad), "reject malformed collection " + key)
 	var bad := ghost.frames.duplicate(true)
+	bad[0][0] = {}
+	check(not GhostReplay.valid(bad), "reject malformed snapshot time before any numeric conversion")
+	bad = ghost.frames.duplicate(true)
+	bad[0][13].enemies[0][1] = "unknown_enemy"
+	check(not GhostReplay.valid(bad), "reject unknown enemy art identity")
+	bad = ghost.frames.duplicate(true)
+	bad[0][13].events[0][3][1] = "unknown_enemy"
+	check(not GhostReplay.valid(bad), "reject unknown enemy identity in lifecycle events")
+	bad = ghost.frames.duplicate(true)
 	bad[0][13].enemies[0][2][0] = INF
 	check(not GhostReplay.valid(bad), "reject nonfinite entity coordinate")
 	bad = ghost.frames.duplicate(true)
@@ -212,6 +225,14 @@ func _test_ui(frames: Array, legacy: Array) -> void:
 	game._show_replay(entry)
 	game.replay_time = 0.2
 	game.replay_paused = true
+	var cached: Array = game._sample_replay()
+	check(is_same(cached, game._sample_replay()), "unchanged replay time reuses the whole-world sample")
+	game.replay_time = 0.4
+	check(not is_same(cached, game._sample_replay()), "seeking invalidates the cached world sample")
+	game.replay_time = 0.2
+	cached = game._sample_replay()
+	game.replay_frames = game.replay_frames.duplicate(true)
+	check(not is_same(cached, game._sample_replay()), "replacing a recording at the same time invalidates the cache")
 	await snapshot(game, "replay-full-world")
 	check(game.replay_run.enemies.size() == 3 and game.replay_run.items.size() == 2 and game.replay_run.gems.size() == 2, "spectator renderer restores battlefield")
 	check(game.replay_run.ship_id == "scout" and game.replay_run.sector_id == "storm", "spectator uses recorded loadout")
