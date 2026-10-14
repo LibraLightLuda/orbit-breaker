@@ -211,55 +211,24 @@ func _test_save_versions() -> void:
 
 func _test_audio() -> void:
 	var audio = SoundScript.new()
-	audio.play("select")
-	audio.start_music()
-	audio.set_muted(true)
-	audio.set_music_enabled(false)
-	_check(audio.get_child_count() == 0, "Calls before scene-tree entry are safe")
+	_check(not audio.play("ui_confirm"), "Calls before tree entry are safe")
 	root.add_child(audio)
-	_check(audio._voices.size() == SoundScript.VOICE_LIMIT, "Exactly ten effect voices allocated")
+	audio.set_music_enabled(false)
 	audio.set_muted(false)
 	_check(not audio._music.playing, "Music stays disabled after unmuting")
-	audio.play("unknown")
-	_check(audio._sounds.is_empty(), "Unknown cues ignored safely")
-	audio.play("shoot")
-	var first_play: int = int(audio._last_played["shoot"])
-	for i: int in range(50):
-		audio.play("shoot")
-	_check(_playing_voices(audio) == 1 and audio._last_played["shoot"] == first_play, "Noisy cue burst is rate limited")
-	for cue: String in SoundScript.CUES:
-		audio.play(cue)
-	_check(_playing_voices(audio) <= SoundScript.VOICE_LIMIT, "All cues respect simultaneous-voice cap")
-	_check(audio._sounds.size() == SoundScript.CUES.size(), "Every requested cue generates a WAV")
-	_check(audio._last_played.has("event_warning") and audio._last_played.has("event_start"), "Important event alarms play even when voices are full")
-	for cue: String in audio._sounds:
-		var stream: AudioStreamWAV = audio._sounds[cue]
-		_check(stream.data.size() > 0 and stream.mix_rate == SoundScript.SAMPLE_RATE and stream.format == AudioStreamWAV.FORMAT_16_BITS, "Cue %s is valid PCM" % cue)
+	_check(not audio.play("unknown"), "Unknown cues ignored")
+	audio.play("weapon_cannon")
+	var first := int(audio.played_counts.weapon_cannon)
+	for i in 50: audio.play("weapon_cannon")
+	_check(int(audio.played_counts.weapon_cannon) == first, "Burst cue requests are limited")
+	for cue: String in SoundScript.CUES: audio.play(cue)
+	_check(audio.active_voices() <= SoundScript.VOICE_LIMIT, "Cue saturation respects voice cap")
+	audio._clock += 10
+	_check(audio.play("warn_hull_critical") and audio.play("hazard_charge_lane"), "Critical warnings survive saturation")
 	audio.set_music_enabled(true)
-	var music: AudioStreamWAV = audio._music.stream
-	_check(music != null and audio._music.playing, "Music starts on demand")
-	_check(music.data.size() == 8 * SoundScript.SAMPLE_RATE * 2, "Music contains eight seconds of PCM")
-	_check(music.loop_mode == AudioStreamWAV.LOOP_FORWARD and music.loop_end == 8 * SoundScript.SAMPLE_RATE, "Music loops over full buffer")
-	_check(music.data.decode_s16(0) == 0 and absi(music.data.decode_s16(music.data.size() - 2)) < 100, "Music boundary fades avoid loop clicks")
-	await create_timer(0.15).timeout
+	_check(audio._music.playing and audio._music.stream.get_length() > 60, "Full-length music starts")
+	await create_timer(.15).timeout
 	audio.set_muted(true)
-	_check(_playing_voices(audio) == 0 and not audio._music.playing, "Mute stops music and all effects")
-	audio.play("hit")
-	_check(_playing_voices(audio) == 0, "Muted effects remain silent")
-	await create_timer(0.15).timeout
-	audio.set_muted(false)
-	_check(audio._music.playing, "Unmute resumes enabled music")
-	await create_timer(0.15).timeout
-	audio.set_music_enabled(false)
-	_check(not audio._music.playing, "Music setting stops only background track")
-	# Players clear stopped playback references on their next internal update.
-	await create_timer(0.15).timeout
+	_check(audio.active_voices() == 0 and not audio._music.playing, "Mute stops music and effects")
+	await create_timer(.15).timeout
 	audio.free()
-
-
-func _playing_voices(audio: Node) -> int:
-	var count: int = 0
-	for voice: AudioStreamPlayer in audio._voices:
-		if voice.playing:
-			count += 1
-	return count

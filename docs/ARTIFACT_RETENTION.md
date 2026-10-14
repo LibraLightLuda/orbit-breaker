@@ -2,6 +2,10 @@
 
 적용일: 2026-10-11. 사용자가 최신 배포 버전만 보관하도록 변경했다. 기존의 최신·직전 두 세대 보관 규칙보다 이 규칙이 우선한다.
 
+## 현재 최신 로컬본: pregame-20261014 (2026-10-14)
+
+3.18.3 시작 전 UI 세대. `build/current`·`artifacts/current`·`web/`가 대응한다. Windows SHA-256 `8AFC0A2BAE31F3221EF4C7F05566F676D41DB9476E393143B93055E79BFEB40A`. 후보 검증 후 guarded promotion으로 교체했다. 이전 배포본·증거는 정리하고 기존 정책 차단 자료는 최종 retention-status/file-inventory에 기록한다. 공개 게시하지 않았다.
+
 ## 보관 범위
 
 `build`와 `artifacts`에는 **최신 검증 완료 배포본 한 세대만** 유지한다. 최신 실행 파일·체크섬·플레이 안내·대응 최종 검증 명세·빌드/실행 로그·화면 캡처를 함께 보관한다. Windows와Web은 같은 제품 버전의 플랫폼별 산출물이며 별도 세대가 아니다. `web/`은 최신Web 게시용 복사본이다.
@@ -16,17 +20,11 @@
 4. 교체 성공 확인 후 이전 최신본·직전본·모든 더 오래된 배포 자료와 임시 백업을 정리한다. 별도 상시 직전본을 남기지 않는다.
 5. 최종 한 세대의 파일 목록·SHA-256과 검증 명세를 갱신한다. 정리가 차단되면 남은 위치와 정확한 사유를 기록하며, 한 세대 정리가 완료됐다고 표시하지 않는다.
 
-## 현재 최신본 (2026-10-12)
+## 이전 로컬본: audio-20261014 (2026-10-14)
 
-최신 로컬 세대는 **3.18 / art-20261012**다. `build/current/OrbitBreaker.exe`, Windows/Web ZIP, `build/current/web`와 `web/`, 대응 증거 `artifacts/current`가 최종본이다.
+최신 로컬 세대는 **3.18.3 / audio-20261014**다. `build/current/OrbitBreaker.exe`, Audio Windows/Web ZIP, `build/current/web`와 `web/`, 대응 증거 `artifacts/current`가 최종본이다. 공개 사이트에는 이 오디오 세대를 게시하지 않았다.
 
-Windows SHA-256: `15D4D4098BD767B8B8D63C5550749387DC57FC091651285BCB7BA5F37FF77939`. Web PCK: `DA1B5DACF6A8FBDE1E05D481BBC12845F82D19418E3374B6C03A8D83E984FAF0`.
-
-기존 정상 실행 파일·해시·안내·증거를 retiring에 먼저 보존하고 후보 검증/내보내기/실행/해시 일치를 확인한 뒤 교체했다. 교체 후 이전 세대와 임시 백업을 정리했다. 최신 한 세대 정책을 지키며 원본 계획·제작 소스·미커밋 변경·플레이어 데이터는 보존했다. 최종 목록은 `artifacts/current/file-inventory.json`, `release-hashes.json`, `retention-status.json`, `verification.json`이다.
-
-계획 조사 Temp 삭제 차단은 배포 세대 정리와 구분한다. 공개 사이트와 v3.18.1 릴리즈에 이번 아트 세대가 반영됐다.
-
-최종 보관 확인: 추가 QA 임시 정리는 자동 승인 검토에서 `blocked by policy`로 거부되어 실행되지 않았다. 남은 경로는 `artifacts/candidate`(검증 art 자료만 있으며 후보 실행 파일 없음), `art_source/web_qa_project`, `art_source/memory_baseline_project`다. 최종 증거는 `artifacts/current`에 합쳐 보존했다. 정상 배포본은 build/current 한 세대이며 이전 배포 세대 정리는 완료됐지만 이 임시 정리는 미완료다. 삭제를 다른 방법으로 우회하지 않았다.
+Windows SHA-256 `B2D149A5EE333EFBE3316B1BD2DA79725F465E16C938A6EAD3D9CA2A7E25353E`, Web PCK `6D6CF5D543069E5243EF5569960B436046FCF95E71EE4C8028390D2E6AF0C1A5`. 후보 검사·내보내기·실행·해시 성공 후 guarded promotion으로 교체하며 이전 최신본과 retiring을 정리한다. 최종 실제 정리 상태는 `artifacts/current/retention-status.json`·`file-inventory.json`을 따른다. 기존 정책 차단 임시7디렉터리·진단5로그는 우회/재시도하지 않는다. 소스·과거 설계·플레이어 데이터는 보존한다.
 
 ## 2026-10-12 공개 배포 완료
 

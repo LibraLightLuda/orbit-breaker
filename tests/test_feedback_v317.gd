@@ -98,6 +98,9 @@ func run_checks() -> void:
 func hud_checks() -> void:
 	var game = load("res://main.tscn").instantiate()
 	root.add_child(game)
+	if DisplayServer.get_name() != "headless":
+		root.grab_focus()
+		await create_timer(.05).timeout
 	game.set_physics_process(false)
 	game.sound.set_muted(true)
 	game.records.load_data(base + "ui.json")
@@ -179,8 +182,13 @@ func hud_checks() -> void:
 		game._physics_process(1.0 / 60.0)
 		if DisplayServer.get_name() != "headless" and game.dash_cursor_anchor and native_end_distance < 0:
 			var endpoint: Vector2 = root.get_final_transform() * game.dash_cursor_position + Vector2(DisplayServer.window_get_position())
-			native_end_distance = Vector2(DisplayServer.mouse_get_position()).distance_to(endpoint)
-			print("DASH CURSOR: expected=%s OS=%s error=%.3fpx" % [endpoint, DisplayServer.mouse_get_position(), native_end_distance])
+			# Observe the OS acknowledgement; a rendered frame can precede cursor dispatch.
+			var deadline := Time.get_ticks_msec() + 500
+			while Time.get_ticks_msec() < deadline:
+				await process_frame
+				native_end_distance = Vector2(DisplayServer.mouse_get_position()).distance_to(endpoint)
+				if native_end_distance < 3.0: break
+			print("DASH CURSOR: expected=%s OS=%s error=%.3fpx focus=%s screen=%s" % [endpoint, DisplayServer.mouse_get_position(), native_end_distance, root.has_focus(), game.screen])
 	check(game.dash_cursor_anchor and not game.mouse_active and not game.click_dash_active, "left-click dash anchors the cursor at actual completion")
 	check(game.dash_cursor_position.distance_to(game.get_global_transform_with_canvas() * (game.run.player - game.camera_offset)) < 0.1, "cursor endpoint includes current camera and viewport transforms")
 	var end: Vector2 = game.run.player

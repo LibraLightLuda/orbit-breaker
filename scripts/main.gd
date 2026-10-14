@@ -85,8 +85,11 @@ var touch := preload("res://scripts/touch_controls.gd").new()
 var touch_mode := false
 var touch_mouse_guard := 0.0
 var touch_landscape := true
+var closing := false
 
 func _ready() -> void:
+	get_tree().auto_accept_quit = false
+	run.audio_enabled = true
 	add_child(backdrop)
 	add_child(arena_grid)
 	var engine_quad := QuadMesh.new()
@@ -115,6 +118,7 @@ func _ready() -> void:
 	add_child(sound)
 	sound.set_muted(bool(records.data.muted))
 	sound.set_music_enabled(bool(records.data.music))
+	sound.set_volumes(float(records.data.master_volume), float(records.data.music_volume), float(records.data.effects_volume))
 	sound.start_music()
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 1217
@@ -159,6 +163,7 @@ func _fit_viewport() -> void:
 
 func _animate_menu() -> void:
 	if records.data.reduced_motion or screen in ["playing", "replay"]: return
+	if touch_mode and (screen in ["menu", "hangar", "records", "help", "settings", "credits"] or (screen == "arsenal" and codex_return != "pause")): return
 	if menu_tween: menu_tween.kill()
 	ui.position.y = 7
 	ui.modulate.a = 0.7
@@ -250,6 +255,13 @@ func _setup_inputs() -> void:
 			InputMap.action_add_event(action, event)
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST and not closing:
+		closing = true
+		set_physics_process(false)
+		sound.set_muted(true)
+		sound.stop_all()
+		# Let the audio mixer release streaming playbacks before engine teardown.
+		get_tree().create_timer(.15).timeout.connect(get_tree().quit)
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and screen == "playing":
 		_show_pause()
 
@@ -263,6 +275,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_M:
 			_toggle_mute()
 		KEY_ESCAPE:
+			if screen in ["arsenal", "help", "settings", "credits", "hangar", "records", "replay"]: sound.play("ui_back")
 			if screen == "playing":
 				_show_pause()
 			elif screen == "pause":
@@ -346,14 +359,13 @@ func _physics_process(delta: float) -> void:
 			toast = " · ".join(run.loot_notices.slice(0, 2))
 			toast_time = 3.0
 			run.loot_notices.clear()
+		sound.consume(run, camera_offset)
 		for cue in run.events:
 			if cue == "item" and not run.pending_items.is_empty():
 				var pickup: Dictionary = run.pending_items.back()
 				var info := ItemCatalog.info(str(pickup.id), str(pickup.grade))
 				toast = "%s · %s" % [info.name, info.description]
 				toast_time = 3.3
-			var audio_cue: String = {"shot": "shoot", "kill": "hit", "heal": "pickup", "upgrade": "select", "boss_down": "win", "elite": "boss", "overdrive": "level", "evolution": "win", "milestone": "win", "item": "pickup", "supply": "pickup", "event_reward": "win", "mission_preview": "event_warning", "mission_start": "level", "mission_success": "win", "mission_failed": "hurt", "part_spawn": "pickup", "part_pickup": "level", "hull_evolution": "win"}.get(cue, cue)
-			sound.play(audio_cue)
 			if cue == "hurt":
 				hurt_flash = 0.35
 			if cue == "boss":
@@ -388,6 +400,7 @@ func _physics_process(delta: float) -> void:
 			_show_upgrades()
 		elif run.state in ["won", "lost"]:
 			_show_result()
+	sound.update_state(screen, run, delta, camera_offset)
 	queue_redraw()
 
 func _finish_click_dash() -> void:
@@ -406,6 +419,8 @@ func _queue_notice(key: String, title: String, name_text: String, color: Color, 
 	if notice_keys.has(key):
 		return
 	notice_keys[key] = true
+	if key.begins_with("achievement:"): sound.play("ui_achievement")
+	elif key.begins_with("discovery:"): sound.play("ui_discovery")
 	notices.append({"title": title, "name": name_text, "color": color, "sides": sides, "ttl": 3.0})
 
 func _collect_progress_notices() -> void:
@@ -464,6 +479,7 @@ func _exit_tree() -> void:
 		job.writer.cancel_write()
 
 func _clear_ui(animate: bool = true) -> void:
+	sound.set_screen(screen)
 	touch.reset()
 	if dash_cursor_anchor and OS.has_feature("web"):
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -476,6 +492,8 @@ func _clear_ui(animate: bool = true) -> void:
 	ui.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	ui.size = Vector2(1280, 720)
 	if ui.has_meta("fitted_menu"): ui.remove_meta("fitted_menu")
+	for key in ["pregame_page", "pregame_page_count"]:
+		if ui.has_meta(key): ui.remove_meta(key)
 	ui.get_parent().offset = position
 	for child in ui.get_children():
 		ui.remove_child(child)
@@ -484,6 +502,9 @@ func _clear_ui(animate: bool = true) -> void:
 	if animate: _animate_menu.call_deferred()
 
 func _refresh_menu_layout() -> void:
+	var focused := get_viewport().gui_get_focus_owner()
+	var typing_name := screen == "hangar" and focused is LineEdit
+	var caret: int = focused.caret_column if typing_name else 0
 	match screen:
 		"menu": _show_menu()
 		"hangar": _show_hangar()
@@ -499,6 +520,15 @@ func _refresh_menu_layout() -> void:
 		"pause": _resume(); _show_pause()
 		"upgrade": _show_upgrades(true)
 		"result": _show_result()
+	if typing_name:
+		_restore_name_focus.call_deferred(caret)
+
+func _restore_name_focus(caret: int) -> void:
+	if screen != "hangar": return
+	for child in ui.get_children():
+		if child is LineEdit:
+			child.grab_focus()
+			child.caret_column = caret
 
 func _label(text: String, rect: Rect2, size: int = 20, color: Color = INK, parent: Control = null, wrap: bool = false) -> Label:
 	var label := Label.new()
@@ -560,7 +590,21 @@ func _button(text: String, rect: Rect2, callback: Callable, primary: bool = fals
 	button.add_theme_stylebox_override("focus", _style(Color(0, 0, 0, 0), INK, 2))
 	button.add_theme_stylebox_override("disabled", _style(Color("101923"), LINE))
 	button.add_theme_color_override("font_disabled_color", MUTED)
-	button.pressed.connect(func() -> void: sound.play("select"); callback.call())
+	button.pressed.connect(func() -> void:
+		var previous := screen
+		var selection := selected_ship + selected_sector + mode
+		callback.call()
+		if previous == "upgrade" or screen == "playing" or previous == "playing": return
+		if previous == "hangar" and screen == "hangar" and selection == selected_ship + selected_sector + mode: return
+		if text.contains("전체 소리"): sound.play("ui_toggle_off" if records.data.muted else "ui_toggle_on")
+		elif text.contains("배경 음악"): sound.play("ui_toggle_on" if records.data.music else "ui_toggle_off")
+		else: sound.play("ui_back" if text.contains("돌아") or text.contains("취소") else ("ui_change" if previous == screen else "ui_confirm"))
+	)
+	button.mouse_entered.connect(func() -> void: if not touch_mode and not button.disabled and button.get_meta("audio_armed", false): sound.play("ui_focus"))
+	button.focus_entered.connect(func() -> void:
+		if not touch_mode and button.is_inside_tree() and button.get_meta("audio_armed", false): sound.play("ui_focus")
+	)
+	button.set_meta.call_deferred("audio_armed", true)
 	ui.add_child(button)
 	if focus:
 		button.grab_focus()
@@ -711,6 +755,7 @@ func _show_records() -> void:
 		for i: int in range(entries.size()):
 			var entry: Dictionary = entries[i]
 			var y := 293 + i * 28
+			_panel(Rect2(64, y, 1138, 28))
 			_label("%02d  %s" % [i + 1, entry.name], Rect2(72, y, 340, 27), 16, GOLD if i == 0 else INK)
 			_label("%s점  ·  %s  ·  %s / %s" % [_number(entry.score), _time(entry.time), GameContent.ship_info(entry.ship).name, GameContent.sector_info(entry.sector).name], Rect2(420, y, 615, 27), 15, MUTED)
 			var watch := _button("고스트 관전", Rect2(1040, y, 160, 26), func() -> void: _show_replay(entry))
@@ -799,6 +844,8 @@ func _start_run() -> void:
 	if not mode in records.available_modes():
 		mode = "normal"
 	run.reset(0, mode, selected_ship, selected_sector)
+	sound.begin_run(selected_sector)
+	sound.play("ui_launch")
 	notices.clear()
 	notice_keys.clear()
 	reward_cues.clear()
@@ -964,7 +1011,7 @@ func _show_help() -> void:
 	]
 	if touch_mode:
 		rows[0] = ["01", "드래그로 이동", "화면을 누른 채 원하는 방향으로 밀면 이동합니다. 손을 떼면 멈춥니다. 공격은 자동."]
-		rows[1] = ["02", "탭 · 두 번 탭", "탭은 그 방향으로 돌진. 가까운 곳을 두 번 탭하면 오버드라이브. 아래 스킬 버튼도 사용할 수 있습니다."]
+		rows[1] = ["02", "길게 끌어 놓기 · 두 번 탭", "길게 끌어 놓은 방향으로 돌진. 가까운 곳을 두 번 탭하면 오버드라이브. 아래 스킬 버튼도 사용할 수 있습니다."]
 		rows[2] = ["03", "강화와 도감", "강화 카드를 터치해 선택하세요. 전투 중 도감과 일시정지는 오른쪽 위에 있습니다."]
 	for i in range(rows.size()):
 		var y := 217 + i * 112
@@ -978,15 +1025,35 @@ func _show_help() -> void:
 func _show_settings() -> void:
 	screen = "settings"
 	_clear_ui()
-	_label("PREFERENCES", Rect2(270, 95, 700, 30), 16, LIME)
-	_label("나에게 맞게", Rect2(270, 143, 760, 70), 44)
-	_button("전체 소리  ·  " + ("OFF / 꺼짐" if records.data.muted else "ON / 켜짐"), Rect2(270, 243, 740, 60), func() -> void: _toggle_mute(); _show_settings(), false, true)
-	_button("배경 음악  ·  " + ("ON / 켜짐" if records.data.music else "OFF / 꺼짐"), Rect2(270, 327, 740, 60), _toggle_music)
-	_button("화면 효과 줄이기  ·  " + ("ON / 켜짐" if records.data.reduced_motion else "OFF / 꺼짐"), Rect2(270, 411, 740, 60), _toggle_motion)
-	_wrap_label("배경 이동·화면 흔들림·장식 연출을 줄입니다. 위험 예고는 계속 표시됩니다.", Rect2(273, 480, 740, 30), 16)
-	_wrap_label("설정·최고 기록·도감은 이 기기/브라우저에 자동 저장됩니다." + (" 저장 실패 · 저장 공간과 권한을 확인하세요." if save_failed else ""), Rect2(270, 523, 740, 52), 17, CORAL if save_failed else MUTED)
-	_button("돌아가기", Rect2(270, 584, 240, 58), _show_menu)
-	_button("오픈 소스 라이선스", Rect2(540, 584, 300, 58), _show_credits)
+	_label("PREFERENCES", Rect2(270, 75, 700, 30), 16, LIME)
+	_label("나에게 맞게", Rect2(270, 115, 760, 65), 44)
+	_button("전체 소리  ·  " + ("OFF / 꺼짐" if records.data.muted else "ON / 켜짐"), Rect2(270, 200, 740, 48), func() -> void: _toggle_mute(); _show_settings(), false, true)
+	_button("배경 음악  ·  " + ("ON / 켜짐" if records.data.music else "OFF / 꺼짐"), Rect2(270, 260, 740, 48), _toggle_music)
+	_button("화면 효과 줄이기  ·  " + ("ON / 켜짐" if records.data.reduced_motion else "OFF / 꺼짐"), Rect2(270, 320, 740, 48), _toggle_motion)
+	for i in 3:
+		var key: String = ["master_volume", "music_volume", "effects_volume"][i]
+		var title: String = ["전체 음량", "음악 음량", "효과음 음량"][i]
+		var y := 389 + i * 54
+		_panel(Rect2(270, y, 740, 46))
+		var label := _label(title + "  %d%%" % roundi(float(records.data[key])*100), Rect2(270,y,228,32), 19)
+		var slider := HSlider.new()
+		slider.position = Vector2(510,y+2)
+		slider.size = Vector2(500,40)
+		slider.min_value = 0
+		slider.max_value = 100
+		slider.step = 5
+		slider.value = float(records.data[key])*100
+		slider.tooltip_text = title
+		slider.value_changed.connect(func(value: float) -> void:
+			records.data[key] = value/100.0
+			label.text = title + "  %d%%" % roundi(value)
+			sound.set_volumes(float(records.data.master_volume),float(records.data.music_volume),float(records.data.effects_volume))
+			save_failed = not records.save_data()
+		)
+		ui.add_child(slider)
+	_wrap_label("설정은 이 기기/브라우저에 저장됩니다." + (" 저장 실패 · 저장 공간을 확인하세요." if save_failed else ""), Rect2(270,552,740,30), 16, CORAL if save_failed else MUTED)
+	_button("돌아가기", Rect2(270,610,240,52), _show_menu)
+	_button("오픈 소스 라이선스", Rect2(540,610,300,52), _show_credits)
 
 func _show_credits() -> void:
 	screen = "credits"
@@ -996,7 +1063,7 @@ func _show_credits() -> void:
 	text.position = Vector2(90, 115)
 	text.size = Vector2(1100, 490)
 	text.add_theme_font_size_override("normal_font_size", 16)
-	text.text = "ORBIT BREAKER / ART\n기체·침공체·전장·FX: 이 프로젝트를 위해 제작한 Imagegen 이미지.\n위성·장착 모듈: Blender 5.2.2 원형의 오프라인 렌더.\n시스템 도해·앱 아이콘: 자체 작성 SVG. 외부 게임의 이미지는 제품에 포함하지 않음.\n원본·재현 스크립트·제작 이력: art_source/\n\nNoto Sans KR · SIL Open Font License 1.1\n" + FileAccess.get_file_as_string("res://assets/fonts/OFL.txt") + "\n\nGodot Engine · https://godotengine.org/license/\n\n" + Engine.get_license_text()
+	text.text = "ORBIT BREAKER / AUDIO\n음악·효과음: 프로젝트 전용 오프라인 작곡/합성. 외부 샘플·음성·곡 없음.\n제작 소스·이력: audio_source/\n\nORBIT BREAKER / ART\n기체·침공체·전장·FX: 이 프로젝트를 위해 제작한 Imagegen 이미지.\n위성·장착 모듈: Blender 5.2.2 원형의 오프라인 렌더.\n시스템 도해·앱 아이콘: 자체 작성 SVG. 외부 게임의 이미지는 제품에 포함하지 않음.\n원본·재현 스크립트·제작 이력: art_source/\n\nNoto Sans KR · SIL Open Font License 1.1\n" + FileAccess.get_file_as_string("res://assets/fonts/OFL.txt") + "\n\nGodot Engine · https://godotengine.org/license/\n\n" + Engine.get_license_text()
 	for component in Engine.get_copyright_info():
 		text.text += "\n\n" + str(component.get("name", ""))
 		for part in component.get("parts", []):
@@ -1106,7 +1173,7 @@ func _pick_upgrade(index: int) -> void:
 	var id: String = str(entry.id) if entry is Dictionary else str(entry)
 	if run.choose_upgrade(id):
 		_collect_progress_notices()
-		sound.play("select")
+		sound.play("ui_upgrade_apply")
 		if run.state == "upgrade":
 			_show_upgrades()
 		else:
@@ -1115,6 +1182,7 @@ func _pick_upgrade(index: int) -> void:
 func _show_result() -> void:
 	screen = "result"
 	var won := run.state == "won"
+	var new_record := run.ranked_score() > int(records.data.best_score)
 	if not saved_result:
 		run._update_run_stats()
 		ghost.capture(run, true)
@@ -1136,7 +1204,8 @@ func _show_result() -> void:
 			ghost_jobs.append({"writer": disposer, "discard": true})
 			disposer.start_background()
 		saved_result = true
-		sound.play("win" if won else "lose")
+		sound.play("run_end_collapse" if run.end_reason == "collapse" else ("run_end_cleared" if won else "run_end_lost"))
+		if new_record and not save_failed: sound.play("ui_record")
 	_clear_ui()
 	_shade()
 	_label("RUN COMPLETE / " + ("VICTORY" if won else "SIGNAL LOST"), Rect2(120, 79, 1060, 30), 17, LIME if won else CORAL)

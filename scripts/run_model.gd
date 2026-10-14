@@ -128,6 +128,14 @@ var _mine_timer := 0.0
 var _axe_timer := 0.0
 var _wake_timer := 0.0
 var loot_notices: Array[String] = []
+var audio_events: Dictionary = {}
+var audio_enabled := false
+
+func _audio(cue: String, at: Vector2 = Vector2.INF) -> void:
+	# Presentation-only, one nearest event per family per frame; no game RNG.
+	if not audio_enabled: return
+	if not audio_events.has(cue) or (at.is_finite() and at.distance_squared_to(player) < Vector2(audio_events[cue]).distance_squared_to(player)):
+		audio_events[cue] = at
 
 func reset(seed_value: int = 0, difficulty: String = "normal", selected_ship: String = "striker", selected_sector: String = "ring") -> void:
 	mode = difficulty if difficulty in Content.MODE_IDS else "normal"
@@ -198,6 +206,7 @@ func reset(seed_value: int = 0, difficulty: String = "normal", selected_ship: St
 	shots.clear()
 	effects.clear()
 	events.clear()
+	audio_events.clear()
 	upgrades.clear()
 	orbit_angle = 0.0
 	orbit_count = int(_ship.orbits)
@@ -383,6 +392,7 @@ func step(delta: float, move: Vector2, dash_pressed: bool, dash_aim: Vector2 = V
 		guard_cooldown = 8.0 if guard_stacks < guard_capacity() else 0.0
 	event_remaining = maxf(0.0, event_remaining - dt)
 	dash_cooldown = maxf(0.0, dash_cooldown - dt * (1.0 + buff_value("haste") / 100.0))
+	if dash_pressed and dash_cooldown > 0.0: _audio("ui_denied")
 	invulnerable = maxf(0.0, invulnerable - dt)
 	_combo_timer = maxf(0.0, _combo_timer - dt)
 	if _combo_timer <= 0.0:
@@ -721,6 +731,7 @@ func _update_enemies(dt: float, old_position: Vector2) -> void:
 			var movement := direction
 			if enemy.kind == "boss" and int(enemy.phase) == 1 and float(enemy.hp) <= float(enemy.max_hp) * 0.5 and float(enemy.hp) > 0.0:
 				enemy.phase = 2
+				_audio("boss_phase", enemy.pos)
 				enemy.shot_timer = 0.8
 				_announce("지휘체 격앙 · 탄막 강화", "phase")
 			var tangent := direction.orthogonal() * float(enemy.flank_side)
@@ -743,6 +754,7 @@ func _update_enemies(dt: float, old_position: Vector2) -> void:
 				enemy.shot_timer -= dt
 				if float(enemy.shot_timer) <= 0.0:
 					enemy.warn = 1.1 if enemy.kind == "elite" else 0.70
+					_audio("enemy_attack_charge", enemy.pos)
 					enemy.aim = (player + (player - old_position) / maxf(dt, 0.001) * 0.25 - Vector2(enemy.pos)).normalized() if enemy.kind == "runner" else direction
 					enemy.shot_timer = (1.35 if int(enemy.phase) == 2 else 1.8) if enemy.kind == "boss" else 3.5
 			if float(enemy.charge_time) > 0.0:
@@ -767,6 +779,7 @@ func _update_enemies(dt: float, old_position: Vector2) -> void:
 				var orb := _orbit_positions[j]
 				if orb.distance_squared_to(enemy.pos) <= pow(float(enemy.radius) + (17.0 if evolutions.has("superorbit") else 10.0), 2):
 					var kind := orbit_kind(j)
+					_audio("weapon_orbit_" + (kind if kind in ["blade", "frost"] else "normal"), enemy.pos)
 					_hit_enemy(enemy, 25.0 * power * (1.2 if evolutions.has("ellipse") else 1.0) * (1.6 + 0.15 * evolution_mastery("superorbit") if evolutions.has("superorbit") else 1.0) * (1.0 + 0.35 * float(upgrades.get("blade", 0))) * ((1.12 + 0.12 * evolution_mastery("blizzard") if evolutions.has("blizzard") else 0.8) if kind == "frost" else 1.0))
 					if kind == "frost":
 						var rank := float(upgrades.get("frost", 0))
@@ -803,10 +816,12 @@ func _fire_player_shot() -> void:
 		var aim := direction.rotated((barrel - battery * 0.5) * 0.16)
 		shots.append({"pos": player, "velocity": aim * (780.0 if evolutions.has("rail") else 590.0), "friendly": true, "radius": 5.0, "damage": 19.0 * _power() * (1.0 + focus_bonus()) * (1.35 + 0.15 * mastery if evolutions.has("rail") else 1.0), "ttl": 1.45, "pierce": (3 + mastery if evolutions.has("rail") else 1) + (1 if battery == 2 else 0), "hit_ids": []})
 	events.append("shot")
+	_audio("weapon_rail" if evolutions.has("rail") else "weapon_cannon", player)
 
 func _fire_enemy_shots(enemy: Dictionary) -> void:
 	if enemy.kind == "elite" and int(enemy.elite_index) == 1:
 		enemy.charge_time = 0.6
+		_audio("enemy_attack_charge", enemy.pos)
 		return
 	if shots.size() >= 220:
 		return
@@ -853,6 +868,7 @@ func _update_shots(dt: float) -> void:
 			if not bool(shot.get("returning", false)):
 				shot.returning = true
 				shot.hit_ids = []
+				_audio("weapon_hatchet_return", shot.pos)
 			shot.velocity = (player - Vector2(shot.pos)).normalized() * 540.0
 		if shot.get("kind", "") == "missile":
 			var target := _nearest_enemy(shot.pos, 700.0)
@@ -863,6 +879,7 @@ func _update_shots(dt: float) -> void:
 		shot.ttl -= dt
 		if kind == "axe" and bool(shot.get("returning", false)) and Geometry2D.get_closest_point_to_segment(player, previous, shot.pos).distance_to(player) <= 25.0:
 			axe_catches = mini(8, axe_catches + 1)
+			_audio("weapon_hatchet_catch")
 			_axe_timer = 0.0
 			_effect(player, "reward", 48.0, 0.3)
 			shots.remove_at(i)
@@ -883,6 +900,7 @@ func _update_shots(dt: float) -> void:
 							if Vector2(splash.pos).distance_to(enemy.pos) < float(shot.blast_radius) + float(splash.radius):
 								_hit_enemy(splash, float(shot.damage))
 						_effect(enemy.pos, "pulse", float(shot.blast_radius), 0.30)
+						_audio("weapon_missile_impact", enemy.pos)
 					else:
 						_hit_enemy(enemy, float(shot.damage))
 					shot.pierce = int(shot.get("pierce", 1)) - 1
@@ -899,6 +917,7 @@ func _update_shots(dt: float) -> void:
 		if float(shot.ttl) <= 0.0:
 			if kind == "axe":
 				axe_catches = 0
+				_audio("weapon_hatchet_miss")
 			shots.remove_at(i)
 
 func _shot_candidates(start: Vector2, end: Vector2, radius: float) -> Array:
@@ -931,6 +950,8 @@ func take_damage(amount: float, source: String = "combat", origin: Vector2 = Vec
 				if not bool(shot.friendly) and player.distance_to(shot.pos) <= radius:
 					shot.ttl = 0.0
 		_effect(player, "guard", radius, 0.35)
+		_audio("weapon_citadel" if evolutions.has("citadel") else "guard_block")
+	var previous_hp := hp
 	focus_time *= 0.65
 	_mission_add("survive", 1.0)
 	hp = maxf(0.0, hp - _absorb_damage(amount * (0.75 if mode == "relaxed" else 1.0) * float(_mode.damage) * (0.55 if overdrive_time > 0.0 else 1.0) * (1.0 - 0.04 * int(parts.get("shell", 0)))))
@@ -939,6 +960,7 @@ func take_damage(amount: float, source: String = "combat", origin: Vector2 = Vec
 	_effect(player, "hurt", 32.0, 0.3)
 	_effect(player, "impact_" + source, 54.0, 0.45, origin)
 	events.append("hurt")
+	if hp < previous_hp: _audio("player_hurt")
 	if hp <= 0.0:
 		_finish_run("combat")
 
@@ -946,6 +968,7 @@ func _hit_enemy(enemy: Dictionary, damage: float) -> void:
 	if float(enemy.hp) <= 0.0:
 		return
 	enemy.hp -= damage
+	_audio("enemy_hit_heavy" if enemy.kind in ["tank", "elite", "boss"] else "enemy_hit_light", enemy.pos)
 	enemy.flash = 0.12
 	_effect(enemy.pos, "hit", 22.0, 0.20, player)
 	if not events.has("hit"):
@@ -991,6 +1014,7 @@ func _kill_enemy(enemy: Dictionary) -> void:
 		_announce("정예 격파 · 경험치 +%d · 점수 +%d" % [roundi(12 * risk_multiplier()), bonus], "elite_down")
 	_effect(enemy.pos, "death", float(enemy.radius) * 1.7, 0.35)
 	events.append("kill")
+	_audio("boss_down" if enemy.kind == "boss" else ("enemy_destroy_elite" if enemy.kind == "elite" else ("enemy_destroy_heavy" if enemy.kind == "tank" else "enemy_destroy_small")), enemy.pos)
 
 func _collect_gems(dt: float) -> void:
 	var magnet := 86.0 + float(upgrades.get("magnet", 0)) * 38.0
@@ -1031,6 +1055,7 @@ func _check_level() -> void:
 
 func activate_overdrive() -> bool:
 	if state != "playing" or overdrive_meter < 100.0 or overdrive_time > 0.0:
+		_audio("ui_denied")
 		return false
 	overdrive_meter = 0.0
 	overdrive_time = 6.0
@@ -1119,6 +1144,7 @@ func _update_weapons(dt: float) -> void:
 		_pulse_timer = 4.3 * (1.0 - 0.12 * evolution_mastery("nova"))
 		var radius := 125.0 + float(pulse_rank) * 25.0 + (55.0 + 15.0 * evolution_mastery("nova") if evolutions.has("nova") else 0.0)
 		_effect(player, "pulse", radius, 0.55)
+		_audio("weapon_pulse", player)
 		if evolutions.has("nova"):
 			for i in range(shots.size() - 1, -1, -1):
 				if not bool(shots[i].friendly) and player.distance_squared_to(shots[i].pos) <= radius * radius:
@@ -1134,6 +1160,7 @@ func _add_blast(position: Vector2, radius: float) -> void:
 		return
 	radius *= 1.0 + 0.35 * hazard_pressure()
 	var point := CENTER + (position - CENTER).limit_length(ACTIVITY_RADIUS - radius)
+	_audio("hazard_charge_blast", point)
 	hazards.append({"kind": "blast", "pos": point, "radius": radius, "rect": Rect2(), "warn": 1.6, "ttl": 0.35, "active": false})
 
 func focus_bonus() -> float:
@@ -1151,11 +1178,13 @@ func guard_capacity() -> int:
 func _absorb_damage(amount: float) -> float:
 	if buffs.has("shield"):
 		var absorbed := minf(amount, buff_value("shield"))
+		if absorbed > 0.0: _audio("shield_absorb")
 		amount -= absorbed
 		buffs.shield.value -= absorbed
 		if float(buffs.shield.value) <= 0.0:
 			buffs.erase("shield")
 			loot_notices.append("붕괴 흡수막 소진")
+			_audio("shield_break")
 	return amount
 
 func _deploy(kind: String, at: Vector2, lifetime: float, radius: float) -> void:
@@ -1164,6 +1193,7 @@ func _deploy(kind: String, at: Vector2, lifetime: float, radius: float) -> void:
 		count += int(shot.get("kind", "") == kind)
 	if shots.size() >= 240 or count >= (3 if kind == "sentry" else (8 if kind == "mine" else 6)):
 		return
+	_audio({"sentry":"weapon_sentry_place", "mine":"weapon_mine_place", "wake":"weapon_wake"}[kind], at)
 	shots.append({"kind": kind, "pos": at, "velocity": Vector2.ZERO, "radius": radius, "friendly": true, "damage": 0.0, "ttl": lifetime, "armed": 0.6 if kind == "mine" else 0.0, "fire_timer": 0.0})
 
 func _update_evolved_weapons(dt: float) -> void:
@@ -1180,11 +1210,14 @@ func _update_evolved_weapons(dt: float) -> void:
 		var target := _nearest_enemy(player, 700.0)
 		if not target.is_empty():
 			_axe_timer = 2.8
+			_audio("weapon_hatchet_throw", player)
 			shots.append({"kind": "axe", "pos": player, "velocity": (Vector2(target.pos) - player).normalized() * 390.0, "friendly": true, "radius": 12.0, "damage": 58.0 * _power() * (1.0 + 0.15 * axe_catches + 0.1 * evolution_mastery("hatchet")), "ttl": 4.0, "pierce": 64, "hit_ids": [], "returning": false})
 
 func _update_deployed(shot: Dictionary, dt: float) -> void:
 	shot.ttl -= dt
+	var previous_armed := float(shot.get("armed", 0.0))
 	shot.armed = maxf(0.0, float(shot.get("armed", 0.0)) - dt)
+	if shot.kind == "mine" and previous_armed > 0.0 and float(shot.armed) <= 0.0: _audio("weapon_mine_arm", shot.pos)
 	shot.fire_timer = float(shot.get("fire_timer", 0.0)) - dt
 	if float(shot.ttl) <= 0.0 or float(shot.armed) > 0.0 or float(shot.fire_timer) > 0.0:
 		return
@@ -1206,6 +1239,7 @@ func _update_deployed(shot: Dictionary, dt: float) -> void:
 	_effect(origin, "pulse", radius, 0.28)
 	shot.fire_timer = 0.35
 	if shot.kind == "mine":
+		_audio("weapon_mine_blast", origin)
 		shot.ttl = 0.0
 
 func hazard_pressure() -> float:
@@ -1221,6 +1255,7 @@ func _add_lane(lateral: float = 0.0) -> void:
 	var offset := clampf(target, -radius + width, radius - width)
 	var half_length := radius
 	var rect := Rect2(CENTER + Vector2(offset - width * 0.5, -half_length), Vector2(width, half_length * 2.0)) if vertical else Rect2(CENTER + Vector2(-half_length, offset - width * 0.5), Vector2(half_length * 2.0, width))
+	_audio("hazard_charge_lane", rect.get_center())
 	hazards.append({"kind": "lane", "pos": rect.get_center(), "radius": 0.0, "rect": rect, "warn": 1.5, "ttl": 1.1, "active": false})
 
 func _update_hazards(dt: float) -> void:
@@ -1245,8 +1280,10 @@ func _update_hazards(dt: float) -> void:
 			hazard.warn = maxf(0.0, float(hazard.warn) - dt)
 			if ENCOUNTERS.has(hazard.kind) and ceili(float(hazard.warn)) < previous_warning and previous_warning <= 4:
 				events.append("event_warning")
+				_audio("event_countdown")
 			if float(hazard.warn) <= 0.0:
 				hazard.active = true
+				_audio("event_active_" + str(hazard.kind) if ENCOUNTERS.has(hazard.kind) else "hazard_strike_" + str(hazard.kind), hazard.pos)
 				_effect(hazard.pos, "hazard_start", maxf(40.0, float(hazard.radius)), 0.5)
 				events.append("event_start" if ENCOUNTERS.has(hazard.kind) else "hazard_start")
 			continue
@@ -1255,6 +1292,7 @@ func _update_hazards(dt: float) -> void:
 		if ENCOUNTERS.has(hazard.kind):
 			_update_encounter(hazard, dt, previous_ttl)
 			if float(hazard.ttl) <= 0.0:
+				_audio("event_end_" + str(hazard.kind))
 				hazards.remove_at(i)
 			continue
 		var overlaps: bool = Rect2(hazard.rect).grow(PLAYER_RADIUS * 0.65).has_point(player) if hazard.kind == "lane" else player.distance_to(hazard.pos) < float(hazard.radius) + PLAYER_RADIUS
@@ -1285,6 +1323,7 @@ func _add_encounter(kind: String, position: Vector2 = Vector2.INF) -> bool:
 	_last_encounter = kind
 	_encounter_timer = encounter_interval()
 	events.append("event_warning")
+	_audio("event_warn_" + kind)
 	return true
 
 func gravity_pull(position: Vector2) -> Vector2:
@@ -1313,7 +1352,10 @@ static func meteor_points(hazard: Dictionary) -> Array[Vector2]:
 func _update_encounter(hazard: Dictionary, dt: float, previous_ttl: float) -> void:
 	match str(hazard.kind):
 		"planet":
+			var previous_hold := float(hazard.get("hold", 0.0))
 			hazard.hold = float(hazard.get("hold", 0.0)) + dt if player.distance_to(hazard.pos) <= float(hazard.radius) + PLAYER_RADIUS else 0.0
+			if previous_hold > 0.0 and float(hazard.hold) == 0.0: _audio("planet_reset")
+			elif floori(float(hazard.hold)) > floori(previous_hold): _audio("planet_hold")
 			if float(hazard.hold) >= 12.0:
 				_grant_score(5000)
 				xp += 45.0
@@ -1347,6 +1389,12 @@ func _update_run_stats() -> void:
 	run_stats["hull_forms"] = hull_forms.duplicate()
 
 func _effect(position: Vector2, kind: String, radius: float, lifetime: float, end: Vector2 = Vector2.INF) -> void:
+	if audio_enabled:
+		match kind:
+			"fire": _audio("enemy_attack_fire", position)
+			"missile": _audio("weapon_missile_launch", position)
+			"lightning": _audio("weapon_sentry_fire" if lifetime < 0.15 else "weapon_chain", position)
+			"meteor_impact": _audio("hazard_strike_meteor", position)
 	if effects.size() < 180:
 		var effect := {"pos": position, "kind": kind, "ttl": lifetime, "max_ttl": lifetime, "radius": radius}
 		if end.is_finite():
@@ -1380,13 +1428,16 @@ func _update_items(dt: float) -> void:
 		buffs[id].ttl = maxf(0.0, float(buffs[id].ttl) - dt)
 		if float(buffs[id].ttl) <= 0.0:
 			buffs.erase(id)
+			_audio("buff_end")
 	for i: int in range(items.size() - 1, -1, -1):
 		items[i].pos = _drift_loot(items[i].pos, dt)
 		var previous_ttl := float(items[i].ttl)
 		items[i].ttl -= dt
 		if previous_ttl > 10.0 and float(items[i].ttl) <= 10.0:
+			_audio("loot_expire_soon")
 			loot_notices.append("보급 소멸까지 10초 · %s %s" % [items[i].grade, ItemCatalog.info(str(items[i].id)).name])
 		if float(items[i].ttl) <= 0.0:
+			_audio("loot_expire_gone")
 			loot_notices.append("보급 소멸 · %s %s" % [items[i].grade, ItemCatalog.info(str(items[i].id)).name])
 			items.remove_at(i)
 	_drop_cooldown = maxf(0.0, _drop_cooldown - dt)
@@ -1411,6 +1462,7 @@ func apply_item(id: String, grade: String, risky: bool = false) -> bool:
 	var info := ItemCatalog.info(id, grade)
 	if state != "playing" or info.is_empty():
 		return false
+	var previous_shield: Dictionary = buffs.get("shield", {}).duplicate()
 	if float(info.duration) > 0.0:
 		# Stronger effects replace weaker ones; weaker pickups cannot prolong an A buff.
 		if not buffs.has(id) or (ItemCatalog.GRADES.find(grade) >= ItemCatalog.GRADES.find(str(buffs[id].grade)) if id == "shield" else float(info.value) >= float(buffs[id].value)):
@@ -1429,6 +1481,7 @@ func apply_item(id: String, grade: String, risky: bool = false) -> bool:
 		if id == "emp":
 			shots = shots.filter(func(shot: Dictionary) -> bool: return bool(shot.friendly) or player.distance_to(shot.pos) > float(info.radius))
 		_effect(player, "pulse", float(info.radius), 0.6)
+	_audio("loot_item_" + id + "_" + grade if id != "shield" or previous_shield != buffs.get("shield", {}) else "loot_score_bonus")
 	items_collected += 1
 	pending_items.append({"id": id, "grade": grade, "risky": risky})
 	_effect(player, "pickup", 38.0, 0.4)
@@ -1509,8 +1562,11 @@ func collect_part(id: String) -> bool:
 			hull_forms.append(recipe_id)
 			pending_tech.append({"kind": "hull", "id": recipe_id})
 			events.append("hull_evolution")
+			_audio("growth_hull_II" if hull_rank(recipe_id) >= 2 else "growth_hull_I")
 	_effect(player, "reward", 85.0, 0.6)
 	events.append("part_pickup")
+	_audio("loot_part_" + id)
+	if int(parts.get(id, 0)) >= 6: _audio("loot_part_overflow")
 	_update_run_stats()
 	return true
 
@@ -1533,12 +1589,14 @@ func _update_expedition(dt: float, previous: Vector2) -> void:
 		var previous_ttl := float(drop.ttl)
 		drop.ttl -= dt
 		if previous_ttl > 10.0 and float(drop.ttl) <= 10.0:
+			_audio("loot_expire_soon")
 			loot_notices.append("파츠 소멸까지 10초 · " + str(Expedition.part(str(drop.id)).name))
 		var reachable := not bool(drop.locked) or boundary_layer(player) >= 2
 		if reachable and Geometry2D.get_closest_point_to_segment(drop.pos, previous, player).distance_to(drop.pos) <= 30.0:
 			collect_part(str(drop.id))
 			part_drops.remove_at(i)
 		elif float(drop.ttl) <= 0.0:
+			_audio("loot_expire_gone")
 			loot_notices.append("파츠 소멸 · " + str(Expedition.part(str(drop.id)).name))
 			part_drops.remove_at(i)
 	if elapsed >= _explore_at:

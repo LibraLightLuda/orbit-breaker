@@ -7,6 +7,7 @@ static func apply(game: Node2D) -> void:
 	var window := Vector2(DisplayServer.window_get_size())
 	if (window.x >= 900 and not game.touch_mode) or window.x < 1:
 		return
+	var paged_pregame: bool = game.screen in ["records", "help", "settings", "credits"] or (game.screen == "arsenal" and game.codex_return != "pause") or (game.screen == "hangar" and (window.y < 340 or (window.y > window.x and window.y < 600)))
 	var controls: Array[Control] = []
 	for child in game.ui.get_children():
 		if child is Control and child.name != "Shade":
@@ -18,10 +19,15 @@ static func apply(game: Node2D) -> void:
 		for child in controls.duplicate():
 			if child == panel or child is Panel:
 				continue
-			if Rect2(panel.position, panel.size).encloses(Rect2(child.position, child.size)):
+			var panel_rect := Rect2(panel.position, panel.size)
+			# Wrapped labels can grow beyond their original card before responsive layout runs.
+			if (paged_pregame and panel_rect.has_point(child.position)) or (not paged_pregame and panel_rect.encloses(Rect2(child.position, child.size))):
 				child.position -= panel.position
 				child.reparent(panel, false)
 				controls.erase(child)
+	if paged_pregame:
+		_fit_pregame(game, controls, window)
+		return
 	if game.screen in ["menu", "hangar", "upgrade"]:
 		_fit_core(game, controls, window)
 		return
@@ -56,6 +62,170 @@ static func apply(game: Node2D) -> void:
 		launch.size = Vector2(window.x - 40, 56)
 		game.ui.move_child(launch, game.ui.get_child_count() - 1)
 
+static func _fit_pregame(game: Node2D, controls: Array[Control], window: Vector2) -> void:
+	game.ui.set_meta("fitted_menu", true)
+	game.ui.size = window
+	game.ui.scale = Vector2.ONE * game.get_viewport_rect().size.x / window.x
+	game.ui.get_parent().offset = Vector2.ZERO
+	var tabs: Array[Control] = []
+	var footer: Array[Control] = []
+	var items: Array[Control] = []
+	var title := {"records":"작전 기록", "arsenal":"도감", "help":"플레이 방법", "settings":"설정", "credits":"라이선스", "hangar":"출격 준비"}.get(game.screen, "") as String
+	controls.sort_custom(func(a: Control, b: Control) -> bool: return a.position.x < b.position.x if is_equal_approx(a.position.y, b.position.y) else a.position.y < b.position.y)
+	for c in controls:
+		if c is Button and ((game.screen == "hangar" and (c.text == "돌아가기" or int(c.get_meta("flow_order", 0)) == 750)) or (game.screen != "hangar" and (c.position.y >= 600 or (game.screen == "records" and c.position.y >= 565)))):
+			footer.append(c)
+		elif c is Button and ((game.screen == "arsenal" and c.position.y < 80) or (game.screen == "records" and c.position.y < 280)):
+			tabs.append(c)
+		elif (game.screen == "hangar" and c is Panel) or (c is Label and c.position.y < 180 and (c.position.y < 80 or c.get_theme_font_size("font_size") >= 30 or c.text.contains(" / ") or c.text == "파일럿 이름")):
+			c.hide()
+			c.set_meta("pregame_redundant", true)
+		else:
+			items.append(c)
+	var width := window.x - 24
+	var y := 8.0
+	var heading: Label = game._label(title, Rect2(12, y, width, 28), 22)
+	heading.name = "PregameHeading"
+	y += 36
+	if window.y < 420 and not tabs.is_empty():
+		heading.hide()
+		y = 8
+	var tab_cols := mini(4 if window.x >= 500 else 3, tabs.size())
+	for i in tabs.size():
+		_place(tabs[i], Rect2(12 + i % tab_cols * (width + 8) / tab_cols, y + i / tab_cols * 48, (width - 8 * (tab_cols - 1)) / tab_cols, 44), 14)
+	y += ceili(float(tabs.size()) / maxi(1, tab_cols)) * 48
+	var footer_cols := mini(2 if window.x < 600 else 4, footer.size())
+	var short_footer := window.y < 420 and window.x >= 500
+	var bottom: float = window.y - 60 - (0.0 if short_footer else ceili(float(footer.size()) / maxi(1, footer_cols)) * 48)
+	for i in footer.size():
+		if short_footer:
+			_place(footer[i], Rect2(108 + i * (window.x - 208) / footer.size(), window.y - 52, (window.x - 216) / footer.size() - 8, 44), 14)
+		else:
+			_place(footer[i], Rect2(12 + i % footer_cols * (width + 8) / footer_cols, bottom + 8 + i / footer_cols * 48, (width - 8 * (footer_cols - 1)) / footer_cols, 44), 14)
+	var available: float = bottom - y - 8
+	if game.screen == "arsenal":
+		# Open on an item/card; auxiliary guidance must not consume a whole first page.
+		for c in items.duplicate():
+			if c is Label:
+				items.erase(c)
+				items.append(c)
+	var pages: Array = [[]]
+	var used := 0.0
+	var expanded: Array[Control] = []
+	for c in items:
+		if window.y < 340 and game.screen == "arsenal" and game.codex_tab == "weapons" and c is Panel:
+			for child in c.get_children():
+				if child is Label and child.text.begins_with("EVOLUTION /"): child.set_meta("pregame_redundant", true)
+		if window.y < 420 and game.screen == "arsenal" and game.codex_tab == "items" and game.item_detail.is_empty() and c is Button and c.text.is_empty():
+			for i in range(2, c.get_child_count()): c.get_child(i).set_meta("pregame_redundant", true)
+			var hint: Label = game._wrap_label("C / B / A · 터치해 등급별 효과 보기", Rect2(), 14, game.MUTED, c)
+			hint.position.y = 40
+		if c is RichTextLabel:
+			# Preserve every license character while replacing its internal scrolling with pages.
+			var remaining: String = c.text
+			var measure: Label = game._wrap_label("", Rect2(0, 0, width, 0), 14)
+			measure.hide()
+			while not remaining.is_empty():
+				var lo := 1
+				var hi := remaining.length()
+				while lo < hi:
+					var mid := ceili((lo + hi) / 2.0)
+					# shortcut: reserve space for license tab shaping; use TextParagraph if the font changes.
+					if _text_height(measure, remaining.left(mid), width, 14) <= available * 0.75 - 8: lo = mid
+					else: hi = mid - 1
+				var part: Label = game._wrap_label(remaining.left(lo), Rect2(), 14)
+				part.set_meta("license_fragment", true)
+				expanded.append(part)
+				remaining = remaining.substr(lo)
+			game.ui.remove_child(measure)
+			measure.queue_free()
+			c.hide()
+		else:
+			expanded.append(c)
+	for c in expanded:
+		var height := _pregame_height(c, width, 14 if window.y < 340 else 16)
+		if used > 0 and used + height > available:
+			pages.append([])
+			used = 0
+		_place(c, Rect2(12, y + used, width, height), c.get_theme_font_size("font_size") if c is Label else 16)
+		c.hide()
+		c.set_meta("pregame_content", true)
+		pages[-1].append(c)
+		used += height + 8
+	var key: String = game.screen + (game.records_tab + game.ranking_mode if game.screen == "records" else (game.codex_tab + str(game.tech_page) + str(game.item_page) + str(game.arsenal_page) + game.item_detail if game.screen == "arsenal" else ""))
+	var cursors: Dictionary = game.get_meta("pregame_cursors", {})
+	var page := 0
+	for i in pages.size():
+		if not pages[i].is_empty() and expanded.find(pages[i][0]) <= int(cursors.get(key, 0)): page = i
+	var previous: Button = game._button("← 이전", Rect2(12, window.y - 52, 92, 44), func() -> void: pass)
+	previous.name = "PregamePrevious"
+	var next: Button = game._button("다음 →", Rect2(window.x - 104, window.y - 52, 92, 44), func() -> void: pass)
+	next.name = "PregameNext"
+	_place(previous, Rect2(12, window.y - 52, 92, 44), 16)
+	_place(next, Rect2(window.x - 104, window.y - 52, 92, 44), 16)
+	var indicator: Label = game._label("", Rect2(108, window.y - 44, window.x - 216, 30), 16)
+	indicator.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	indicator.visible = not short_footer
+	var show_page := func(index: int) -> void:
+		cursors[key] = expanded.find(pages[index][0]) if not pages[index].is_empty() else 0
+		game.set_meta("pregame_cursors", cursors)
+		for p in pages.size():
+			for c in pages[p]: c.visible = p == index
+		previous.disabled = index == 0
+		next.disabled = index == pages.size() - 1
+		indicator.text = "%d / %d" % [index + 1, pages.size()]
+		if short_footer: next.text = "%d/%d →" % [index + 1, pages.size()]
+		game.ui.set_meta("pregame_page_count", pages.size())
+		game.ui.set_meta("pregame_page", index)
+	previous.pressed.connect(func() -> void: show_page.call(int(game.ui.get_meta("pregame_page")) - 1))
+	next.pressed.connect(func() -> void: show_page.call(int(game.ui.get_meta("pregame_page")) + 1))
+	show_page.call(page)
+
+static func _pregame_height(c: Control, width: float, font_size: int = 16) -> float:
+	if c is Button and not c.text.is_empty():
+		for child in c.get_children(): child.hide()
+		return 44
+	if c is Label:
+		if not c.has_meta("license_fragment"): c.text = c.text.trim_suffix("\n")
+		var fs := 14 if c.has_meta("license_fragment") else font_size
+		c.add_theme_font_size_override("font_size", fs)
+		c.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		c.size.x = width
+		return maxf(24, _text_height(c, c.text, width, fs) + 4)
+	if c is Panel or (c is Button and c.text.is_empty() and c.get_child_count() > 0):
+		var children := c.get_children()
+		children.sort_custom(func(a: Control, b: Control) -> bool: return a.position.y < b.position.y)
+		var y := 6.0
+		var has_icon := false
+		for child in children:
+			if child.has_meta("pregame_redundant"):
+				child.hide()
+				continue
+			if child.get_script() in [preload("res://scripts/ui_glyph.gd"), preload("res://scripts/item_icon.gd")]:
+				_place(child, Rect2(10, 6, 28, 28))
+				has_icon = true
+		for child in children:
+			if child.has_meta("pregame_redundant"):
+				child.hide()
+				continue
+			if child.get_script() in [preload("res://scripts/ui_glyph.gd"), preload("res://scripts/item_icon.gd")]:
+				continue
+			var inset := 48.0 if has_icon and y < 34 else 10.0
+			var height := _pregame_height(child, width - inset - 10, font_size)
+			_place(child, Rect2(inset, y, width - inset - 10, height), font_size)
+			y += height + 2
+		return y + 2
+	if c is ColorRect: return 4
+	if c.get_script() == preload("res://scripts/ui_glyph.gd"): return 28
+	return 44
+
+static func _text_height(label: Label, text: String, width: float, fs: int) -> float:
+	var font := label.get_theme_font("font")
+	# Label reserves a final empty line that Font's string measurement omits.
+	var measured := text.replace("\t", "    ") + ("." if text.ends_with("\n") else "")
+	var height := font.get_multiline_string_size(measured, HORIZONTAL_ALIGNMENT_LEFT, width, fs, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE).y
+	return height + maxi(0, roundi(height / font.get_height(fs)) - 1) * label.get_theme_constant("line_spacing")
+
 static func _place(control: Control, rect: Rect2, font_size: int = 16) -> void:
 	control.position = rect.position
 	control.visible = true
@@ -86,19 +256,20 @@ static func _fit_core(game: Node2D, controls: Array[Control], window: Vector2) -
 	for control in controls: control.hide()
 	match game.screen:
 		"menu":
+			var short_window := h < 420
 			var buttons: Array[Control] = []
 			for c in controls:
 				if c is Button: buttons.append(c)
 				if c is Label and c.text == "오빗 브레이커":
-					_place(c, Rect2(16, h * 0.1, w - 32, 54), 32 if portrait else 38)
+					_place(c, Rect2(16, 8 if short_window else h * 0.1, w - 32, 38 if short_window else 54), 28 if short_window else (32 if portrait else 38))
 				if c is Label and c.text == "돌진하고, 성장하고, 궤도를 지켜라.":
-					_place(c, Rect2(16, h * 0.1 + 60, w - 32, 30), 16)
+					_place(c, Rect2(16, 50 if short_window else h * 0.1 + 60, w - 32, 24 if short_window else 30), 16)
 				if c is Label and c.text.begins_with("최고 "):
 					_place(c, Rect2(16, h - 42, w - 32, 30), 13)
-			var start := maxf(h * 0.33, h * 0.1 + 98)
+			var start := 82.0 if short_window else maxf(h * 0.33, h * 0.1 + 98)
 			var cols := 1 if portrait else 2
 			var rows := ceili(float(buttons.size()) / cols)
-			var bh := minf(64, (h - start - 62) / rows - gap)
+			var bh := maxf(44, minf(64, (h - start - 62) / rows - gap))
 			for i in buttons.size():
 				var bw := (w - 32 - gap * (cols - 1)) / cols
 				_place(buttons[i], Rect2(16 + (i % cols) * (bw + gap), start + (i / cols) * (bh + gap), bw, bh), 18)

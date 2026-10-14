@@ -15,6 +15,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $projectRoot 'project.godot') -PathT
 function Invoke-GodotChecked {
     param([string[]]$Arguments, [string]$SuccessPattern = '')
 
+	if ('--audio-driver' -notin $Arguments) { $Arguments = @('--audio-driver', 'Dummy') + $Arguments }
     $ErrorActionPreference = 'Continue'
     $output = @(& $GodotPath @Arguments 2>&1)
     $exitCode = $LASTEXITCODE
@@ -36,6 +37,9 @@ $outputPath = Join-Path $buildDirectory 'OrbitBreaker.exe'
 New-Item -ItemType Directory -Path $buildDirectory -Force | Out-Null
 
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--editor', '--quit')
+
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_audio.gd') `
+    -SuccessPattern '(?m)^AUDIO SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_feedback_mobile.gd') `
     -SuccessPattern '(?m)^MOBILEFEEDBACK SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
@@ -85,6 +89,9 @@ Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_art.gd') `
     -SuccessPattern '(?m)^ART SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 
+Invoke-GodotChecked -Arguments @('--path', $projectRoot, '--audio-driver', 'Dummy', '--script', 'res://tests/test_pregame.gd') `
+    -SuccessPattern '(?m)^PREGAME SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--export-release', 'Windows Desktop', $outputPath)
 if (-not (Test-Path -LiteralPath $outputPath -PathType Leaf)) {
     throw "Export returned success without creating $outputPath"
@@ -96,5 +103,5 @@ finally { $buildHash.Dispose() }
 $webDirectory = Join-Path $buildDirectory 'web'
 New-Item -ItemType Directory -Path $webDirectory -Force | Out-Null
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--export-release', 'Web', (Join-Path $webDirectory 'index.html'))
-Invoke-GodotChecked -Arguments @('--path', $projectRoot, '--audio-driver', 'Dummy', '--quit-after', '180')
+Invoke-GodotChecked -Arguments @('--path', $projectRoot, '--audio-driver', 'Dummy', '--script', 'res://tests/audio_smoke.gd') -SuccessPattern 'AUDIO SMOKE COMPLETE'
 Write-Host 'Candidate exported. Promote only after the exported executable and browser checks pass. Existing release remains untouched.'

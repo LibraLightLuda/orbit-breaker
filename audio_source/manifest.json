@@ -1,0 +1,3274 @@
+{
+  "version": 1,
+  "generator": "audio_source/generate_audio.py",
+  "seed": 20261013,
+  "rate": 48000,
+  "provenance": "Original deterministic synthesis/composition for Orbit Breaker. No third-party samples, voices, songs or recordings.",
+  "cues": {
+    "ui_focus": {
+      "paths": [
+        "res://assets/audio/ui/ui_focus_1.wav"
+      ],
+      "gain": -21,
+      "priority": 3,
+      "interval": 0.08,
+      "bus": "UI"
+    },
+    "ui_confirm": {
+      "paths": [
+        "res://assets/audio/ui/ui_confirm_1.wav"
+      ],
+      "gain": -15,
+      "priority": 3,
+      "interval": 0.08,
+      "bus": "UI"
+    },
+    "ui_back": {
+      "paths": [
+        "res://assets/audio/ui/ui_back_1.wav"
+      ],
+      "gain": -15,
+      "priority": 3,
+      "interval": 0.08,
+      "bus": "UI"
+    },
+    "ui_change": {
+      "paths": [
+        "res://assets/audio/ui/ui_change_1.wav"
+      ],
+      "gain": -15,
+      "priority": 3,
+      "interval": 0.08,
+      "bus": "UI"
+    },
+    "ui_denied": {
+      "paths": [
+        "res://assets/audio/ui/ui_denied_1.wav"
+      ],
+      "gain": -15,
+      "priority": 3,
+      "interval": 0.5,
+      "bus": "UI"
+    },
+    "ui_toggle_on": {
+      "paths": [
+        "res://assets/audio/ui/ui_toggle_on_1.wav"
+      ],
+      "gain": -15,
+      "priority": 3,
+      "interval": 0.08,
+      "bus": "UI"
+    },
+    "ui_toggle_off": {
+      "paths": [
+        "res://assets/audio/ui/ui_toggle_off_1.wav"
+      ],
+      "gain": -15,
+      "priority": 3,
+      "interval": 0.08,
+      "bus": "UI"
+    },
+    "ui_pause_open": {
+      "paths": [
+        "res://assets/audio/ui/ui_pause_open_1.wav"
+      ],
+      "gain": -15,
+      "priority": 3,
+      "interval": 0.08,
+      "bus": "UI"
+    },
+    "ui_pause_close": {
+      "paths": [
+        "res://assets/audio/ui/ui_pause_close_1.wav"
+      ],
+      "gain": -15,
+      "priority": 3,
+      "interval": 0.08,
+      "bus": "UI"
+    },
+    "ui_launch": {
+      "paths": [
+        "res://assets/audio/ui/ui_launch_1.wav"
+      ],
+      "gain": -15,
+      "priority": 2,
+      "interval": 0.4,
+      "bus": "UI"
+    },
+    "ui_upgrade_open": {
+      "paths": [
+        "res://assets/audio/ui/ui_upgrade_open_1.wav"
+      ],
+      "gain": -15,
+      "priority": 2,
+      "interval": 0.4,
+      "bus": "UI"
+    },
+    "ui_upgrade_apply": {
+      "paths": [
+        "res://assets/audio/ui/ui_upgrade_apply_1.wav"
+      ],
+      "gain": -15,
+      "priority": 2,
+      "interval": 0.4,
+      "bus": "UI"
+    },
+    "ui_record": {
+      "paths": [
+        "res://assets/audio/ui/ui_record_1.wav"
+      ],
+      "gain": -15,
+      "priority": 2,
+      "interval": 0.4,
+      "bus": "UI"
+    },
+    "ui_achievement": {
+      "paths": [
+        "res://assets/audio/ui/ui_achievement_1.wav"
+      ],
+      "gain": -15,
+      "priority": 2,
+      "interval": 0.4,
+      "bus": "UI"
+    },
+    "ui_discovery": {
+      "paths": [
+        "res://assets/audio/ui/ui_discovery_1.wav"
+      ],
+      "gain": -15,
+      "priority": 2,
+      "interval": 0.4,
+      "bus": "UI"
+    },
+    "ui_save_error": {
+      "paths": [
+        "res://assets/audio/ui/ui_save_error_1.wav"
+      ],
+      "gain": -15,
+      "priority": 2,
+      "interval": 0.4,
+      "bus": "UI"
+    },
+    "ship_dash": {
+      "paths": [
+        "res://assets/audio/combat/ship_dash_1.wav"
+      ],
+      "gain": -13,
+      "priority": 1,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "ship_dash_ready": {
+      "paths": [
+        "res://assets/audio/combat/ship_dash_ready_1.wav"
+      ],
+      "gain": -26,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "ship_overdrive_ready": {
+      "paths": [
+        "res://assets/audio/combat/ship_overdrive_ready_1.wav"
+      ],
+      "gain": -22,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "ship_overdrive_start": {
+      "paths": [
+        "res://assets/audio/combat/ship_overdrive_start_1.wav"
+      ],
+      "gain": -12,
+      "priority": 1,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "ship_overdrive_end": {
+      "paths": [
+        "res://assets/audio/combat/ship_overdrive_end_1.wav"
+      ],
+      "gain": -21,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "ship_focus_ready": {
+      "paths": [
+        "res://assets/audio/combat/ship_focus_ready_1.wav"
+      ],
+      "gain": -26,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "ship_guard_ready": {
+      "paths": [
+        "res://assets/audio/combat/ship_guard_ready_1.wav"
+      ],
+      "gain": -24,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_cannon": {
+      "paths": [
+        "res://assets/audio/combat/weapon_cannon_1.wav",
+        "res://assets/audio/combat/weapon_cannon_2.wav",
+        "res://assets/audio/combat/weapon_cannon_3.wav"
+      ],
+      "gain": -22,
+      "priority": 3,
+      "interval": 0.075,
+      "bus": "Combat"
+    },
+    "weapon_rail": {
+      "paths": [
+        "res://assets/audio/combat/weapon_rail_1.wav",
+        "res://assets/audio/combat/weapon_rail_2.wav",
+        "res://assets/audio/combat/weapon_rail_3.wav"
+      ],
+      "gain": -21,
+      "priority": 3,
+      "interval": 0.075,
+      "bus": "Combat"
+    },
+    "weapon_orbit_normal": {
+      "paths": [
+        "res://assets/audio/combat/weapon_orbit_normal_1.wav",
+        "res://assets/audio/combat/weapon_orbit_normal_2.wav",
+        "res://assets/audio/combat/weapon_orbit_normal_3.wav"
+      ],
+      "gain": -24,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_orbit_blade": {
+      "paths": [
+        "res://assets/audio/combat/weapon_orbit_blade_1.wav",
+        "res://assets/audio/combat/weapon_orbit_blade_2.wav",
+        "res://assets/audio/combat/weapon_orbit_blade_3.wav"
+      ],
+      "gain": -25,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_orbit_frost": {
+      "paths": [
+        "res://assets/audio/combat/weapon_orbit_frost_1.wav",
+        "res://assets/audio/combat/weapon_orbit_frost_2.wav",
+        "res://assets/audio/combat/weapon_orbit_frost_3.wav"
+      ],
+      "gain": -25,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_missile_launch": {
+      "paths": [
+        "res://assets/audio/combat/weapon_missile_launch_1.wav",
+        "res://assets/audio/combat/weapon_missile_launch_2.wav",
+        "res://assets/audio/combat/weapon_missile_launch_3.wav"
+      ],
+      "gain": -24,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_missile_impact": {
+      "paths": [
+        "res://assets/audio/combat/weapon_missile_impact_1.wav",
+        "res://assets/audio/combat/weapon_missile_impact_2.wav",
+        "res://assets/audio/combat/weapon_missile_impact_3.wav"
+      ],
+      "gain": -20,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_chain": {
+      "paths": [
+        "res://assets/audio/combat/weapon_chain_1.wav",
+        "res://assets/audio/combat/weapon_chain_2.wav",
+        "res://assets/audio/combat/weapon_chain_3.wav"
+      ],
+      "gain": -23,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_pulse": {
+      "paths": [
+        "res://assets/audio/combat/weapon_pulse_1.wav",
+        "res://assets/audio/combat/weapon_pulse_2.wav",
+        "res://assets/audio/combat/weapon_pulse_3.wav"
+      ],
+      "gain": -20,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_sentry_place": {
+      "paths": [
+        "res://assets/audio/combat/weapon_sentry_place_1.wav",
+        "res://assets/audio/combat/weapon_sentry_place_2.wav"
+      ],
+      "gain": -23,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_sentry_fire": {
+      "paths": [
+        "res://assets/audio/combat/weapon_sentry_fire_1.wav",
+        "res://assets/audio/combat/weapon_sentry_fire_2.wav",
+        "res://assets/audio/combat/weapon_sentry_fire_3.wav"
+      ],
+      "gain": -26,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_wake": {
+      "paths": [
+        "res://assets/audio/combat/weapon_wake_1.wav",
+        "res://assets/audio/combat/weapon_wake_2.wav",
+        "res://assets/audio/combat/weapon_wake_3.wav"
+      ],
+      "gain": -24,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_citadel": {
+      "paths": [
+        "res://assets/audio/combat/weapon_citadel_1.wav",
+        "res://assets/audio/combat/weapon_citadel_2.wav"
+      ],
+      "gain": -16,
+      "priority": 1,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_hatchet_throw": {
+      "paths": [
+        "res://assets/audio/combat/weapon_hatchet_throw_1.wav",
+        "res://assets/audio/combat/weapon_hatchet_throw_2.wav"
+      ],
+      "gain": -21,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_hatchet_return": {
+      "paths": [
+        "res://assets/audio/combat/weapon_hatchet_return_1.wav",
+        "res://assets/audio/combat/weapon_hatchet_return_2.wav"
+      ],
+      "gain": -23,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_hatchet_catch": {
+      "paths": [
+        "res://assets/audio/combat/weapon_hatchet_catch_1.wav",
+        "res://assets/audio/combat/weapon_hatchet_catch_2.wav"
+      ],
+      "gain": -15,
+      "priority": 1,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_hatchet_miss": {
+      "paths": [
+        "res://assets/audio/combat/weapon_hatchet_miss_1.wav"
+      ],
+      "gain": -23,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_mine_place": {
+      "paths": [
+        "res://assets/audio/combat/weapon_mine_place_1.wav",
+        "res://assets/audio/combat/weapon_mine_place_2.wav"
+      ],
+      "gain": -25,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_mine_arm": {
+      "paths": [
+        "res://assets/audio/combat/weapon_mine_arm_1.wav"
+      ],
+      "gain": -29,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "weapon_mine_blast": {
+      "paths": [
+        "res://assets/audio/combat/weapon_mine_blast_1.wav",
+        "res://assets/audio/combat/weapon_mine_blast_2.wav",
+        "res://assets/audio/combat/weapon_mine_blast_3.wav"
+      ],
+      "gain": -21,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "enemy_hit_light": {
+      "paths": [
+        "res://assets/audio/combat/enemy_hit_light_1.wav",
+        "res://assets/audio/combat/enemy_hit_light_2.wav",
+        "res://assets/audio/combat/enemy_hit_light_3.wav"
+      ],
+      "gain": -27,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "enemy_hit_heavy": {
+      "paths": [
+        "res://assets/audio/combat/enemy_hit_heavy_1.wav",
+        "res://assets/audio/combat/enemy_hit_heavy_2.wav",
+        "res://assets/audio/combat/enemy_hit_heavy_3.wav"
+      ],
+      "gain": -25,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "enemy_destroy_small": {
+      "paths": [
+        "res://assets/audio/combat/enemy_destroy_small_1.wav",
+        "res://assets/audio/combat/enemy_destroy_small_2.wav",
+        "res://assets/audio/combat/enemy_destroy_small_3.wav"
+      ],
+      "gain": -25,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "enemy_destroy_heavy": {
+      "paths": [
+        "res://assets/audio/combat/enemy_destroy_heavy_1.wav",
+        "res://assets/audio/combat/enemy_destroy_heavy_2.wav",
+        "res://assets/audio/combat/enemy_destroy_heavy_3.wav"
+      ],
+      "gain": -23,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "enemy_destroy_elite": {
+      "paths": [
+        "res://assets/audio/combat/enemy_destroy_elite_1.wav",
+        "res://assets/audio/combat/enemy_destroy_elite_2.wav",
+        "res://assets/audio/combat/enemy_destroy_elite_3.wav"
+      ],
+      "gain": -17,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "enemy_attack_charge": {
+      "paths": [
+        "res://assets/audio/combat/enemy_attack_charge_1.wav",
+        "res://assets/audio/combat/enemy_attack_charge_2.wav"
+      ],
+      "gain": -21,
+      "priority": 1,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "enemy_attack_fire": {
+      "paths": [
+        "res://assets/audio/combat/enemy_attack_fire_1.wav",
+        "res://assets/audio/combat/enemy_attack_fire_2.wav",
+        "res://assets/audio/combat/enemy_attack_fire_3.wav"
+      ],
+      "gain": -27,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "boss_arrive": {
+      "paths": [
+        "res://assets/audio/combat/boss_arrive_1.wav"
+      ],
+      "gain": -14,
+      "priority": 1,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "boss_phase": {
+      "paths": [
+        "res://assets/audio/combat/boss_phase_1.wav"
+      ],
+      "gain": -14,
+      "priority": 1,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "boss_down": {
+      "paths": [
+        "res://assets/audio/combat/boss_down_1.wav"
+      ],
+      "gain": -12,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "player_hurt": {
+      "paths": [
+        "res://assets/audio/combat/player_hurt_1.wav",
+        "res://assets/audio/combat/player_hurt_2.wav",
+        "res://assets/audio/combat/player_hurt_3.wav"
+      ],
+      "gain": -12,
+      "priority": 1,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "guard_block": {
+      "paths": [
+        "res://assets/audio/combat/guard_block_1.wav",
+        "res://assets/audio/combat/guard_block_2.wav",
+        "res://assets/audio/combat/guard_block_3.wav"
+      ],
+      "gain": -14,
+      "priority": 1,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "shield_absorb": {
+      "paths": [
+        "res://assets/audio/combat/shield_absorb_1.wav",
+        "res://assets/audio/combat/shield_absorb_2.wav"
+      ],
+      "gain": -24,
+      "priority": 3,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "shield_break": {
+      "paths": [
+        "res://assets/audio/combat/shield_break_1.wav"
+      ],
+      "gain": -16,
+      "priority": 1,
+      "interval": 0.12,
+      "bus": "Combat"
+    },
+    "loot_xp": {
+      "paths": [
+        "res://assets/audio/feedback/loot_xp_1.wav",
+        "res://assets/audio/feedback/loot_xp_2.wav",
+        "res://assets/audio/feedback/loot_xp_3.wav"
+      ],
+      "gain": -29,
+      "priority": 3,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "loot_score_bonus": {
+      "paths": [
+        "res://assets/audio/feedback/loot_score_bonus_1.wav"
+      ],
+      "gain": -26,
+      "priority": 3,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "loot_heal": {
+      "paths": [
+        "res://assets/audio/feedback/loot_heal_1.wav"
+      ],
+      "gain": -16,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "loot_part_spawn": {
+      "paths": [
+        "res://assets/audio/feedback/loot_part_spawn_1.wav"
+      ],
+      "gain": -22,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "loot_part_core": {
+      "paths": [
+        "res://assets/audio/feedback/loot_part_core_1.wav"
+      ],
+      "gain": -14,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "loot_part_drive": {
+      "paths": [
+        "res://assets/audio/feedback/loot_part_drive_1.wav"
+      ],
+      "gain": -14,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "loot_part_shell": {
+      "paths": [
+        "res://assets/audio/feedback/loot_part_shell_1.wav"
+      ],
+      "gain": -14,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "loot_part_overflow": {
+      "paths": [
+        "res://assets/audio/feedback/loot_part_overflow_1.wav"
+      ],
+      "gain": -24,
+      "priority": 3,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "growth_weapon": {
+      "paths": [
+        "res://assets/audio/feedback/growth_weapon_1.wav"
+      ],
+      "gain": -14,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "growth_hull_I": {
+      "paths": [
+        "res://assets/audio/feedback/growth_hull_I_1.wav"
+      ],
+      "gain": -14,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "growth_hull_II": {
+      "paths": [
+        "res://assets/audio/feedback/growth_hull_II_1.wav"
+      ],
+      "gain": -13,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "loot_expire_soon": {
+      "paths": [
+        "res://assets/audio/feedback/loot_expire_soon_1.wav"
+      ],
+      "gain": -27,
+      "priority": 3,
+      "interval": 2.0,
+      "bus": "Feedback"
+    },
+    "loot_expire_gone": {
+      "paths": [
+        "res://assets/audio/feedback/loot_expire_gone_1.wav"
+      ],
+      "gain": -29,
+      "priority": 3,
+      "interval": 2.0,
+      "bus": "Feedback"
+    },
+    "buff_end": {
+      "paths": [
+        "res://assets/audio/feedback/buff_end_1.wav"
+      ],
+      "gain": -27,
+      "priority": 3,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "mission_preview": {
+      "paths": [
+        "res://assets/audio/feedback/mission_preview_1.wav"
+      ],
+      "gain": -20,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "mission_start": {
+      "paths": [
+        "res://assets/audio/feedback/mission_start_1.wav"
+      ],
+      "gain": -20,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "mission_progress": {
+      "paths": [
+        "res://assets/audio/feedback/mission_progress_1.wav"
+      ],
+      "gain": -28,
+      "priority": 3,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "mission_deadline": {
+      "paths": [
+        "res://assets/audio/feedback/mission_deadline_1.wav"
+      ],
+      "gain": -23,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "mission_failed": {
+      "paths": [
+        "res://assets/audio/feedback/mission_failed_1.wav"
+      ],
+      "gain": -22,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "planet_hold": {
+      "paths": [
+        "res://assets/audio/feedback/planet_hold_1.wav"
+      ],
+      "gain": -29,
+      "priority": 3,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "planet_reset": {
+      "paths": [
+        "res://assets/audio/feedback/planet_reset_1.wav"
+      ],
+      "gain": -26,
+      "priority": 3,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "planet_success": {
+      "paths": [
+        "res://assets/audio/feedback/planet_success_1.wav"
+      ],
+      "gain": -15,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "planet_end": {
+      "paths": [
+        "res://assets/audio/feedback/planet_end_1.wav"
+      ],
+      "gain": -24,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "run_breakthrough": {
+      "paths": [
+        "res://assets/audio/feedback/run_breakthrough_1.wav"
+      ],
+      "gain": -12,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "run_end_cleared": {
+      "paths": [
+        "res://assets/audio/feedback/run_end_cleared_1.wav"
+      ],
+      "gain": -12,
+      "priority": 0,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "run_end_lost": {
+      "paths": [
+        "res://assets/audio/feedback/run_end_lost_1.wav"
+      ],
+      "gain": -13,
+      "priority": 0,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "run_end_collapse": {
+      "paths": [
+        "res://assets/audio/feedback/run_end_collapse_1.wav"
+      ],
+      "gain": -12,
+      "priority": 0,
+      "interval": 0.25,
+      "bus": "Feedback"
+    },
+    "mission_success_C": {
+      "paths": [
+        "res://assets/audio/feedback/mission_success_C_1.wav"
+      ],
+      "gain": -17,
+      "priority": 2,
+      "interval": 0.4,
+      "bus": "Feedback"
+    },
+    "loot_item_power_C": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_power_C_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_drive_C": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_drive_C_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_repair_C": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_repair_C_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_stun_C": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_stun_C_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_emp_C": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_emp_C_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_data_C": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_data_C_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_bounty_C": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_bounty_C_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_shield_C": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_shield_C_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "mission_success_B": {
+      "paths": [
+        "res://assets/audio/feedback/mission_success_B_1.wav"
+      ],
+      "gain": -17,
+      "priority": 2,
+      "interval": 0.4,
+      "bus": "Feedback"
+    },
+    "loot_item_power_B": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_power_B_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_drive_B": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_drive_B_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_repair_B": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_repair_B_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_stun_B": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_stun_B_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_emp_B": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_emp_B_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_data_B": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_data_B_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_bounty_B": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_bounty_B_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_shield_B": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_shield_B_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "mission_success_A": {
+      "paths": [
+        "res://assets/audio/feedback/mission_success_A_1.wav"
+      ],
+      "gain": -17,
+      "priority": 2,
+      "interval": 0.4,
+      "bus": "Feedback"
+    },
+    "loot_item_power_A": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_power_A_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_drive_A": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_drive_A_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_repair_A": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_repair_A_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_stun_A": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_stun_A_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_emp_A": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_emp_A_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_data_A": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_data_A_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_bounty_A": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_bounty_A_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "loot_item_shield_A": {
+      "paths": [
+        "res://assets/audio/feedback/loot_item_shield_A_1.wav"
+      ],
+      "gain": -19,
+      "priority": 2,
+      "interval": 0.12,
+      "bus": "Feedback"
+    },
+    "warn_hull_low": {
+      "paths": [
+        "res://assets/audio/warnings/warn_hull_low_1.wav"
+      ],
+      "gain": -16,
+      "priority": 0,
+      "interval": 3,
+      "bus": "Warnings"
+    },
+    "warn_hull_critical": {
+      "paths": [
+        "res://assets/audio/warnings/warn_hull_critical_1.wav"
+      ],
+      "gain": -13,
+      "priority": 0,
+      "interval": 0.7,
+      "bus": "Warnings"
+    },
+    "warn_decay_rise": {
+      "paths": [
+        "res://assets/audio/warnings/warn_decay_rise_1.wav"
+      ],
+      "gain": -19,
+      "priority": 1,
+      "interval": 2,
+      "bus": "Warnings"
+    },
+    "warn_boundary_enter": {
+      "paths": [
+        "res://assets/audio/warnings/warn_boundary_enter_1.wav"
+      ],
+      "gain": -22,
+      "priority": 1,
+      "interval": 0.5,
+      "bus": "Warnings"
+    },
+    "warn_boundary_deep": {
+      "paths": [
+        "res://assets/audio/warnings/warn_boundary_deep_1.wav"
+      ],
+      "gain": -18,
+      "priority": 1,
+      "interval": 0.5,
+      "bus": "Warnings"
+    },
+    "warn_boundary_return": {
+      "paths": [
+        "res://assets/audio/warnings/warn_boundary_return_1.wav"
+      ],
+      "gain": -25,
+      "priority": 1,
+      "interval": 0.5,
+      "bus": "Warnings"
+    },
+    "warn_final_collapse": {
+      "paths": [
+        "res://assets/audio/warnings/warn_final_collapse_1.wav"
+      ],
+      "gain": -14,
+      "priority": 1,
+      "interval": 5,
+      "bus": "Warnings"
+    },
+    "event_countdown": {
+      "paths": [
+        "res://assets/audio/warnings/event_countdown_1.wav"
+      ],
+      "gain": -18,
+      "priority": 0,
+      "interval": 0.5,
+      "bus": "Warnings"
+    },
+    "hazard_charge_lane": {
+      "paths": [
+        "res://assets/audio/warnings/hazard_charge_lane_1.wav"
+      ],
+      "gain": -18,
+      "priority": 0,
+      "interval": 0.5,
+      "bus": "Warnings"
+    },
+    "hazard_charge_blast": {
+      "paths": [
+        "res://assets/audio/warnings/hazard_charge_blast_1.wav"
+      ],
+      "gain": -18,
+      "priority": 0,
+      "interval": 0.5,
+      "bus": "Warnings"
+    },
+    "hazard_strike_lane": {
+      "paths": [
+        "res://assets/audio/warnings/hazard_strike_lane_1.wav"
+      ],
+      "gain": -20,
+      "priority": 1,
+      "interval": 0.12,
+      "bus": "Warnings"
+    },
+    "hazard_strike_blast": {
+      "paths": [
+        "res://assets/audio/warnings/hazard_strike_blast_1.wav"
+      ],
+      "gain": -19,
+      "priority": 1,
+      "interval": 0.12,
+      "bus": "Warnings"
+    },
+    "hazard_strike_meteor": {
+      "paths": [
+        "res://assets/audio/warnings/hazard_strike_meteor_1.wav"
+      ],
+      "gain": -19,
+      "priority": 1,
+      "interval": 0.12,
+      "bus": "Warnings"
+    },
+    "event_warn_black_hole": {
+      "paths": [
+        "res://assets/audio/warnings/event_warn_black_hole_1.wav"
+      ],
+      "gain": -18,
+      "priority": 0,
+      "interval": 0.25,
+      "bus": "Warnings"
+    },
+    "event_active_black_hole": {
+      "paths": [
+        "res://assets/audio/warnings/event_active_black_hole_1.wav"
+      ],
+      "gain": -21,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Warnings"
+    },
+    "event_end_black_hole": {
+      "paths": [
+        "res://assets/audio/warnings/event_end_black_hole_1.wav"
+      ],
+      "gain": -21,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Warnings"
+    },
+    "event_warn_meteor": {
+      "paths": [
+        "res://assets/audio/warnings/event_warn_meteor_1.wav"
+      ],
+      "gain": -18,
+      "priority": 0,
+      "interval": 0.25,
+      "bus": "Warnings"
+    },
+    "event_active_meteor": {
+      "paths": [
+        "res://assets/audio/warnings/event_active_meteor_1.wav"
+      ],
+      "gain": -21,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Warnings"
+    },
+    "event_end_meteor": {
+      "paths": [
+        "res://assets/audio/warnings/event_end_meteor_1.wav"
+      ],
+      "gain": -21,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Warnings"
+    },
+    "event_warn_flare": {
+      "paths": [
+        "res://assets/audio/warnings/event_warn_flare_1.wav"
+      ],
+      "gain": -18,
+      "priority": 0,
+      "interval": 0.25,
+      "bus": "Warnings"
+    },
+    "event_active_flare": {
+      "paths": [
+        "res://assets/audio/warnings/event_active_flare_1.wav"
+      ],
+      "gain": -21,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Warnings"
+    },
+    "event_end_flare": {
+      "paths": [
+        "res://assets/audio/warnings/event_end_flare_1.wav"
+      ],
+      "gain": -21,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Warnings"
+    },
+    "event_warn_planet": {
+      "paths": [
+        "res://assets/audio/warnings/event_warn_planet_1.wav"
+      ],
+      "gain": -18,
+      "priority": 0,
+      "interval": 0.25,
+      "bus": "Warnings"
+    },
+    "event_active_planet": {
+      "paths": [
+        "res://assets/audio/warnings/event_active_planet_1.wav"
+      ],
+      "gain": -21,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Warnings"
+    },
+    "event_end_planet": {
+      "paths": [
+        "res://assets/audio/warnings/event_end_planet_1.wav"
+      ],
+      "gain": -21,
+      "priority": 2,
+      "interval": 0.25,
+      "bus": "Warnings"
+    }
+  },
+  "tracks": {
+    "mus_menu": {
+      "path": "res://assets/audio/music/mus_menu.ogg",
+      "gain": 0
+    },
+    "mus_battle_bed": {
+      "path": "res://assets/audio/music/mus_battle_bed.ogg",
+      "gain": 0
+    },
+    "mus_battle_drive": {
+      "path": "res://assets/audio/music/mus_battle_drive.ogg",
+      "gain": 0
+    },
+    "mus_battle_pressure": {
+      "path": "res://assets/audio/music/mus_battle_pressure.ogg",
+      "gain": 0
+    },
+    "amb_ring": {
+      "path": "res://assets/audio/ambience/amb_ring.ogg",
+      "gain": 0
+    },
+    "amb_storm": {
+      "path": "res://assets/audio/ambience/amb_storm.ogg",
+      "gain": 0
+    },
+    "amb_forge": {
+      "path": "res://assets/audio/ambience/amb_forge.ogg",
+      "gain": 0
+    },
+    "ship_drive": {
+      "path": "res://assets/audio/ambience/ship_drive.ogg",
+      "gain": 0
+    },
+    "warn_decay_bed": {
+      "path": "res://assets/audio/ambience/warn_decay_bed.ogg",
+      "gain": 0
+    }
+  },
+  "assets": [
+    {
+      "path": "assets/audio/ui/ui_focus_1.wav",
+      "frames": 6720,
+      "seconds": 0.14,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "BFB352F9EF311381E438E060322663329DCF151E446A55678431DAE0851D3992",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/ui/ui_confirm_1.wav",
+      "frames": 6720,
+      "seconds": 0.14,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "EF2C4801B93151396C3E3F748EB14F4383C05E79D39A638236B4ACEE329127CE",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/ui/ui_back_1.wav",
+      "frames": 6720,
+      "seconds": 0.14,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "1ADC3B1E7E62955BE1AA36DC8D6B8775FA7995E5370FA63B3EDDD95C6AE4965B",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/ui/ui_change_1.wav",
+      "frames": 6720,
+      "seconds": 0.14,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "73CA760CB1168990AB4D1611C8D0B6095B55D425B29A5B22E0CC4ABAE285ED84",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/ui/ui_denied_1.wav",
+      "frames": 6720,
+      "seconds": 0.14,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "2E2C0AF4D81CA19CE2B98CFD4FE6D8542108C5B15A7AB1C1449E96AB6F4B9162",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/ui/ui_toggle_on_1.wav",
+      "frames": 6720,
+      "seconds": 0.14,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "9FD86FF1ADFA791F25F2C0C927B6F534B0821D52549FD69DB322D41CBDC3BD05",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/ui/ui_toggle_off_1.wav",
+      "frames": 6720,
+      "seconds": 0.14,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "D70C4A26FE092DAB62E5EAC9060BE7FE994686AD3D555109C053E4B4BFB4AF79",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/ui/ui_pause_open_1.wav",
+      "frames": 6720,
+      "seconds": 0.14,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "6DDF1A16B9B7E31514B0301CB13A3A0A7CE551C03E53102A3E30DFBEF4ED9475",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/ui/ui_pause_close_1.wav",
+      "frames": 6720,
+      "seconds": 0.14,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "6F618B278ADEF6F567D84290085D0F864A7A3CE5649B7B0D32DF2A12AEE53867",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/ui/ui_launch_1.wav",
+      "frames": 45600,
+      "seconds": 0.95,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "9742B68533B18768ECEA452FAAE1F2764B9D092AE2B85F9E8D34F78B27F75635",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/ui/ui_upgrade_open_1.wav",
+      "frames": 22080,
+      "seconds": 0.46,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "A1A71B13FE5B5DDD099EE0C930EF493E73F3B97A09568C21ABF912A59E3B3FAA",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/ui/ui_upgrade_apply_1.wav",
+      "frames": 18240,
+      "seconds": 0.38,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "D62C07D031998C1A211C752570751E4CCDE83608AE815F69658878454C559670",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/ui/ui_record_1.wav",
+      "frames": 38400,
+      "seconds": 0.8,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "F3BEA8558BEBFC051923B716565876DB1AE1DBD2D49C9A6022E7C477B2895CB4",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/ui/ui_achievement_1.wav",
+      "frames": 24000,
+      "seconds": 0.5,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "7840DA610486D52FB5735B0FCC9F374EC8F5CB7A9CC4638F481ACBD095E56787",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/ui/ui_discovery_1.wav",
+      "frames": 16800,
+      "seconds": 0.35,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "B3D6897E36C11280649C13C17EF5B3EFDD017EC82A7E3F2A28A4705789FFD74B",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/ui/ui_save_error_1.wav",
+      "frames": 10560,
+      "seconds": 0.22,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "AD76028461B2E03C9D7138707F1E02A45160BBEC9FDD9FE27C1DEB846ABF16BB",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/ship_dash_1.wav",
+      "frames": 11520,
+      "seconds": 0.24,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "6F1159FA29E0728DAF78CFC9E7DA9FC19034DC752B3D0BCBB405AEC6A5A3880E",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/ship_dash_ready_1.wav",
+      "frames": 3840,
+      "seconds": 0.08,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "FF610A7018DFDB43D023F9BDDD8E0C449B9D1C18E0D07486CB5FB113CE27F026",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/ship_overdrive_ready_1.wav",
+      "frames": 10560,
+      "seconds": 0.22,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "EB32594FAA05C38BF7FA6499A236C4B4B23E654BAABEA4E419E6A5401905E0C5",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/ship_overdrive_start_1.wav",
+      "frames": 28800,
+      "seconds": 0.6,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "4CFB6D7B6E6E36CF201482D29A9C9AC83DEABD7EB7E0B1901AA201BDA5DD84AF",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/ship_overdrive_end_1.wav",
+      "frames": 10560,
+      "seconds": 0.22,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "922EC328C3CAFF44212B42CE959098F66100EC898760EFC27F354CBAFCB3B4A5",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/ship_focus_ready_1.wav",
+      "frames": 4800,
+      "seconds": 0.1,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "6F9BA3A30FB28CF6F8E47CA566508B8F57DF6BDEC5A77E3A45E6E168438258F6",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/ship_guard_ready_1.wav",
+      "frames": 7200,
+      "seconds": 0.15,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "4EB6374051A609183F266B9FA1C1BE16409C2D4560124563AD81100A2CAA2580",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/weapon_cannon_1.wav",
+      "frames": 4800,
+      "seconds": 0.1,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "73F8C37B5ABC2DD7E555C080B8B524DBC9EE614EF0EE597FD7171B344B0C7D29",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_cannon_2.wav",
+      "frames": 4800,
+      "seconds": 0.1,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "DDAC98D98E1AFDB5FE65CA49E9BACF11CBA0074A36ED87E57ED1F62AA4B05B3C",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_cannon_3.wav",
+      "frames": 4800,
+      "seconds": 0.1,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "F513DD749E18E5C37AA4728F72604302BCBF65CFAFFCDDCEBC0D085F576A7FBE",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_rail_1.wav",
+      "frames": 6720,
+      "seconds": 0.14,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "171836B7B60AC6FA83BBEC01C5404244631F9A28AB8327DC5F7BA34D34088F78",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_rail_2.wav",
+      "frames": 6720,
+      "seconds": 0.14,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "EF1E555693CE1C60EFDB89AF5391233B55D2DAFF791653E91C72F7C2C00DF311",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_rail_3.wav",
+      "frames": 6720,
+      "seconds": 0.14,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "14B059BF1A93307D0489186CCC5ADA86FB9AA33BFC0ABCCF0D848B0530DC7223",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/weapon_orbit_normal_1.wav",
+      "frames": 4800,
+      "seconds": 0.1,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "CDA895AFDB3883514E536D9436581219EEEB00B0E9B8294A58EDCBC301EE8948",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_orbit_normal_2.wav",
+      "frames": 4800,
+      "seconds": 0.1,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "41C0B9998FE88ED6890077CBE3F43324BED36D08323E17AB04F0FD88DDFA41E1",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_orbit_normal_3.wav",
+      "frames": 4800,
+      "seconds": 0.1,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "CC90D6489C4B6971441095803FD70EF3688C8CF294CF6383125E87DEE0B392CC",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_orbit_blade_1.wav",
+      "frames": 6240,
+      "seconds": 0.13,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "7C4C97BE60669737E29ED8A4B0D8925929B30B299F54953D3BF133F55F638D62",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_orbit_blade_2.wav",
+      "frames": 6240,
+      "seconds": 0.13,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "9160F845CED299F1105A5463493842AEC84CA5F5F952A55BA8EDCFC9F407C9F2",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/weapon_orbit_blade_3.wav",
+      "frames": 6240,
+      "seconds": 0.13,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "5C8612C9E573E2D74F455B3B2E78286E89393E8C10A8466723EA3E92D5ADC836",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_orbit_frost_1.wav",
+      "frames": 7680,
+      "seconds": 0.16,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "E846E943C8CD19E34CB2D1EFB909083670A726EF87435D8B8560163E84A64E69",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_orbit_frost_2.wav",
+      "frames": 7680,
+      "seconds": 0.16,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "221E28233D1A163F040A59E164CCBDD5ACA3A9E611A07C351C819C53096A3CEE",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_orbit_frost_3.wav",
+      "frames": 7680,
+      "seconds": 0.16,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "7AADDBCF49EF7942489293E054C590A8CEF5A917B08D8D1FA0F79326E2CAD01C",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_missile_launch_1.wav",
+      "frames": 8640,
+      "seconds": 0.18,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "BA8255E60FD83C46BEF02A2F17FB7B3CCDCAB5BC5A3716684A4F628DC1CF4498",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/weapon_missile_launch_2.wav",
+      "frames": 8640,
+      "seconds": 0.18,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "A8F093D200E61415381D124FEF41FD69D62CF4BE7D2FFE24188D7EF53C02D3B4",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_missile_launch_3.wav",
+      "frames": 8640,
+      "seconds": 0.18,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "03F66AA9C2B09DEE4353DC3414E3780D6916B8A3C5D11EE3DE873B176CD63958",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_missile_impact_1.wav",
+      "frames": 17280,
+      "seconds": 0.36,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "E60FA594E2B9F2D5AAFFAE20947C5170454D6993FA096F7B914F96EA94A2587E",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_missile_impact_2.wav",
+      "frames": 17280,
+      "seconds": 0.36,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "1408F173AD4BA285225F3DBFD99213D277438D32F0E51A1CD8F0D8F101BF90C1",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_missile_impact_3.wav",
+      "frames": 17280,
+      "seconds": 0.36,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "5CC94516E1DF0D4B1764CD68CB7C6B244B6D80CBDE3E0B85E3499719624CB41D",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_chain_1.wav",
+      "frames": 9600,
+      "seconds": 0.2,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "64197579774C99A79D723521AA550F5C636F9384F0F4AAFDC9019D2E2CDCA07B",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_chain_2.wav",
+      "frames": 9600,
+      "seconds": 0.2,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "998F0686639D0BD722C97FCE1C25CEDB8CAA7E5608754B5220709C560B2F5AA5",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/weapon_chain_3.wav",
+      "frames": 9600,
+      "seconds": 0.2,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "9D3E5DB7A1396534040501C1B403B471B5836C55FE45157EB7D66EBE10A42A6B",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_pulse_1.wav",
+      "frames": 19200,
+      "seconds": 0.4,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "EE5116DB6E1EA81A75C3D6FD4D309A2E8B52BA14FBC0222DBF4A7EF9A264E233",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_pulse_2.wav",
+      "frames": 19200,
+      "seconds": 0.4,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "055053E1DCFAEEB4DB7F48CC0CF30896DB78DC240E4FD1738697E95DB4B22CCA",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/weapon_pulse_3.wav",
+      "frames": 19200,
+      "seconds": 0.4,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "94CB2C85ADFC65D78C1DA54C32B579F830AE9F6A00E59861700BBDDB91C92BF6",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_sentry_place_1.wav",
+      "frames": 11520,
+      "seconds": 0.24,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "DE7ED6CEDA8A67ECC580F8B59805E2947507374EB210A6340377E591D30AB32C",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_sentry_place_2.wav",
+      "frames": 11520,
+      "seconds": 0.24,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "952FE1F6C74C78CD8C0D02693B05E0008FC50960B98EDC5B9A576B0B5DDA3E4E",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_sentry_fire_1.wav",
+      "frames": 3840,
+      "seconds": 0.08,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "34FFAC3E53A2456B4140260F915216B865D31DCAF058AB22A9590706C39306BC",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/weapon_sentry_fire_2.wav",
+      "frames": 3840,
+      "seconds": 0.08,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "0C315D24FD480275908A351C9805753B68CAC8A5188FB25C2C58F4F349206E94",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_sentry_fire_3.wav",
+      "frames": 3840,
+      "seconds": 0.08,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "4E245453360BE9461631887313878F3288ECF510DB3669F14C34FE16E6103239",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_wake_1.wav",
+      "frames": 14400,
+      "seconds": 0.3,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "B4E9F16C7FF723BB375388D41894DE114F623A889875699AC9F0794A455355A8",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_wake_2.wav",
+      "frames": 14400,
+      "seconds": 0.3,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "515F16D7136D39BD4F551AE5A7FD07DCDE0A7444FBA4DAB6B04D1957B808FE65",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/weapon_wake_3.wav",
+      "frames": 14400,
+      "seconds": 0.3,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "401865047F65D8356A3B0D4E5D9FD7C446D4051502C566C6E907D938ED140AF9",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_citadel_1.wav",
+      "frames": 19200,
+      "seconds": 0.4,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "F9E126217D249DFB5F601C39B29475DF65E408E36741B54D61CB0616586632AC",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/weapon_citadel_2.wav",
+      "frames": 19200,
+      "seconds": 0.4,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "953FBCAAA9A687500D9CDD211A7C360EE98F828D9E24D642CC2CA5DE93AA29D6",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/weapon_hatchet_throw_1.wav",
+      "frames": 9600,
+      "seconds": 0.2,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "B654F57FE610AAFD1720C6BE57D7049EC3F381429338B36B05488DA800763E5B",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/weapon_hatchet_throw_2.wav",
+      "frames": 9600,
+      "seconds": 0.2,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "218ED4767F1E1BC353D383660D44AE64E28E63677A9F52EE47E6079381C05929",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_hatchet_return_1.wav",
+      "frames": 10560,
+      "seconds": 0.22,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "87C8BA46E91D325255939110E3D0A46E96344827D53602433348312B33DFEA7E",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_hatchet_return_2.wav",
+      "frames": 10560,
+      "seconds": 0.22,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "4BFBC347837EF35454CF7937B4B05B2478FE10A381D6293F6B237AE1B1F7BD96",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_hatchet_catch_1.wav",
+      "frames": 13440,
+      "seconds": 0.28,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "84870991E57FDD63C4C043F30E4CDEAD546C23558D65FAE7D35E226FB0780F5D",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_hatchet_catch_2.wav",
+      "frames": 13440,
+      "seconds": 0.28,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "7874767FB0EDD9EB6DF0FBE2451999D58E77F62989F81210ABE074D8D923C65A",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_hatchet_miss_1.wav",
+      "frames": 8640,
+      "seconds": 0.18,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "E74ACB1DFB70F88727DE1EDC9082F7DE62389AA78DAA7EB3F9B11BBDC4BC8C9B",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_mine_place_1.wav",
+      "frames": 4800,
+      "seconds": 0.1,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "9C31BC1280D2B1E55164178F4AC99F3D296BD1C561A0F006352931A61424B9EB",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_mine_place_2.wav",
+      "frames": 4800,
+      "seconds": 0.1,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "1CD0433ABEE6075CD32A05B62B74D0021C3CC260C926AA6CDBF012716AC24E54",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/weapon_mine_arm_1.wav",
+      "frames": 3840,
+      "seconds": 0.08,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "25A45D746313E252DD19DEEE0430C4520341F2E3FD7FEBE37ECA1D6DBC49C571",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/weapon_mine_blast_1.wav",
+      "frames": 16320,
+      "seconds": 0.34,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "0BB0541EB6D9D5C4E61DFE556C456E7904C56E401F7A9B5979FBB771645625F4",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/weapon_mine_blast_2.wav",
+      "frames": 16320,
+      "seconds": 0.34,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "B70CE276814A7AA711671AC1EFDA81CE7C101A14F35EF9307393B4AFCBC55540",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/weapon_mine_blast_3.wav",
+      "frames": 16320,
+      "seconds": 0.34,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "26AEE830DDEE40194C825A418B512C5C9EC748A0BC0A2AB205319130F1EBAAD7",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_hit_light_1.wav",
+      "frames": 3840,
+      "seconds": 0.08,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "B79F62FCEF7039C0C894B4FB532545088F96F914BEB1A564EBA180B130019266",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_hit_light_2.wav",
+      "frames": 3840,
+      "seconds": 0.08,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "2C4A02E16F3A572E08E2B8C3A3D564150E256C16A0362148E44B9048F9768606",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_hit_light_3.wav",
+      "frames": 3840,
+      "seconds": 0.08,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "300DCE1624F3917958EB71A90B205E8AC58EBF005D0DA802FED632CE185EC47E",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/enemy_hit_heavy_1.wav",
+      "frames": 6240,
+      "seconds": 0.13,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "627169FA7DA51A09B11FE9F7DFB79C3D7C48BBE20440B2C92EED36914AE9F122",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_hit_heavy_2.wav",
+      "frames": 6240,
+      "seconds": 0.13,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "1256DA1BF829EAC9FAEBE6624F3F87476E83EC0DAAFF869831BF51FBE10D3744",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_hit_heavy_3.wav",
+      "frames": 6240,
+      "seconds": 0.13,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "BCF89AA39311CCF45DD8B77ED2A7C03B1BEC5E8E6E3FB84709F87053AE8CCA5A",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/enemy_destroy_small_1.wav",
+      "frames": 7200,
+      "seconds": 0.15,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "6898756FDE1959B23EC28386B37A2BCA170C5F850228EB9A47335FD8A6C85CF4",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/enemy_destroy_small_2.wav",
+      "frames": 7200,
+      "seconds": 0.15,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "7248C54E13A0747E2F73624437295FF7F94E05C0263701866BD77AF618DD0A68",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_destroy_small_3.wav",
+      "frames": 7200,
+      "seconds": 0.15,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "302ECA9C3BC47CC9DF130B61BCB756C6B643D9E5D17D33CFBD281EAB1802EEF7",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_destroy_heavy_1.wav",
+      "frames": 11520,
+      "seconds": 0.24,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "2064C8DC1A882CD050EF5F083966D14D88F90E13025A83A1ABCC2072909F631C",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_destroy_heavy_2.wav",
+      "frames": 11520,
+      "seconds": 0.24,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "EFA5F848B2D8AE255D10628AC4BE5AF6235FF78E94FFD8DC6BBEB1AFAF9E9695",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_destroy_heavy_3.wav",
+      "frames": 11520,
+      "seconds": 0.24,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "EC59404648F6196F28262F7B5F3E82FF45437F65F9BB3CB94B5477B56A0DCDB7",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_destroy_elite_1.wav",
+      "frames": 23040,
+      "seconds": 0.48,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "0CFA335E17DEAE12574F358571F59BD657B5CF3CB34416CF8CFE35690173CA57",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_destroy_elite_2.wav",
+      "frames": 23040,
+      "seconds": 0.48,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "6A691ECF6E5E5A2EE05766D71B02223AB8DA61A84C46A1AFD13A423C96D32B22",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_destroy_elite_3.wav",
+      "frames": 23040,
+      "seconds": 0.48,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "1ADD85B56C30A41E0854E8FF69151FC93082E4182573043EC56DFD0B907E88A8",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_attack_charge_1.wav",
+      "frames": 16800,
+      "seconds": 0.35,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "098CD8E5AE2838E5D1AEF82096F9CAA0C69061BE98B6219CC99EA6625E38152E",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_attack_charge_2.wav",
+      "frames": 16800,
+      "seconds": 0.35,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "2BB75A6906D34EA5162AA327BC9AFCA2B804F8A8897FFE145A9215A4914E4590",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_attack_fire_1.wav",
+      "frames": 5760,
+      "seconds": 0.12,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "A40C3BED3504DBEEF82A06D900135D1224634C4760FB4C1856398E81411184DB",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/enemy_attack_fire_2.wav",
+      "frames": 5760,
+      "seconds": 0.12,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "1242261BCD61E70F1002247455BF470D72A3BED7C6078E9EF38B83D03F0C2E9A",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/enemy_attack_fire_3.wav",
+      "frames": 5760,
+      "seconds": 0.12,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "735355C33CD9EDEC15865F51A0F3C3F68109081E119AE69563DAF7A363FBAB65",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/boss_arrive_1.wav",
+      "frames": 48000,
+      "seconds": 1.0,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "9616EF46C017B2B2EE336ACA65187A4CC72C3003DBEF41BFB34B80A0ECA2256C",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/boss_phase_1.wav",
+      "frames": 31200,
+      "seconds": 0.65,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "6FC12FB79FD9B9DC387878BE247C188B5A9ED74B8B37F6318841283C5379A106",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/boss_down_1.wav",
+      "frames": 60000,
+      "seconds": 1.25,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "46C33A0209814751388ED0B50A66424344E68E533DB4D6E4CED4D37D497DB854",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/player_hurt_1.wav",
+      "frames": 12480,
+      "seconds": 0.26,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "E96F835EBDD7720053544D4751C368314403050BED424A629AFBF251139F1EB8",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/player_hurt_2.wav",
+      "frames": 12480,
+      "seconds": 0.26,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "D212E9AF203D5EF83DA54FA972C4845A0135090DBFE3DE621D97FE8E75786A70",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/player_hurt_3.wav",
+      "frames": 12480,
+      "seconds": 0.26,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "8B89C39EB4B353870BB997A07B36D1C418F9A714CE7961239F5C3CB926824EFD",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/guard_block_1.wav",
+      "frames": 13440,
+      "seconds": 0.28,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "B552A1E99CA6AA588B5BD7CD72A28C8FCE050E2504BDD45BD6F685DB0B12D0DD",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/guard_block_2.wav",
+      "frames": 13440,
+      "seconds": 0.28,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "CFAA10C7A965697C804558DB3FBF1ECBFD68CAA2ABFD29C2FD1CD39DFD80CBA3",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/guard_block_3.wav",
+      "frames": 13440,
+      "seconds": 0.28,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "922320E05770DF4884DD70D5C9E09519884299716AE4E73AC6BF6DCC4C38D993",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/combat/shield_absorb_1.wav",
+      "frames": 8640,
+      "seconds": 0.18,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "3A49CF260EB664C9D4E74386193A7F53DE1F25BF44EC045A642DAB44D1D4C35E",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/shield_absorb_2.wav",
+      "frames": 8640,
+      "seconds": 0.18,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "8905DB633EEC06853EB3B83276642DAC53923BA6B8F6ACB39D4541A2872E1DBD",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/combat/shield_break_1.wav",
+      "frames": 13440,
+      "seconds": 0.28,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "C50D3FA8D7351FE302EC3507C3AA8A65225BB3A7F280F83C8F5EAF511DB180CA",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_xp_1.wav",
+      "frames": 3840,
+      "seconds": 0.08,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "67A51BC519BFA4CC03A00E7FC44CC2A628EF137B306D5584569493B7E37B91B9",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_xp_2.wav",
+      "frames": 3840,
+      "seconds": 0.08,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "46AA4688846798A57C2DD9C3D26AF7F97A4E5C9B4F7628AB00FCBD58303F2748",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_xp_3.wav",
+      "frames": 3840,
+      "seconds": 0.08,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "8931CCAE902268645C2DA6678CFEF86E60DEC93D00FFEC705A68A9ABAEDF457D",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/loot_score_bonus_1.wav",
+      "frames": 5760,
+      "seconds": 0.12,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "809FACCDF992BB96EEA41770529CB1C5C47D924E17804B1F0E46FB69578D9738",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_heal_1.wav",
+      "frames": 18240,
+      "seconds": 0.38,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "56DFEB724FF9D99958E0926D9AF4DDF0CA639B7D5B03F31C3AA9D608BBA9461C",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_part_spawn_1.wav",
+      "frames": 9600,
+      "seconds": 0.2,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "FADBB8A87E271F7563C27FBA3EF1F2817C063AA247ACF8C498C2C78B3AD66D09",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_part_core_1.wav",
+      "frames": 20160,
+      "seconds": 0.42,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "04B20D52F06A839563E898DED73002B4CC827F22C645BC6F133439C80D66CFF5",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/loot_part_drive_1.wav",
+      "frames": 19200,
+      "seconds": 0.4,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "5B975973A3DCBB2EE7629F3DF02153C709796EA50C24D0593F16976A5BE0398F",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_part_shell_1.wav",
+      "frames": 23040,
+      "seconds": 0.48,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "AAF1C512E456F4DC8DB2F91EA26EAB522E2DB9AD8E5DDEF1D5D1507F6AF23242",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_part_overflow_1.wav",
+      "frames": 8640,
+      "seconds": 0.18,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "8A484E2A5B9CF9840D238221FB1E456CDF8F274ED13707A5BDC09D5C0BA30776",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/growth_weapon_1.wav",
+      "frames": 45600,
+      "seconds": 0.95,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "527B982CA54DB81612C7B89863FB147204778D10D45895F0145B0C1A93FC5C50",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/growth_hull_I_1.wav",
+      "frames": 38400,
+      "seconds": 0.8,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "C72DD08C165537B2413EF707ED4524975D237F65515EB3EBA1D7216ABD07EDDA",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/growth_hull_II_1.wav",
+      "frames": 48000,
+      "seconds": 1.0,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "7EA07AD082E35BF52D1F4FCDB418F40D41B2E43627FDEA2A58ECBB8F92613294",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_expire_soon_1.wav",
+      "frames": 5760,
+      "seconds": 0.12,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "5C765CA82382D9629EA9F844CD53079D285427420C7FB01ED9541B2CD3DFA71C",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_expire_gone_1.wav",
+      "frames": 4800,
+      "seconds": 0.1,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "23CE5B0C92300A81EB450BA6FB6300DC61F0C697B6982559576828BC88121421",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/buff_end_1.wav",
+      "frames": 6720,
+      "seconds": 0.14,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "E73A5856453F29096D7AEB95BAB9801DDF7F53D9E17022A32601DC36B4C7F0DC",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/mission_preview_1.wav",
+      "frames": 16800,
+      "seconds": 0.35,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "093859DBE9DBEAB83A66F6A74143723D3E875B19C1C21B968A94879DD141049B",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/mission_start_1.wav",
+      "frames": 9600,
+      "seconds": 0.2,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "1727D21C40A87F685E50345DB33550150C93C27D46257CFA6DAD5AD38F4E6610",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/mission_progress_1.wav",
+      "frames": 4320,
+      "seconds": 0.09,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "DF5783EC2975C7BC93B7D0CF36642864F3D3DB1B72C8AED62B5CCEB0D82A83ED",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/mission_deadline_1.wav",
+      "frames": 8640,
+      "seconds": 0.18,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "68756E1896D723897F315081B749CCB00255745E218B303E54333FBF1733AB9D",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/mission_failed_1.wav",
+      "frames": 12000,
+      "seconds": 0.25,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "5C89AE1BCBBC727BBEC008BA90F907F878F0F4183320F5E716E4FBF005818BF2",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/planet_hold_1.wav",
+      "frames": 3840,
+      "seconds": 0.08,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "7CEB397A9B1DA8E93FAD096AC8D7286F4453493E5A360AB0A9FC0B45FEAC188C",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/planet_reset_1.wav",
+      "frames": 7200,
+      "seconds": 0.15,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "36F89F1D495BA517C1290678B2A0476BB42E9AAC18C00721C96FBCC52F26C705",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/planet_success_1.wav",
+      "frames": 40800,
+      "seconds": 0.85,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "334C45AFCCE2D1A9CF054BE0272A49A2977FA962DC632C503E2A017BFE81492E",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/planet_end_1.wav",
+      "frames": 12000,
+      "seconds": 0.25,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "92C4CB0CBC2056DC8888E785B0D4C389CE83F2B5108CA34872C46A7ED58028FE",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/run_breakthrough_1.wav",
+      "frames": 72000,
+      "seconds": 1.5,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "AC20233681421B879E75837118C73882338EF4D7A6E87BFFC9AFAB6A3BE3FFCE",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/run_end_cleared_1.wav",
+      "frames": 72000,
+      "seconds": 1.5,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "1342341FF0408F3F43F04C16D949FD990E97C749465F44886B6BC449CBE4DAE1",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/run_end_lost_1.wav",
+      "frames": 52800,
+      "seconds": 1.1,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "840EBB8B2EBA0DDFF671A16411CB2AA1ECD963159B46E8B73D088F2FFA7DAFB6",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/run_end_collapse_1.wav",
+      "frames": 76800,
+      "seconds": 1.6,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "CA51914B5EC55F1A1B3C95A2A06C99C59B573EA0787DF1D3DF882D268B9556F2",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/mission_success_C_1.wav",
+      "frames": 21600,
+      "seconds": 0.45,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "37C09DDF1AAD188025395C16983B0D4C8EE972D9D52BA85E7BF3380F824AF350",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_power_C_1.wav",
+      "frames": 10560,
+      "seconds": 0.22,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "0480F15FB39DB69AFAF2914988C0A82BB39F9ADEA23719ABB49EA5E1D1A6CA86",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_drive_C_1.wav",
+      "frames": 10560,
+      "seconds": 0.22,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "C0391FDB82421AA50D3E40F815C745A3D0409AB00C1237DCFCE3989C88A15FBF",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_repair_C_1.wav",
+      "frames": 10560,
+      "seconds": 0.22,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "5241C1548B3C81C756CBBA4BFD44CAD076BDAAB5EE09632B0DBA3DF36738F2B0",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_stun_C_1.wav",
+      "frames": 10560,
+      "seconds": 0.22,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "4E692B9D5BC0BE0FCAE8FE6D9A18083069987377A504E7644A2AA8CA5DE0F1DC",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_emp_C_1.wav",
+      "frames": 10560,
+      "seconds": 0.22,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "8CBE54067BD16750870A9528DFFF4ABA0923EAFF03B4446BA04469A2400679F8",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_data_C_1.wav",
+      "frames": 10560,
+      "seconds": 0.22,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "DBD90E3B55AD6EDC5573C3E91737C1C1623C5FA18B528CBF3BBB6D841FD69371",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_bounty_C_1.wav",
+      "frames": 10560,
+      "seconds": 0.22,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "3E27604CD63E919BA3C2E3546A04EB8FDA4DEFD135D28F88ED19CFEDF7D8EA47",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_shield_C_1.wav",
+      "frames": 10560,
+      "seconds": 0.22,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "5DB200D540E4D56D8CC153821CBF6D174147BEC94729D22A059179176AD5F050",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/mission_success_B_1.wav",
+      "frames": 28800,
+      "seconds": 0.6,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "D25B091A2B7C4471A0689A2EB9F7F2122E7A18F8D03C5A916A6B357458DC5908",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_power_B_1.wav",
+      "frames": 13200,
+      "seconds": 0.275,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "08E58CB928FFBDCB289DE8DFC0D23ED225503EA37F2933FD460DF7BC50F34A3D",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_drive_B_1.wav",
+      "frames": 13200,
+      "seconds": 0.275,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "343646FD401D4357A54BCFCF43A168350E7C774AFC401A42401C1D2DFBDD60AD",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_repair_B_1.wav",
+      "frames": 13200,
+      "seconds": 0.275,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "AE0882D5BFBC816485A4AAAE0C40EB2441E024738FC01DD0F1A91E90BCBC0E15",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_stun_B_1.wav",
+      "frames": 13200,
+      "seconds": 0.275,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "8332937332CE28A3D637F31B24A079ED26E2FF4AE1C4CED93ACD8CE79004A2BC",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_emp_B_1.wav",
+      "frames": 13200,
+      "seconds": 0.275,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "3E47A3963C1BB237F55144916557F4DE2BCB8850361B06E3F668B79FE211C098",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_data_B_1.wav",
+      "frames": 13200,
+      "seconds": 0.275,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "28EF265A5A73B08B892492EEA45B2ECBE43F5C564AEC4ACF192746F80F03FF57",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_bounty_B_1.wav",
+      "frames": 13200,
+      "seconds": 0.275,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "DB9B3DBA4825040CB5E6D60CC84ED5B248E9435160FFDD1AF41E13F0DC40E906",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_shield_B_1.wav",
+      "frames": 13200,
+      "seconds": 0.275,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "DBB5BC3B2205434C2FFF443E73C960E65B5C76C03CA42916602F522713E6D86A",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/mission_success_A_1.wav",
+      "frames": 36000,
+      "seconds": 0.75,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "094373F6B8B4FBF8B7EB3CE083109478D7FCFA624BC34EBC98296C41881A0FEC",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_power_A_1.wav",
+      "frames": 15840,
+      "seconds": 0.33,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "9EE1A6C44F8B1C674BE0637D8DE8B09B16EE71C74BEDC71AC9D87C93CDCD6BA1",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_drive_A_1.wav",
+      "frames": 15840,
+      "seconds": 0.33,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "D1E1A7CA15FFAF2B4B4AA93314F56793C7CF3927BC2883D1B91274C73A05AD93",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_repair_A_1.wav",
+      "frames": 15840,
+      "seconds": 0.33,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "243A7E35C1C03AF3CC0E1337F32CC96AD694BF9F9D6656D227DFE0FA3A2CEA71",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_stun_A_1.wav",
+      "frames": 15840,
+      "seconds": 0.33,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "20A38FD38F714E988C71E886CBF67D377E65CA5478B3BA562F2846D941D16A16",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_emp_A_1.wav",
+      "frames": 15840,
+      "seconds": 0.33,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "39209F25071F22E4816CA0AA63D603B2170B11D27880CD60D647EEEB8D7F8D63",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_data_A_1.wav",
+      "frames": 15840,
+      "seconds": 0.33,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "0BB4F1FB39E3AD152BF720963604CE2BC96E743886CA871F4922D465B39E7119",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_bounty_A_1.wav",
+      "frames": 15840,
+      "seconds": 0.33,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "F1F81C3B5F6D8EC47DA104D3BE0EFE6FFF5CC41F091FAC0ECC3FE8EB5D17CB24",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/feedback/loot_item_shield_A_1.wav",
+      "frames": 15840,
+      "seconds": 0.33,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "F31F0EACAAD01FCB1F106D345840EB0E8CA7081B886F3A259ED6B9AD5B298036",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/warnings/warn_hull_low_1.wav",
+      "frames": 11520,
+      "seconds": 0.24,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "9488A6CF5D9000C16DC959DA5067126169CE773729C8D5B85DB557B9132E5CCD",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/warnings/warn_hull_critical_1.wav",
+      "frames": 12000,
+      "seconds": 0.25,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "9F1EFFD99E1C68EA77DC5C5D740F293FD29DA4B034EC57CA1DD0283A32B30245",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/warnings/warn_decay_rise_1.wav",
+      "frames": 20160,
+      "seconds": 0.42,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "854CA3BB40570FC7E9D14C9BAB2625FF89215D3AF06039E59497C975141B24F3",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/warnings/warn_boundary_enter_1.wav",
+      "frames": 11040,
+      "seconds": 0.23,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "F9A26CC7D31A8A75CD9EF6C654FBD15A4764DA1E5414DE5FED182A491A056070",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/warnings/warn_boundary_deep_1.wav",
+      "frames": 12480,
+      "seconds": 0.26,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "19683B868A646AA39126761169D1C2EC4FF68E92E9042830D74BCEDDF329F200",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/warnings/warn_boundary_return_1.wav",
+      "frames": 7680,
+      "seconds": 0.16,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "DE727636A4F4F23C1AFB6E24320FAF21BBA805B8B9AAAAD3D825C208AA2D8385",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/warnings/warn_final_collapse_1.wav",
+      "frames": 31200,
+      "seconds": 0.65,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "E25E9D87922605CB4817BC4F95208E1D15E0E8138F61CE4288A61304CA6F679E",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/warnings/event_countdown_1.wav",
+      "frames": 3360,
+      "seconds": 0.07,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "773703A1B2B6394D70130E034C3422CA1DEFF2EA6411172AAB3F9C3A24070A4F",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/warnings/hazard_charge_lane_1.wav",
+      "frames": 26400,
+      "seconds": 0.55,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "28A16D3094EBA4417FB3066ECF04DC40D164CCFC0D8598CF0C1312BEA767F213",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/warnings/hazard_charge_blast_1.wav",
+      "frames": 26400,
+      "seconds": 0.55,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "3F4D9453910670B285F52F014E8F7EF1ED27C9685395BFA3203D07612E89FD1E",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/warnings/hazard_strike_lane_1.wav",
+      "frames": 16800,
+      "seconds": 0.35,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "BE638D08F1C9207271F434A0BEB0C04D81CC22901CD43B8228F408CED182B5E6",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/warnings/hazard_strike_blast_1.wav",
+      "frames": 19200,
+      "seconds": 0.4,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "111DE5C372C9738DAE1FAED9D29C420562E40DFAC9682358F155375A828B08B7",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/warnings/hazard_strike_meteor_1.wav",
+      "frames": 19200,
+      "seconds": 0.4,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "FC19CCE5B7C03E939F74D3EAE076EDE8138862111CFB31909DF08FA6722E397C",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/warnings/event_warn_black_hole_1.wav",
+      "frames": 26400,
+      "seconds": 0.55,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "B052466417C91AD8DD5EF30C3BFDDEFB235A773AD359E0270F712D6C5881DB55",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/warnings/event_active_black_hole_1.wav",
+      "frames": 31200,
+      "seconds": 0.65,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "85B37C6CB737503F71D90560E86E5F09D13DDDA4210C4934785AE4D801BFA4DD",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/warnings/event_end_black_hole_1.wav",
+      "frames": 12000,
+      "seconds": 0.25,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "F67F1C4D4F8254CBB7D2DC75378AA21FE62D2F56D32504ADF90F2586FA137BEF",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/warnings/event_warn_meteor_1.wav",
+      "frames": 26400,
+      "seconds": 0.55,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "694E174CDB585A906B133C751C098D0A0EB62964F8DA7AFA1DB584FDA3E03265",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/warnings/event_active_meteor_1.wav",
+      "frames": 31200,
+      "seconds": 0.65,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "0108573A6D29B7B108BF3DFA0B431904ECE6A408372B531FD22A995FE47F1C12",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/warnings/event_end_meteor_1.wav",
+      "frames": 12000,
+      "seconds": 0.25,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "352778894D9B3C6F3C9181F70FFF6494FEE5E00E2F3D8349D3DDC54A2DF359BA",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/warnings/event_warn_flare_1.wav",
+      "frames": 26400,
+      "seconds": 0.55,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "4BBEB0E419E2102957BCDC3384CCE653E2FB8B28322E01CCC2A449902DCB7C62",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/warnings/event_active_flare_1.wav",
+      "frames": 31200,
+      "seconds": 0.65,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "5A8DE78AD9C24846BA792C0AB00F494177D69844D6F5ED0BF77F7726B4227BAE",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/warnings/event_end_flare_1.wav",
+      "frames": 12000,
+      "seconds": 0.25,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "0D7CD2FFCB04F5A2A535489A305FCBD93239D30978FA79C637995E56BD9E45F8",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/warnings/event_warn_planet_1.wav",
+      "frames": 26400,
+      "seconds": 0.55,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "C0684DDB63C3F5BF45D829B5F2F8072E285ECFE8F8D6502E07BD9A699E933CC7",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/warnings/event_active_planet_1.wav",
+      "frames": 31200,
+      "seconds": 0.65,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "931F4A2BA89F498883D36291C3D041D74CBCB047060774D0ECBCDC628F6903E1",
+      "peak": 0.5199999809265137
+    },
+    {
+      "path": "assets/audio/warnings/event_end_planet_1.wav",
+      "frames": 12000,
+      "seconds": 0.25,
+      "rate": 48000,
+      "channels": 1,
+      "loop": false,
+      "sha256": "310169C1C17F74459E26A284448A1EAC398C5E6121C17B023563209C29FA94D3",
+      "peak": 0.5200000405311584
+    },
+    {
+      "path": "assets/audio/music/mus_menu.ogg",
+      "frames": 3072000,
+      "seconds": 64.0,
+      "rate": 48000,
+      "channels": 2,
+      "loop": true,
+      "sha256": "EFD60A1A1D15F36029A20BD7B8A5E43221F277DBB4C5038116225D42C2436619",
+      "peak": 0.15924648940563202
+    },
+    {
+      "path": "assets/audio/music/mus_battle_bed.ogg",
+      "frames": 4608000,
+      "seconds": 96.0,
+      "rate": 48000,
+      "channels": 2,
+      "loop": true,
+      "sha256": "F2E62FECEF60CA3D04D8941A20AAE2CE4D6CF7F998F38ABA9187E2AA4B3657EB",
+      "peak": 0.14138005673885345
+    },
+    {
+      "path": "assets/audio/music/mus_battle_drive.ogg",
+      "frames": 4608000,
+      "seconds": 96.0,
+      "rate": 48000,
+      "channels": 2,
+      "loop": true,
+      "sha256": "07FEE3D7420BD15BBACF87DC6E55C3EC4E2E34E531A9C0DB13330B029CB0A7F2",
+      "peak": 0.5958645343780518
+    },
+    {
+      "path": "assets/audio/music/mus_battle_pressure.ogg",
+      "frames": 4608000,
+      "seconds": 96.0,
+      "rate": 48000,
+      "channels": 2,
+      "loop": true,
+      "sha256": "68014B3E49E24AB74A0940FAE3643175AA6401167A7BF54531FEC146FCD13486",
+      "peak": 0.07888884842395782
+    },
+    {
+      "path": "assets/audio/ambience/amb_ring.ogg",
+      "frames": 1536000,
+      "seconds": 32.0,
+      "rate": 48000,
+      "channels": 2,
+      "loop": true,
+      "sha256": "832A3284BA7ED75CCB2587B7A888737C299444C35745DC5970242534D072C9E2",
+      "peak": 0.0720152035355568
+    },
+    {
+      "path": "assets/audio/ambience/amb_storm.ogg",
+      "frames": 1536000,
+      "seconds": 32.0,
+      "rate": 48000,
+      "channels": 2,
+      "loop": true,
+      "sha256": "17632CEE383314E9A911A3E250544F7F357AF02B2009A05317C58A87F705856D",
+      "peak": 0.07584459334611893
+    },
+    {
+      "path": "assets/audio/ambience/amb_forge.ogg",
+      "frames": 1536000,
+      "seconds": 32.0,
+      "rate": 48000,
+      "channels": 2,
+      "loop": true,
+      "sha256": "21335EFA8031BE317D822E07763DC42830DB2A0177720BC5FA91FAE48B78575D",
+      "peak": 0.07067873328924179
+    },
+    {
+      "path": "assets/audio/ambience/ship_drive.ogg",
+      "frames": 192000,
+      "seconds": 4.0,
+      "rate": 48000,
+      "channels": 1,
+      "loop": true,
+      "sha256": "D8892EABDEE2233705C844E5E3428DB22F8632BDB90787FABF322453BD4F9ED0",
+      "peak": 0.09703657776117325
+    },
+    {
+      "path": "assets/audio/ambience/warn_decay_bed.ogg",
+      "frames": 192000,
+      "seconds": 4.0,
+      "rate": 48000,
+      "channels": 1,
+      "loop": true,
+      "sha256": "19411ADC3663186D31CCE1D66E7E5631706F2AD7AC931BDFD704E561DE79559C",
+      "peak": 0.08678928017616272
+    }
+  ],
+  "runtime_bytes": 9192418
+}

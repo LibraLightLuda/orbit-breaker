@@ -123,6 +123,15 @@ $planningTemp = 'C:\Users\home\AppData\Local\Temp\orbit-breaker-art-review-20261
 if (Test-Path -LiteralPath $planningTemp) { $scratch += @{path=$planningTemp;reason='Previously blocked by policy; not retried'} }
 $comparisonProject = Contained 'art_source/motion_baseline_project'
 if (Test-Path -LiteralPath $comparisonProject) { $scratch += @{path=$comparisonProject;reason='Previously blocked by policy; not retried'} }
+$previousRetentionPath = Join-Path $currentArt 'previous-retention.json'
+if (Test-Path -LiteralPath $previousRetentionPath) {
+    $previousRetention = Read-Json $previousRetentionPath
+    foreach ($entry in @($previousRetention.retained_scratch) + @($previousRetention.blocked)) {
+        if ($entry.path -and (Test-Path -LiteralPath $entry.path) -and $entry.path -notin @($scratch | ForEach-Object { $_.path })) {
+            $scratch += @{path=$entry.path;reason=$entry.reason}
+        }
+    }
+}
 $retention = @{generation=$Generation;local_release_cleanup_complete=($blocked.Count -eq 0);single_verified_release_generation=($blocked.Count -eq 0);
     removed=$removed;blocked=$blocked;temporary_cleanup_complete=($scratch.Count -eq 0);retained_scratch=$scratch;
     source_and_player_data='preserved';public_publication=$verification.public_publication;

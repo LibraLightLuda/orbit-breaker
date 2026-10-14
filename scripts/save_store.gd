@@ -4,6 +4,7 @@ extends RefCounted
 const DEFAULTS: Dictionary = {
 	"best_score": 0, "best_time": 0.0, "wins": 0, "runs": 0,
 	"muted": false, "music": true, "reduced_motion": false,
+	"master_volume": 1.0, "music_volume": 1.0, "effects_volume": 1.0,
 	"total_kills": 0, "best_level": 0, "unlocked_medals": [],
 	"recent_runs": [], "best_by_loadout": {},
 	"player_name": "파일럿", "leaderboard": [], "achievement_progress": {}, "achievements": [],
@@ -272,6 +273,10 @@ func _validated(source: Dictionary) -> Dictionary:
 	for key: String in ["muted", "music", "reduced_motion"]:
 		if source.get(key) is bool:
 			result[key] = source[key]
+	for key: String in ["master_volume", "music_volume", "effects_volume"]:
+		var value: Variant = source.get(key, 1.0)
+		if (value is float or value is int) and is_finite(float(value)):
+			result[key] = clampf(float(value), 0.0, 1.0)
 	result["wins"] = mini(int(result["wins"]), int(result["runs"]))
 	var medals: Variant = source.get("unlocked_medals")
 	if medals is Array:
