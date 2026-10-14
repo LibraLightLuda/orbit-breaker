@@ -1,3 +1,11 @@
+## 2026-10-14 사운드·시작 전 모바일 UI 공개 배포 완료
+
+전체 변경 431파일과 음원 195개·독자 제작 소스를 커밋 `db122e2bf157f50993c9efcb7bd3d6cef1e5e5f4`로 main에 게시했다. [릴리즈 v3.18.3-audio-ui](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.18.3-audio-ui)와 [웹 플레이](https://libralightluda.github.io/orbit-breaker/) 공개 완료. 게임 표시 버전 3.18.3, 검증된 EXE/PCK 바이트는 유지하며 ZIP 안내만 공개 주소로 갱신했다.
+
+Pages 작업 [38492355622](https://github.com/LibraLightLuda/orbit-breaker/actions/runs/38492355622) 성공. 공개 Web 9파일·기본 HTML과 릴리즈 6첨부의 크기/SHA-256이 최종 로컬본과 일치한다. 공개 Chromium 390×844·844×390에서 메인·설정·페이지/복귀·기체/전장 선택·회전 상태 유지와 콘솔 오류/경고 0을 확인했다. 이전 릴리즈 첨부 6개와 이전 Pages artifact 1개는 신규 공개본 검증 후 정리했다. 소스 태그와 릴리즈 이력은 보존했다.
+
+기존 회귀 3,100개와 시작 전 실제 렌더 106,496개는 최신 로컬 검사 결과이며, 이번 공개 smoke를 장시간 플레이나 실물 휴대폰/사람의 청취 수용으로 취급하지 않는다. 최종 근거는 `artifacts/current/github-publication.json`, `public-web-hashes.json`, `public-release-assets.json`, `public-retention.json`, `public-play-status.json`이다.
+
 # 최신 로컬 검증 결과: 3.18.3 / pregame-20261014 (2026-10-14)
 
 [시작 전 모바일 UI 검수 보고](PREGAME_MOBILE_REPORT.md). 메인·출격 준비·기록·도감·도움말·설정·라이선스의 가로/세로 흐름을 개선했다. 고정 탭·복귀·출격과 페이지 이동으로 세로 스크롤 없이 선택한다. 카드 밖으로 분리되던 긴 조건을 같은 카드에 묶고, 이름 입력 포커스와 선택을 회전 후 복원한다. 진행 중 UI는 이번 검수에서 제외했다.

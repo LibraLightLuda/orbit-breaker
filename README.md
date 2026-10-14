@@ -1,6 +1,6 @@
-# ORBIT BREAKER 3.18.3 · 모바일 화면·조작 개선
+# ORBIT BREAKER 3.18.3 · 사운드·모바일 시작 전 UI
 
-[지금 웹에서 플레이](https://libralightluda.github.io/orbit-breaker/) · [Windows/Web 다운로드](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.18.3)
+[지금 웹에서 플레이](https://libralightluda.github.io/orbit-breaker/) · [Windows/Web 다운로드](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.18.3-audio-ui)
 
 세라믹·흑연 기체, 흑요석 침공체,3개 우주 전장과 실물 장비/FX,61개 정보 도해를 전체 메뉴·전투·신구고스트에 적용했습니다.125개 제작 대상과95개 아트+2개 브랜딩 리소스이며, 게임 규칙·저장·고스트 형식은3.18을 유지합니다. 모바일 드래그 이동·길게 끌어 놓는 방향 돌진·두 번 탭 오버드라이브와 가로/세로 UI를 지원하며, 데스크톱 키보드/마우스도 유지합니다. 기록은 해당 기기·브라우저에 로컬 저장됩니다.
 
@@ -8,7 +8,7 @@
 
 모바일 가로·세로 모두 메인·출격 준비·강화 선택을 스크롤 없이 사용할 수 있습니다. 0.3초/48px 이상 끌었다 놓으면 해당 방향으로 돌진합니다. 단일 탭은 스킬을 소비하지 않습니다. 가로 전체화면 버튼은 지원 브라우저에서 화면 잠금을 요청하며, 미지원이면 직접 기기를 돌리세요. 하단 스킬 버튼은 즉시 발동합니다.
 
-공개 Pages9개 파일 해시 대조와 실제 출격·전투·강화·일시정지·도감 검사를 마쳤습니다. [모바일 검증과 한계](docs/MOBILE_FEEDBACK_3183.md) · [최종 검증](docs/VALIDATION_V3.md) · [아트 구현/품질 보고서](docs/ART_IMPLEMENTATION_REPORT.md) · [전체 제작 목록](docs/ART_ASSET_MATRIX.md).
+독자 제작 cue136개·음원195개와 제작 소스, 시작 전 모바일 UI 개선을 함께 배포했습니다. 공개 Web9파일·기본 HTML과 릴리즈6첨부의 SHA-256/크기가 검증본과 일치합니다. 공개 메인·설정·페이지/복귀·출격 준비·회전을 확인했습니다. [사운드 구현과 한계](docs/SOUND_IMPLEMENTATION_REPORT.md) · [시작 전 모바일 UI 검수](docs/PREGAME_MOBILE_REPORT.md) · [최종 검증](docs/VALIDATION_V3.md) · [아트 구현/품질 보고서](docs/ART_IMPLEMENTATION_REPORT.md) · [전체 제작 목록](docs/ART_ASSET_MATRIX.md).
 
 ## 기존3.18 게임 규칙과 변경 기록
 

@@ -4,7 +4,7 @@
 
 ## 현재 최신 로컬본: pregame-20261014 (2026-10-14)
 
-3.18.3 시작 전 UI 세대. `build/current`·`artifacts/current`·`web/`가 대응한다. Windows SHA-256 `8AFC0A2BAE31F3221EF4C7F05566F676D41DB9476E393143B93055E79BFEB40A`. 후보 검증 후 guarded promotion으로 교체했다. 이전 배포본·증거는 정리하고 기존 정책 차단 자료는 최종 retention-status/file-inventory에 기록한다. 공개 게시하지 않았다.
+3.18.3 시작 전 UI 세대. `build/current`·`artifacts/current`·`web/`가 대응한다. Windows SHA-256 `8AFC0A2BAE31F3221EF4C7F05566F676D41DB9476E393143B93055E79BFEB40A`. 후보 검증 후 guarded promotion으로 교체했다. 이전 배포본·증거는 정리하고 기존 정책 차단 자료는 최종 retention-status/file-inventory에 기록한다. [v3.18.3-audio-ui](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.18.3-audio-ui)와 공개 Web 게시를 완료했다. 공개본 해시 확인 후 이전 첨부 6개와 Pages artifact 1개를 정리했다.
 
 ## 보관 범위
 
