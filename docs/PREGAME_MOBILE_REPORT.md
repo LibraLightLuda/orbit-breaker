@@ -32,4 +32,3 @@
 Pages 작업 [38492355622](https://github.com/LibraLightLuda/orbit-breaker/actions/runs/38492355622) 성공. 공개 Web 9파일·기본 HTML과 릴리즈 6첨부의 크기/SHA-256이 최종 로컬본과 일치한다. 공개 Chromium 390×844·844×390에서 메인·설정·페이지/복귀·기체/전장 선택·회전 상태 유지와 콘솔 오류/경고 0을 확인했다. 이전 릴리즈 첨부 6개와 이전 Pages artifact 1개는 신규 공개본 검증 후 정리했다. 소스 태그와 릴리즈 이력은 보존했다.
 
 기존 회귀 3,100개와 시작 전 실제 렌더 106,496개는 최신 로컬 검사 결과이며, 이번 공개 smoke를 장시간 플레이나 실물 휴대폰/사람의 청취 수용으로 취급하지 않는다. 최종 근거는 `artifacts/current/github-publication.json`, `public-web-hashes.json`, `public-release-assets.json`, `public-retention.json`, `public-play-status.json`이다.
-
