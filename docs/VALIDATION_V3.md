@@ -1,4 +1,14 @@
-# 최신 로컬 검증 결과: 3.19 / audit-20261014 (2026-10-14)
+# 최신 검증 결과: 3.19 / audit-20261014 (공개 확인 2026-10-16)
+
+## 2026-10-16 GitHub 공개 배포 완료
+
+소스 32개 파일의 전투 확장·검수 보완을 커밋 [`79cae4c68ea71cb6a3255e9be6e5cb7ae2d70f73`](https://github.com/LibraLightLuda/orbit-breaker/commit/79cae4c68ea71cb6a3255e9be6e5cb7ae2d70f73)로 main에 반영했다. [GitHub Pages 작업 38546865017](https://github.com/LibraLightLuda/orbit-breaker/actions/runs/38546865017) 성공을 확인했으며 [웹 플레이](https://libralightluda.github.io/orbit-breaker/)와 [릴리즈 v3.19.0](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.19.0)을 공개했다.
+
+공개 Web 9개 파일·기본 주소 HTML과 릴리즈 다운로드 6개를 실제 HTTP로 내려받아 SHA-256/바이트 수를 대조했고 모두 일치했다. Windows EXE와 Web PCK는 아래 로컬 검증본 그대로이며, ZIP·플레이 안내만 공개 주소로 갱신했다. 공개 Chrome DevTools 브라우저의 2048×970 CSS viewport에서 버전 3.19 메인 화면과 출격 준비 화면 전환을 스크린샷으로 확인했다. 전환 입력은 관찰한 버튼 위치에 보낸 합성 DOM MouseEvent다. 해당 동작 중 window error/unhandled rejection은 0개였지만 전체 콘솔을 수집한 검사는 아니며, 공개 모바일·실물 터치·장시간 전투/청취 검증으로 취급하지 않는다. 이전 로컬 브라우저/네이티브 검사 범위는 아래와 같다.
+
+새 공개본 검증 후 이전 v3.18.3-audio-ui 첨부 6개를 삭제했다. 소스 태그·릴리즈 이력은 보존했다. Actions Pages artifact는 1일 보관 기간이 이미 만료되어 잔여 0개이며 이번 완료 단계에서 artifact를 직접 삭제하지 않았다. 로컬 정책 차단 임시 자료 15개는 재시도하지 않았고 전체 임시 자료 정리는 미완료다. 근거는 `artifacts/current/github-publication.json`, `public-web-hashes.json`, `public-release-assets.json`, `public-play-status.json`, `public-retention.json`, `retention-status.json`이다.
+
+## 2026-10-14 로컬 후보·최신본 검증
 
 [코드 검수 보완·검증 보고서](CODE_AUDIT_IMPLEMENTATION_REPORT.md). 오디오 불변성의 실제 진행/정상 종료, 제작 정보 전체 페이지의 뷰포트 터치, 원시 성능 수치 기반 판정, 소스·검사·출력 해시 연결, 손상 고스트 방어, 전술 선택 음악과 리플레이 보간을 보완했다. 기존 3.19 게임 수치·보상·난수·기록/고스트 형식은 유지한다.
 

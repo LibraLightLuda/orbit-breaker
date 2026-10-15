@@ -6,6 +6,8 @@
 
 [지금 웹에서 플레이](https://libralightluda.github.io/orbit-breaker/) · [Windows/Web 다운로드](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.19.0)
 
+2026-10-16 공개 검증 완료. Web 9개 파일·기본 HTML과 릴리즈 다운로드 6개의 SHA-256/크기가 검증본과 일치합니다. 공개 브라우저에서 버전 3.19와 메인→출격 준비를 확인했습니다. 상세 범위와 한계는 [최종 검증](docs/VALIDATION_V3.md)을 참고하세요.
+
 세라믹·흑연 기체, 흑요석 침공체,3개 우주 전장과 실물 장비/FX,61개 정보 도해를 전체 메뉴·전투·신구고스트에 적용했습니다.125개 제작 대상과95개 아트+2개 브랜딩 리소스이며, 게임 규칙·저장·고스트 형식은3.18을 유지합니다. 모바일 드래그 이동·길게 끌어 놓는 방향 돌진·두 번 탭 오버드라이브와 가로/세로 UI를 지원하며, 데스크톱 키보드/마우스도 유지합니다. 기록은 해당 기기·브라우저에 로컬 저장됩니다.
 
 ![모바일 강화 선택](docs/images/orbit-breaker-mobile-upgrades.png)

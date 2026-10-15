@@ -4,6 +4,8 @@
 
 ## 현재 최신 로컬본: audit-20261014 (2026-10-14)
 
+2026-10-16 후속 요청으로 [v3.19.0](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.19.0)과 [공개 Web](https://libralightluda.github.io/orbit-breaker/)을 배포했다. 공개 Web 9개 파일·기본 HTML과 릴리즈 다운로드 6개의 해시/크기 확인 뒤 이전 v3.18.3-audio-ui 첨부 6개를 정리했다. 소스 태그·릴리즈 이력은 보존한다. Actions Pages artifact는 보관 기간 만료로 잔여 0개다. 공개 최신 한 세대의 첨부 6개만 남으며, 실제 공개 정리 상태는 `artifacts/current/public-retention.json`을 따른다. 아래 공개 게시를 수행하지 않았다는 문장은 최초 로컬 검증 당시 기록이다.
+
 3.19 코드 검수 보완 세대. `build/current`·`artifacts/current`·`web/`가 대응한다. Windows SHA-256 `DCC4FE1CFF548FBF778E1D808972B98ED559A023C3A5B9041205E5D6F0D2BC88`, Web PCK `E63EA3688FA094A03387F3011E0124578DA79A879949C5613A6CD84C17B98807`. 후보 전체 검사·내보내기·실제 실행·브라우저 확인 후 기존 정상본을 보존하면서 교체했고, 교체 후 배포/소스/증거 해시와 ZIP 내용을 확인했다. 이전 정상본·대응 증거·교체용 백업은 정리했다. 공개 게시/원격 push는 수행하지 않았다.
 
 현재 정상 배포 경로의 세대는 하나지만 **전체 자료 정리는 미완료**다. 과거 자동 승인 검토로 삭제가 차단된 12개 항목은 재시도하지 않았다. 이번 `artifacts/audit-work`, `artifacts/combat-work`, `artifacts/pregame-candidate`의 삭제도 자동 승인 검토가 실행 전에 `blocked by policy`로 거부했다. 이 3개도 재시도하지 않으며 총 15개 잔여의 정확한 경로·사유를 `artifacts/current/retention-status.json`에 기록한다. 실제 최신본 목록은 `file-inventory.json`을 따른다. 정리 성공이나 공간 회수를 주장하지 않는다.
