@@ -1,6 +1,6 @@
 {
   "date_kst": "2026-10-18",
-  "status": "ready_for_github_publication",
+  "status": "deployed_verified_cleanup_blocked",
   "request": "Publish latest code and web game to GitHub and update the existing public ranking Site",
   "github_repository": "https://github.com/LibraLightLuda/orbit-breaker",
   "ranking_site": "https://orbit-breaker-records.chrcra89.chatgpt.site",
@@ -9,8 +9,8 @@
   "private_validation_site": "unchanged",
   "scope_limit": "Rankings and ghosts are supported; authoritative online combat remains unavailable on Sites",
   "required_connection_fix": "GitHub-hosted web clients must use the public ranking API instead of the GitHub Pages origin",
-  "source_upload": "pending",
-  "deployment": "pending",
+  "source_upload": "completed",
+  "deployment": "completed",
   "site": {
     "status": "succeeded",
     "project_id": "appgprj_6ad16bc1fe7c819185c816d7f37b2222",
@@ -63,5 +63,62 @@
   "source_whitespace_check": {
     "historical_audit_blank_eof_warnings": 6,
     "handling": "Preserved historical audit documents/logs as-is; check all other whitespace rules with core.whitespace=-blank-at-eof"
-  }
+  },
+  "github": {
+    "pages_status": "succeeded",
+    "pages_run_id": 39047711932,
+    "pages_run_url": "https://github.com/LibraLightLuda/orbit-breaker/actions/runs/39047711932",
+    "source_url": "https://github.com/LibraLightLuda/orbit-breaker/commit/e0cefc89865dc9ada06d96d06d8a4204589b4df1",
+    "pages_url": "https://libralightluda.github.io/orbit-breaker/",
+    "source_commit": "e0cefc89865dc9ada06d96d06d8a4204589b4df1",
+    "public_verification": "artifacts/publish-work/github-public-web-verification.json",
+    "public_files_verified": 9,
+    "pages_conclusion": "success",
+    "source_files_committed": 362
+  },
+  "browser_verification": {
+    "ranking_site": "Coop/storm filters and empty board rendered",
+    "github_game": "Public title -> online -> global records rendered with normal empty board; public config disables official challenge and room creation",
+    "screenshots": [
+      "artifacts/publish-work/public-ranking.png",
+      "artifacts/publish-work/github-game-ranking.png"
+    ],
+    "scope": "Short browser smoke, not physical mobile or long-play acceptance"
+  },
+  "temporary_cleanup": {
+    "status": "blocked_before_execution",
+    "remaining": [
+      {
+        "path": "build/publish-previous-20261018",
+        "files": 22,
+        "bytes": 280953564,
+        "reason": "Native PowerShell cleanup rejected by tool approval review before process creation: blocked by policy. Effective approval_policy=never; no escalation available; no retry or workaround."
+      },
+      {
+        "path": "build/publish-web-previous-20261018",
+        "files": 10,
+        "bytes": 59267818,
+        "reason": "Native PowerShell cleanup rejected by tool approval review before process creation: blocked by policy. Effective approval_policy=never; no escalation available; no retry or workaround."
+      }
+    ],
+    "deleted_targets": 0,
+    "deleted_files": 0,
+    "reclaimed_bytes": 0,
+    "permanent_archive_created": false,
+    "official_escalation_available": false
+  },
+  "preservation": {
+    "normal_local_files_unchanged_before_metadata_update": 315,
+    "immutable_release_files": 15,
+    "immutable_evidence_files": 296,
+    "candidate_manifest_checks": 870,
+    "mismatches": [],
+    "player_data_and_secrets": "preserved; no production test score or record deletion",
+    "normal_release_promoted": false
+  },
+  "verified_at_utc": "2026-10-17T16:07:28.509094+00:00",
+  "authorized_metadata_updates": [
+    "artifacts/current/retention-status.json",
+    "artifacts/current/file-inventory.json"
+  ]
 }
