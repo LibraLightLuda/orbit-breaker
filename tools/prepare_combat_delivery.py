@@ -12,10 +12,10 @@ import time
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-QA = ROOT / 'artifacts/audit-work'
+QA = ROOT / 'artifacts/clarity-work'
 BUILD = ROOT / 'build/candidate'
-READY = ROOT / 'artifacts/audit-ready'
-GENERATION = 'audit-20261014'
+READY = ROOT / 'artifacts/clarity-ready'
+GENERATION = 'clarity-20261016'
 
 
 def sha(path):
@@ -48,6 +48,9 @@ def source_hashes(root=ROOT):
                 sources[path.relative_to(root).as_posix()] = sha(path)
     for name in ['project.godot', 'main.tscn', 'export_presets.cfg', 'icon.svg']:
         sources[name] = sha(root / name)
+    for name in ['art_source/clarify_assets.py', 'art_source/prepare_assets.py', 'art_source/clarity-manifest.json']:
+        if (root / name).is_file():
+            sources[name] = sha(root / name)
     return sources
 
 

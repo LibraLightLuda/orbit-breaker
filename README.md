@@ -1,6 +1,14 @@
-# ORBIT BREAKER 3.19 · 전투 진화와 최종 작전
+# ORBIT BREAKER 3.19 · 선명도 개선판
 
-## 3.19 전투 확장과 코드 검수 보완
+## 최신 로컬본: clarity-20261016 (2026-10-16)
+
+플레이어 선체를 42→52로 약 24% 키우고 전체 95개 등록 자산과 위험 경계의 외곽·재질 대비를 개선했습니다. 작은 보급/파츠의 투명 여백을 보정했고, 가까운 적탄이 선체 위에 보이도록 했습니다. 피격 판정과 게임 규칙·저장/고스트 형식은 유지합니다.
+
+실행: [Windows EXE](build/current/OrbitBreaker.exe) · [Windows ZIP](build/current/OrbitBreaker-Windows.zip) · [Web ZIP](build/current/OrbitBreaker-Web.zip). [구현·검증 보고서](docs/VISUAL_CLARITY_IMPLEMENTATION_REPORT.md) · [95개 자산 검수표](docs/VISUAL_CLARITY_COVERAGE.md) · [같은 장면 전/후](artifacts/current/before-after.png) · [이동 미리보기](artifacts/current/motion-preview.gif).
+
+필수 회귀·Windows/Web 내보내기와 실제 실행을 확인한 로컬 최신본입니다. 공개 사이트/GitHub의 기존 v3.19.0은 아래 audit-20261014 세대이며 이 선명도 개선판은 아직 공개하지 않았습니다. 표시 버전 3.19가 같으므로 실행 파일 해시로 구분합니다. 최신 로컬 Windows SHA-256은 `1363DFF57C0B3FF8264F95EB52FDD71F4E289AAFD807F18EA7D337F24272B2FC`입니다.
+
+## 이전 공개본: 3.19 전투 확장과 코드 검수 보완
 
 아래 웹 플레이 또는 Windows/Web 다운로드로 실행합니다. `audit-20261014`는 진화 이후 6개 전술 분기·보스 코어 공략·환경 역이용·선택형 최종 작전에 더해, 테스트의 실제 진행·터치 경로, 성능 회귀 판정, 빌드 소스/출력 연결, 손상 고스트 방어, 전술 선택 음악과 리플레이 계산을 보완한 세대입니다. [코드 검수 보완·검증 보고서](docs/CODE_AUDIT_IMPLEMENTATION_REPORT.md)와 [전투 확장 보고서](docs/COMBAT_IMPLEMENTATION_REPORT.md)를 참고하세요.
 

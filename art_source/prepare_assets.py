@@ -89,7 +89,7 @@ paths={
 'aegis':'M12 16L32 9L52 16V37L32 55L12 37ZM20 22L32 18L44 22V34L32 45L20 34M5 26V38M59 26V38',
 'trinity':'M32 10L51 43H13ZM27 8H37V18H27ZM8 39H18V49H8ZM46 39H56V49H46ZM27 28H37V38H27Z',
 'survive':'M16 16L32 10L48 16V36L32 51L16 36M25 20H39V39H25M32 22V30L37 34',
-'outer':'M22 13A22 22 0 1 0 22 51M30 32H55M46 24L55 32L46 40',
+'outer':'M24 13A19 19 0 1 0 24 51M30 32H55M46 24L55 32L46 40',
 'outer_kills':'M17 12A23 23 0 0 0 17 52M36 21A11 11 0 1 0 36 43A11 11 0 1 0 36 21M36 15V27M36 37V49M19 32H31M41 32H53',
 'returns':'M23 10V54M9 23H48L42 17M55 41H16L22 47',
 'dash_hits':'M8 24L30 32L8 40L13 32ZM38 18V27M38 37V46M43 32H55M31 22L34 25M31 42L34 39',
@@ -154,3 +154,6 @@ static func achievement_icon(id: String) -> String:
 (ROOT/'scripts/art_assets.gd').write_text(gd,encoding='utf-8')
 (ROOT/'art_source/asset-manifest.json').write_text(json.dumps(assets,indent=2),encoding='utf-8')
 print(f'Prepared {len(assets)} production resources')
+if '--clarity' in __import__('sys').argv:
+    from clarify_assets import apply
+    apply()

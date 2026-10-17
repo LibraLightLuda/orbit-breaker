@@ -1,0 +1,26 @@
+{
+  "chunks": [
+    {
+      "bytes": 1694,
+      "end": 2.11666666666666,
+      "sha256": "83c4c650b05ba20d9a193626b0857194294766c30e98b2ce78f87c5319fa2230",
+      "start": 0.0
+    },
+    {
+      "bytes": 3409,
+      "end": 4.51666666666666,
+      "sha256": "60d28d7e1892434746df38c5cc96b466fe5f7db5ea2ea2b81fd37a7abc6ab878",
+      "start": 2.38333333333333
+    }
+  ],
+  "difficulty": "normal",
+  "rules": "coop-v1",
+  "sector": "ring",
+  "seed": 6558566,
+  "ships": [
+    "striker",
+    "striker"
+  ],
+  "status": "complete",
+  "version": 1
+}

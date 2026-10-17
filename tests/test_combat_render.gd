@@ -5,6 +5,8 @@ var failures := 0
 var output := "res://artifacts/combat-work/screens"
 
 func _init() -> void:
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--output="): output = arg.trim_prefix("--output=")
 	call_deferred("run_checks")
 	create_timer(40).timeout.connect(func() -> void: push_error("COMBAT UI timeout"); quit(1))
 
@@ -51,6 +53,8 @@ func run_checks() -> void:
 		await process_frame
 		check(DisplayServer.window_get_size() == dimensions, "Actual window matches requested dimensions")
 		game.touch_mode = dimensions.x < 900
+		game._fit_viewport()
+		await process_frame
 		for ship: String in GameContent.SHIP_IDS:
 			game.run.reset(42, "normal", ship, "storm")
 			game.run.evolutions.append({"striker":"sentry", "scout":"wake", "bastion":"citadel"}[ship])
@@ -123,6 +127,7 @@ func run_checks() -> void:
 		await snapshot(game, "%dx%d-final-core" % [dimensions.x, dimensions.y])
 		check(float(boss.weakpoint) > 0.0, "Core visible after attachment destruction")
 	game.touch_mode = false
+	game._fit_viewport()
 	DisplayServer.window_set_size(Vector2i(1600, 900))
 	await process_frame
 	game.tech_page = 2

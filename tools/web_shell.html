@@ -134,7 +134,7 @@ function fitGame() {
 	window.orbitMobile = navigator.maxTouchPoints > 0 || matchMedia('(pointer: coarse)').matches || innerWidth < 900;
 	document.documentElement.classList.toggle('orbit-mobile', window.orbitMobile);
 	const bounds = gameFrame.getBoundingClientRect();
-	// Phone DPR 2-4 should not multiply fragment work while drawing the same game.
+	// Pixel-sized UI and gestures currently share CSS dimensions on phones.
 	const ratio = window.orbitMobile ? 1 : Math.min(devicePixelRatio || 1, 2);
 	canvas.width = Math.max(1, Math.round(bounds.width * ratio));
 	canvas.height = Math.max(1, Math.round(bounds.height * ratio));

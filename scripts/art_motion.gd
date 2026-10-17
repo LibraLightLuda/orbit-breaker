@@ -3,6 +3,8 @@ extends RefCounted
 const WHITE := Color("f4ffff")
 const CYAN := Color("83f5f3")
 const GOLD := Color("ffca76")
+const PLAYER_SIZE := 52.0
+const PLAYER_VISUAL_SCALE := PLAYER_SIZE / 42.0
 
 # All combat phases come from recorded model time/effects; rendering never advances the simulation.
 static func engine(canvas: CanvasItem, at: Vector2, angle: float, power: float, time: float, color: Color, size: float = 1.0, reduced: bool = false) -> void:
@@ -16,7 +18,7 @@ static func hull(canvas: CanvasItem, id: String, at: Vector2, angle: float, size
 	var breath := 0.0 if reduced else sin(time * 3.2) * 0.012
 	var lean := 0.0 if reduced else sin(time * 2.1) * 0.025 * speed
 	var dimensions := Vector2(size * (1.0 + breath - recoil * 0.045), size * (1.0 - breath + speed * 0.025))
-	ArtAssets.sprite(canvas, "ships/" + id, at - Vector2.from_angle(angle) * recoil * 1.8, dimensions, angle + lean, Vector2.ZERO, Color(1.04 + hit * 0.6, 1.09 + hit * 0.6, 1.12 + hit * 0.6))
+	ArtAssets.sprite(canvas, "ships/" + id, at - Vector2.from_angle(angle) * recoil * 1.8, dimensions, angle + lean, Vector2.ZERO, Color(1.0 + hit * 0.35, 1.02 + hit * 0.35, 1.04 + hit * 0.35))
 
 static func muzzle(canvas: CanvasItem, at: Vector2, angle: float, power: float, color: Color, size: float = 1.0) -> void:
 	if power <= 0.01: return
@@ -56,7 +58,7 @@ static func effect(canvas: CanvasItem, e: Dictionary, reduced: bool) -> void:
 		return
 	if kind in ["death", "meteor_impact", "hazard_start", "impact_blast", "impact_meteor"]:
 		var spread := 1.5 if reduced else 1.0 + age * 1.3
-		ArtAssets.sprite(canvas, "fx/explosion", at, Vector2.ONE * radius * spread, 0.0 if reduced else age * 0.7, Vector2.ZERO, Color(1.3, 1.18, 1.05, life * (0.3 if reduced else 1.0)))
+		ArtAssets.sprite(canvas, "fx/explosion", at, Vector2.ONE * radius * spread, 0.0 if reduced else age * 0.7, Vector2.ZERO, Color(1.1, 1.04, 1.0, life * (0.3 if reduced else 0.72)))
 		if not reduced: debris(canvas, at, direction, age * 2, life, GOLD, 6)
 		return
 	var color := CYAN if kind in ["pulse", "level", "reward", "arrival"] else (GOLD if kind == "guard" else Color("ff8593"))
@@ -72,7 +74,7 @@ static func effect(canvas: CanvasItem, e: Dictionary, reduced: bool) -> void:
 
 static func orbital(canvas: CanvasItem, at: Vector2, kind: String, angle: float, size: float, time: float, reduced: bool) -> void:
 	var turn := angle if reduced else angle + (time * 3.5 if kind == "blade" else sin(time * 5) * 0.12)
-	ArtAssets.sprite(canvas, "objects/" + kind, at, Vector2.ONE * size, turn, Vector2.ZERO, Color(1.35, 1.4, 1.45))
+	ArtAssets.sprite(canvas, "objects/" + kind, at, Vector2.ONE * size, turn, Vector2.ZERO, Color("b1edff") if kind == "frost" else (Color("ffb6b2") if kind == "blade" else Color.WHITE))
 	if kind == "frost":
 		ArtAssets.sprite(canvas, "fx/spark", at, Vector2.ONE * size * 0.4, turn, Vector2.ZERO, Color(CYAN, 0.65))
 

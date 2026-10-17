@@ -57,6 +57,8 @@ func _ready() -> void:
 			game.run.state="playing"
 			game._physics_process(1.0/60.0)
 			while game.run.shots.size()<240: refill()
+			while game.run.gems.size()<300:
+				game.run.gems.append({"pos":game.run.player+Vector2(500,0),"kind":"xp","value":1})
 			var submitted:=Time.get_ticks_usec()
 			game.queue_redraw()
 			await RenderingServer.frame_post_draw
@@ -102,11 +104,11 @@ func touch_checks() -> void:
 	game.touch_mode = true
 	game._start_run()
 	await get_tree().process_frame
-	var at: Vector2 = game.position + game.run.player + Vector2(100, 40)
+	var at: Vector2 = game.position + game.run.player - game.camera_offset + Vector2(80, 40)
 	push_touch(at, true)
 	push_touch(at, false)
 	game._physics_process(0.25)
-	results.append(game.run.dash_time > 0)
+	results.append(game.run.dash_time <= 0 and game.run.dash_cooldown <= 0)
 	game._start_run()
 	game.run.overdrive_meter = 100
 	push_touch(at, true)
@@ -126,14 +128,34 @@ func touch_checks() -> void:
 	for i in 15: game._physics_process(1.0 / 60)
 	results.append(game.run.player.x > start.x + 5)
 	push_touch(drag.position, false)
-	results.append(game._movement_direction().is_zero_approx() and not game.dash_queued)
+	results.append(game._movement_direction().is_zero_approx())
+	game._start_run()
+	at = game.position + game.run.player - game.camera_offset + Vector2(80,40)
+	var pixel_scale := get_viewport().get_final_transform().get_scale().x
+	var dpr: float = float(JavaScriptBridge.eval("document.getElementById('canvas').width / document.getElementById('canvas').getBoundingClientRect().width")) if OS.has_feature("web") else 1.0
+	push_touch(at,true)
+	drag.position = at + Vector2(40.0 * dpr / pixel_scale,0)
+	get_viewport().push_input(drag,true)
+	game._physics_process(0.35)
+	push_touch(drag.position,false)
+	game._physics_process(0.01)
+	results.append(game.run.dash_time <= 0)
+	game._start_run()
+	at = game.position + game.run.player - game.camera_offset + Vector2(80,40)
+	push_touch(at,true)
+	drag.position = at + Vector2(60.0 * dpr / pixel_scale,0)
+	get_viewport().push_input(drag,true)
+	game._physics_process(0.35)
+	push_touch(drag.position,false)
+	game._physics_process(0.01)
+	results.append(game.run.dash_time > 0)
 	var mobile: Control = game.ui.get_node("MobileHUD")
 	at = mobile.pause.get_global_transform_with_canvas() * (mobile.pause.size * 0.5)
 	push_touch(at, true)
 	push_touch(at, false)
 	await get_tree().process_frame
 	results.append(game.screen == "pause" and not game.touch.pending)
-	var report := {"kind":"orbit-mobile-input","passed":results.count(true),"total":results.size(),"checks":results,"note":"Actual WebAssembly Godot viewport touch events; physical DOM touch/device not tested"}
+	var report := {"kind":"orbit-mobile-input","passed":results.count(true),"total":results.size(),"checks":results,"render_ratio":dpr,"viewport":str(get_viewport().get_visible_rect().size),"note":"Actual WebAssembly viewport input; 40 CSS px must not dash, 60 CSS px must dash after hold. Physical device/DOM touch not tested"}
 	print(JSON.stringify(report))
 	if OS.has_feature("web"): JavaScriptBridge.eval("window.parent.postMessage("+JSON.stringify(report)+",window.location.origin)")
 	else: get_tree().quit(0 if results.count(false) == 0 else 1)

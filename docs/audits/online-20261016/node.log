@@ -1,0 +1,18 @@
+(node:31308) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ encrypted consistent SQLite backup, restore and wrong-key rejection (268.6381ms)
+✔ cloud metadata backup preserves anonymous publication and verifies encryption before restore (448.2371ms)
+✔ anonymous HTTP + two WebSocket clients against Godot + stored replay (3241.333ms)
+(node:28320) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ anonymous publication, duplicate results and shared ranking (24.1295ms)
+✔ trust boundaries and Korea season (0.2715ms)
+✔ replay expiry preserves scores and the twenty best published records until season + 90 days (155.326ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3306.3143

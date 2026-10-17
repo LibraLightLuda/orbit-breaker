@@ -1,0 +1,16 @@
+<!doctype html><meta charset="utf-8"><title>Orbit Breaker clarity validation</title>
+<style>body{margin:0;background:#07111d;color:#e8f8ff;font:14px sans-serif}iframe{display:block;border:0;width:390px;height:844px}pre{position:absolute;left:410px;top:0;white-space:pre-wrap}</style>
+<iframe id="game" allow="autoplay"></iframe><pre id="report">Starting three DPR stress and gesture comparisons...</pre>
+<script>
+const frame=document.getElementById('game'),reports=[];
+const runs=[...[1,1.5,2].map(dpr=>({dpr,touch:false})),...[1,1.5,2].map(dpr=>({dpr,touch:true}))];
+let index=0;
+function start(){const run=runs[index];frame.src='../artifacts/clarity-work/web-stress/index.html?qa_dpr='+run.dpr+(run.touch?'&touch':'');}
+addEventListener('message',async event=>{
+ if(event.origin!==location.origin||event.source!==frame.contentWindow||!['orbit-art-web-stress','orbit-mobile-input'].includes(event.data?.kind))return;
+ const result={...runs[index],...event.data};reports.push(result);
+ document.getElementById('report').textContent=JSON.stringify(reports,null,2);
+ await fetch('/qa-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(result)});
+ index++;if(index<runs.length)start();else document.title='Orbit Breaker clarity validation complete';
+});start();
+</script>

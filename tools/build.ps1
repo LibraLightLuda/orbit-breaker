@@ -1,5 +1,6 @@
 param(
-    [string]$GodotPath = 'D:\Antigravity\GodotGameProject\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe'
+    [string]$GodotPath = 'D:\Antigravity\GodotGameProject\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe',
+    [string]$PythonPath = 'python'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -34,14 +35,16 @@ function Invoke-GodotChecked {
 
 function Get-SourceHashes {
     $hashes = [ordered]@{}
-    foreach ($base in @('scripts','assets','tests','tools')) {
+    foreach ($base in @('scripts','assets','tests','tools','server')) {
         foreach ($file in Get-ChildItem -LiteralPath (Join-Path $projectRoot $base) -File -Recurse | Sort-Object FullName) {
             if ($file.Extension -in @('.uid','.pyc')) { continue }
             $relative = $file.FullName.Substring($projectRoot.Length + 1).Replace('\','/')
+            if ($relative -like 'server/data/*' -or $relative -eq 'server/.env' -or ($relative -like 'server/.env.*' -and $relative -ne 'server/.env.example')) { continue }
+            if ($relative -match '^server/ranking/(node_modules|dist|\.next|\.wrangler|\.git|\.sites-runtime)/') { continue }
             $hashes[$relative] = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash
         }
     }
-    foreach ($relative in @('project.godot','main.tscn','export_presets.cfg','icon.svg')) {
+    foreach ($relative in @('project.godot','main.tscn','export_presets.cfg','icon.svg','art_source/clarify_assets.py','art_source/prepare_assets.py','art_source/clarity-manifest.json')) {
         $hashes[$relative] = (Get-FileHash -LiteralPath (Join-Path $projectRoot $relative) -Algorithm SHA256).Hash
     }
     return $hashes
@@ -55,10 +58,26 @@ Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--editor
 $sourceHashes = Get-SourceHashes
 $validationStarted = (Get-Date).ToUniversalTime().ToString('o')
 $ErrorActionPreference = 'Continue'
-& python -m unittest discover -s (Join-Path $projectRoot 'tests') -p test_validation.py 2>&1 | ForEach-Object { Write-Host $_ }
+& $PythonPath -m unittest discover -s (Join-Path $projectRoot 'tests') -p 'test_*.py' 2>&1 | ForEach-Object { Write-Host $_ }
 $validationExit = $LASTEXITCODE
 $ErrorActionPreference = 'Stop'
 if ($validationExit -ne 0) { throw 'Build validation regression tests failed.' }
+
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_online_regressions.gd') -SuccessPattern 'ONLINE REGRESSIONS: 10 checks passed'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_online_world.gd') -SuccessPattern '(?m)^ONLINE WORLD SELF-CHECK: [1-9][0-9]* checks passed$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_online_ui.gd') -SuccessPattern '(?m)^ONLINE UI SELF-CHECK: [1-9][0-9]* checks passed$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_online_history.gd') -SuccessPattern '(?m)^ONLINE HISTORY SELF-CHECK: [1-9][0-9]* assertions passed$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_online_life.gd') -SuccessPattern '(?m)^ONLINE LIFE SELF-CHECK: [1-9][0-9]* assertions passed$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_online_damage.gd') -SuccessPattern '(?m)^ONLINE DAMAGE SELF-CHECK: [1-9][0-9]* assertions passed$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_online_choices.gd') -SuccessPattern '(?m)^ONLINE CHOICES SELF-CHECK: [1-9][0-9]* assertions passed$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_online_replay.gd') -SuccessPattern '(?m)^ONLINE REPLAY SELF-CHECK: [1-9][0-9]* assertions passed$'
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_online_practice.gd') -SuccessPattern '(?m)^ONLINE PRACTICE SELF-CHECK: [1-9][0-9]* assertions passed$'
+& (Join-Path $projectRoot 'tools/test_dedicated_boot.ps1') -GodotPath $GodotPath
+$ErrorActionPreference = 'Continue'
+& node --test (Join-Path $projectRoot 'server/test/backup.test.mjs') (Join-Path $projectRoot 'server/test/cloud-backup.test.mjs') (Join-Path $projectRoot 'server/test/store.test.mjs') (Join-Path $projectRoot 'server/test/integration.test.mjs') (Join-Path $projectRoot 'server/test/sites.test.mjs')
+$onlineExit = $LASTEXITCODE
+$ErrorActionPreference = 'Stop'
+if ($onlineExit -ne 0) { throw 'Online service tests failed.' }
 
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_combat_expansion.gd') `
     -SuccessPattern '(?m)^COMBAT SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
@@ -117,6 +136,9 @@ Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--script', 'res://tests/test_art.gd') `
     -SuccessPattern '(?m)^ART SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 
+Invoke-GodotChecked -Arguments @('--path', $projectRoot, '--script', 'res://tests/test_visual_clarity.gd', '--', '--motion') `
+    -SuccessPattern '(?m)^CLARITY SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
+
 Invoke-GodotChecked -Arguments @('--path', $projectRoot, '--audio-driver', 'Dummy', '--script', 'res://tests/test_pregame.gd') `
     -SuccessPattern '(?m)^PREGAME SELF-CHECK: ([1-9][0-9]*) / \1 assertions passed\s*$'
 
@@ -131,6 +153,12 @@ finally { $buildHash.Dispose() }
 $webDirectory = Join-Path $buildDirectory 'web'
 New-Item -ItemType Directory -Path $webDirectory -Force | Out-Null
 Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--export-release', 'Web', (Join-Path $webDirectory 'index.html'))
+$serverDirectory = Join-Path $buildDirectory 'server'
+New-Item -ItemType Directory -Path $serverDirectory -Force | Out-Null
+Invoke-GodotChecked -Arguments @('--headless', '--path', $projectRoot, '--export-release', 'Online Server', (Join-Path $serverDirectory 'OrbitBreakerServer.x86_64'))
+$serverRuntime = Join-Path $serverDirectory 'server'
+New-Item -ItemType Directory -Path $serverRuntime -Force | Out-Null
+Get-ChildItem -LiteralPath (Join-Path $projectRoot 'server') -File | Where-Object { $_.Extension -in @('.mjs','.sql') -or $_.Name -in @('package.json','Caddyfile','orbit-breaker.service','.env.example') } | Copy-Item -Destination $serverRuntime -Force
 Invoke-GodotChecked -Arguments @('--path', $projectRoot, '--audio-driver', 'Dummy', '--script', 'res://tests/audio_smoke.gd') -SuccessPattern 'AUDIO SMOKE COMPLETE'
 $finalSources = Get-SourceHashes
 if ($sourceHashes.Count -ne $finalSources.Count) { throw 'Source inventory changed during validation.' }
@@ -138,6 +166,9 @@ foreach ($entry in $sourceHashes.GetEnumerator()) {
     if ($finalSources[$entry.Key] -ne $entry.Value) { throw "Source changed during validation: $($entry.Key)" }
 }
 $outputs = [ordered]@{'OrbitBreaker.exe' = (Get-FileHash -LiteralPath $outputPath -Algorithm SHA256).Hash}
+foreach ($file in Get-ChildItem -LiteralPath $serverDirectory -File -Recurse) {
+    $outputs[$file.FullName.Substring($buildDirectory.Length + 1).Replace('\','/')] = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash
+}
 foreach ($file in Get-ChildItem -LiteralPath $webDirectory -File) {
     $outputs['web/' + $file.Name] = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash
 }

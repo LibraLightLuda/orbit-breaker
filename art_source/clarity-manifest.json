@@ -1,0 +1,1082 @@
+{
+  "enemies/boss": {
+    "source_sha256": "B030DE6DEAFF8F3BF7EFF603955AB3FA1985481C9A9762DAFEAFB1E3FCC02844",
+    "family": "enemies",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      25,
+      31,
+      486,
+      480
+    ],
+    "alpha_bounds": [
+      14,
+      20,
+      497,
+      491
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "7B158AA037F7B02B77FE4261D7D036995F64F6F41518D01BFAF4E7020060EBDB"
+  },
+  "enemies/chaser": {
+    "source_sha256": "96900E6039E18F5D612A591FA030C9DBC102C687DE6E48F3CCAD074134F9F752",
+    "family": "enemies",
+    "size": [
+      256,
+      256
+    ],
+    "source_alpha_bounds": [
+      13,
+      59,
+      243,
+      196
+    ],
+    "alpha_bounds": [
+      7,
+      53,
+      249,
+      202
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "281F8F37383771B23792926ED52C330755627EC6A145217D761E223E588C5D54"
+  },
+  "enemies/elite_artillery": {
+    "source_sha256": "4DFD00780AD8821D3818980B9059EE0402900CE4316A426DD55718F9E631F030",
+    "family": "enemies",
+    "size": [
+      256,
+      256
+    ],
+    "source_alpha_bounds": [
+      13,
+      23,
+      243,
+      232
+    ],
+    "alpha_bounds": [
+      7,
+      17,
+      249,
+      238
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "6DC0D9E78818BE99FA2405C070F2FA7F28AE4680CFE0208D386AEA7C73970E27"
+  },
+  "enemies/elite_assault": {
+    "source_sha256": "335290E1EAC44AE1DF1A6F4CB2083E18DFCE4003A8E27E99D5C1FEA5A5B1D3DA",
+    "family": "enemies",
+    "size": [
+      256,
+      256
+    ],
+    "source_alpha_bounds": [
+      13,
+      43,
+      243,
+      212
+    ],
+    "alpha_bounds": [
+      7,
+      37,
+      249,
+      218
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "74FF0C53498A430CAAAAB4D80E31CCD59E9F1CDB444239E8BF52CCFED726F0A2"
+  },
+  "enemies/runner": {
+    "source_sha256": "FCDC248D133F09162F2D1C8A1FD9E91B9E94535EDE15EC8402466B9D6D57314E",
+    "family": "enemies",
+    "size": [
+      256,
+      256
+    ],
+    "source_alpha_bounds": [
+      13,
+      81,
+      243,
+      174
+    ],
+    "alpha_bounds": [
+      7,
+      75,
+      249,
+      180
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "B990499896D63189ACDF4D991B99F2E645CE760615DF2B26229FEE55B8632EAA"
+  },
+  "enemies/shooter": {
+    "source_sha256": "C4EA7531CCCDCD2B462BC38CCDC68F0F78B842B37B835DA691DF04B2EBA9A3F8",
+    "family": "enemies",
+    "size": [
+      256,
+      256
+    ],
+    "source_alpha_bounds": [
+      13,
+      30,
+      243,
+      225
+    ],
+    "alpha_bounds": [
+      7,
+      24,
+      249,
+      231
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "3396F736907E1381F8349BB4C08966D1CDBC844ACC98C316C51B35C5F0D21292"
+  },
+  "enemies/tank": {
+    "source_sha256": "B95F54DA006DCA3C2EE1D888B0134F2DCE83CB710817A660A8B95835E5BF22F3",
+    "family": "enemies",
+    "size": [
+      256,
+      256
+    ],
+    "source_alpha_bounds": [
+      13,
+      29,
+      243,
+      227
+    ],
+    "alpha_bounds": [
+      7,
+      23,
+      249,
+      233
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "B607989C99572F4E6740AF6522053F1186E6F8069A15C52651354F7117F6B0CC"
+  },
+  "fx/black_hole": {
+    "source_sha256": "908F320E669E8CAE86629628D52FC23FDE1FCE1F2023D097184F9B7015183430",
+    "family": "fx",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      49,
+      77,
+      463,
+      435
+    ],
+    "alpha_bounds": [
+      49,
+      77,
+      463,
+      435
+    ],
+    "treatment": "soft core separation",
+    "output_sha256": "98A3677B87284A6A91831EEE6D33D82C98A71778774D8D80399FBC43F5489E00"
+  },
+  "fx/container": {
+    "source_sha256": "8D7C9630D2205381EBB165F22129676F14FD3B7A69B3018BE7730073CAD13F23",
+    "family": "fx",
+    "size": [
+      256,
+      256
+    ],
+    "source_alpha_bounds": [
+      13,
+      13,
+      243,
+      242
+    ],
+    "alpha_bounds": [
+      7,
+      7,
+      249,
+      248
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "95B6289B9D7151762ED21517632EA065E2C4F14D266229D4C33192DD277AAAB8"
+  },
+  "fx/explosion": {
+    "source_sha256": "62812E54C17DC1052FD6C9D2AE6012512403947758452116E7C9209CD564BAF4",
+    "family": "fx",
+    "size": [
+      256,
+      256
+    ],
+    "source_alpha_bounds": [
+      23,
+      13,
+      233,
+      243
+    ],
+    "alpha_bounds": [
+      23,
+      13,
+      233,
+      243
+    ],
+    "treatment": "soft core separation",
+    "output_sha256": "60CB781AB6C1619E2FC2FE43A13EFC5698FB44EF3D6BA75EB3C107C19997B6FD"
+  },
+  "fx/projectile": {
+    "source_sha256": "382C9713B8DB770878332FE4E943F22376C5A461BF58DE163690B6F82AE4E0FC",
+    "family": "fx",
+    "treatment": "projectile radius preserved; explicit core rim",
+    "output_sha256": "382C9713B8DB770878332FE4E943F22376C5A461BF58DE163690B6F82AE4E0FC"
+  },
+  "fx/spark": {
+    "source_sha256": "7C3FC540658A8D346C8833311BDE35398E02745C76FA8109B6660B3B23338328",
+    "family": "fx",
+    "size": [
+      256,
+      256
+    ],
+    "source_alpha_bounds": [
+      28,
+      13,
+      227,
+      243
+    ],
+    "alpha_bounds": [
+      28,
+      13,
+      227,
+      243
+    ],
+    "treatment": "soft core separation",
+    "output_sha256": "0B6CE5F234BB2AEC973D2CAEF9B071A2B947D5D6A2EC348B574A5B9A77BADAAA"
+  },
+  "fx/thrust": {
+    "source_sha256": "A142D8CEFBA8B89C17376185004FE3F9766939D87D09389E7F9F542632CFAD46",
+    "family": "fx",
+    "size": [
+      256,
+      256
+    ],
+    "source_alpha_bounds": [
+      13,
+      80,
+      243,
+      176
+    ],
+    "alpha_bounds": [
+      13,
+      80,
+      243,
+      176
+    ],
+    "treatment": "soft core separation",
+    "output_sha256": "7EA64220DD996E59F23D203C7AE462B1AB7E8FF37BE6222B61BFB892AFC00727"
+  },
+  "fx/wave": {
+    "source_sha256": "61B9EB5C2893C98C1BAF230C4712D43C13EFB568AB3872412178E8A683A7DE23",
+    "family": "fx",
+    "size": [
+      256,
+      256
+    ],
+    "source_alpha_bounds": [
+      23,
+      13,
+      233,
+      243
+    ],
+    "alpha_bounds": [
+      23,
+      13,
+      233,
+      243
+    ],
+    "treatment": "soft core separation",
+    "output_sha256": "92F8F6981D3983B31172B00621A171555C2C4A80CBAA3893B07976E24BD102CD"
+  },
+  "objects/axe": {
+    "source_sha256": "0AF24E8891E8389046FE37D81EFCE74FEE8924ECE53906E2687691F520E77DEE",
+    "family": "objects",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      170,
+      170,
+      429,
+      342
+    ],
+    "alpha_bounds": [
+      159,
+      159,
+      440,
+      353
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "966788DFF98F0A43E3ADD60CE44E78347474B9B7D5C231CCB84BA999A741CC49"
+  },
+  "objects/blade": {
+    "source_sha256": "67D43D8B783186F46FCEBF5777083D60B4100093D27A95CFFCAE06121838D606",
+    "family": "objects",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      170,
+      170,
+      429,
+      342
+    ],
+    "alpha_bounds": [
+      159,
+      159,
+      440,
+      353
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "966788DFF98F0A43E3ADD60CE44E78347474B9B7D5C231CCB84BA999A741CC49"
+  },
+  "objects/core": {
+    "source_sha256": "7D157FDFD44FD1FF236CE6D40F33B96C188C9BFA6E17D3DDA4028643811E6B8A",
+    "family": "objects",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      147,
+      98,
+      436,
+      414
+    ],
+    "alpha_bounds": [
+      110,
+      52,
+      487,
+      460
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "A3AC7BAADF2C47461A281BAC7CA74383BB6F14BEE98A73D9349EC852DBE07E48"
+  },
+  "objects/drive": {
+    "source_sha256": "C4BB79364B23833C696240703595DDB7799859604E8B0497E95A835657F731AE",
+    "family": "objects",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      123,
+      146,
+      372,
+      367
+    ],
+    "alpha_bounds": [
+      23,
+      61,
+      461,
+      451
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "BB6DB26F3842AEF43B77797B7C7C535356A70F5263FA43BE9560A956991A6E66"
+  },
+  "objects/frost": {
+    "source_sha256": "F066BA5CC2BDC4B5FC80FA6AEFEE37651C935781A41A62EB3EA57439570C65B3",
+    "family": "objects",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      147,
+      98,
+      436,
+      414
+    ],
+    "alpha_bounds": [
+      136,
+      87,
+      447,
+      425
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "A1855212186DA59DFAD52B0885A21E4876102A6847D21A3B54E8FA8B6599CD59"
+  },
+  "objects/heal": {
+    "source_sha256": "D3C2BA5AE1CE25ECE0D2EF01D1A57609AE326A648DA72329A1FC07E0505119AA",
+    "family": "objects",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      163,
+      124,
+      349,
+      388
+    ],
+    "alpha_bounds": [
+      88,
+      25,
+      424,
+      487
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "5A4C2C92617E1093FA19F5A2B0004805ED253376C48C543FCAB4CCA99BAE97AC"
+  },
+  "objects/meteor": {
+    "source_sha256": "DA7F4B2E6D6DA806455052A99DEC50B2185759FF2D311D7D009B350A36886FD3",
+    "family": "objects",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      75,
+      66,
+      437,
+      445
+    ],
+    "alpha_bounds": [
+      64,
+      55,
+      448,
+      456
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "21E592A451B4F0CAA8D4985CF53D204F7268FE85B49C62FF6F401DCD73583CF5"
+  },
+  "objects/mine": {
+    "source_sha256": "B1D5A87115857E468905A0125782948C609FBBA3A8A18F57F6F9DE03F1AF7A1F",
+    "family": "objects",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      96,
+      96,
+      416,
+      416
+    ],
+    "alpha_bounds": [
+      24,
+      24,
+      487,
+      487
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "15E06F30DC55B61F89F2758D70041438F276390ED282EA76926DAEE038E2596C"
+  },
+  "objects/missile": {
+    "source_sha256": "2A1C3C0313BC62BE5CD221AC30D6BB2BE8D127A1F1BBFB081E079AB3D63B9AC8",
+    "family": "objects",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      120,
+      179,
+      414,
+      333
+    ],
+    "alpha_bounds": [
+      109,
+      168,
+      425,
+      344
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "38D3A9A1299AAB41A5F863A87B7D8048B1FDE22B25347EB256FB784DF5AA4A6D"
+  },
+  "objects/normal": {
+    "source_sha256": "DAEFB990F855199011C9E968E7C576F467A4998B5893C491FC3B43F2BD1CA225",
+    "family": "objects",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      147,
+      98,
+      436,
+      414
+    ],
+    "alpha_bounds": [
+      136,
+      87,
+      447,
+      425
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "55D96FF27FF99EE1B9F1B0FA8157A3546041C507600A7E4EE1626C7C566F5A87"
+  },
+  "objects/planet": {
+    "source_sha256": "109AABC950E15D2226F6CC7C8F3FACBE74342998D2AFBB5A1263239DEA044FC0",
+    "family": "objects",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      25,
+      27,
+      486,
+      485
+    ],
+    "alpha_bounds": [
+      14,
+      16,
+      497,
+      496
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "F9947809DEE2B8EA74641739BBF349CC148EA096E0DCB4456E5D258105DBDAAC"
+  },
+  "objects/sentry": {
+    "source_sha256": "DF9FD84EE8FAE0133B935CFF11DB8AB7468B7ABBE2F1F9F549F962CF84DFCBCE",
+    "family": "objects",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      158,
+      114,
+      418,
+      399
+    ],
+    "alpha_bounds": [
+      111,
+      49,
+      490,
+      463
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "AC41BDE8711AE59318316A7CA1D1401428CAED5400BE414F7370F5B4A2120C9F"
+  },
+  "objects/shell": {
+    "source_sha256": "9DB9B25C3CAB120FA0BC430B4099C3599C5EE1107E20F28616E996D2936E49AE",
+    "family": "objects",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      109,
+      114,
+      409,
+      398
+    ],
+    "alpha_bounds": [
+      31,
+      40,
+      487,
+      471
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "E6E3FEFA09B3FE89AD73A37678CA836A8091C332164AEFF3E6C9442B1E3A7C39"
+  },
+  "objects/xp": {
+    "source_sha256": "04C7D88670DEFA111F18FABB4BA850AFEE6133092E4DD0816418F92A0BE8ED45",
+    "family": "objects",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      163,
+      124,
+      349,
+      388
+    ],
+    "alpha_bounds": [
+      88,
+      25,
+      424,
+      487
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "7BE731C852DDC0B0048F7E69DF6605B085F5FB9EC12800FF9600C227E36118EC"
+  },
+  "ships/bastion": {
+    "source_sha256": "B6D851F6AFB8369357701EC7EA80D74F314CBD2607AB5B0C306F0B6BFB57BE33",
+    "family": "ships",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      25,
+      31,
+      486,
+      480
+    ],
+    "alpha_bounds": [
+      14,
+      20,
+      497,
+      491
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "AB3E35C91C3859B17F7D595FC56B8762D4B592304FA17FCE6281615EDDCBF8DD"
+  },
+  "ships/scout": {
+    "source_sha256": "514BBF92A20292D4ABD9E2FB06B6C7ED16661CAA7F4EE65B35CA9E9A8098F0A3",
+    "family": "ships",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      25,
+      105,
+      486,
+      407
+    ],
+    "alpha_bounds": [
+      14,
+      94,
+      497,
+      418
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "F67FAF6B5DCB57700F1D5A41488EB98CCB0C57CDE4D381BB03546F049F1B6A51"
+  },
+  "ships/striker": {
+    "source_sha256": "EAEDA5485322B7CECB130782F9A58C27038C186C02E44A39DE4F5152630F8707",
+    "family": "ships",
+    "size": [
+      512,
+      512
+    ],
+    "source_alpha_bounds": [
+      25,
+      52,
+      486,
+      460
+    ],
+    "alpha_bounds": [
+      14,
+      41,
+      497,
+      471
+    ],
+    "treatment": "baked silhouette and material contrast",
+    "output_sha256": "656A65182EC92C3D0DF83654EFAEAEAB89AD10524C2AF42466C650513D4CD21F"
+  },
+  "ui/achievement": {
+    "source_sha256": "6F7B441C251EA5145A2A08C0284D6213AE7578601718E0D6D2E27149F0D79B34",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "6F7B441C251EA5145A2A08C0284D6213AE7578601718E0D6D2E27149F0D79B34"
+  },
+  "ui/aegis": {
+    "source_sha256": "825A1A45E6BFC1F3E76C2C52ED197A2666494C64A1EFFD8D9B4A7A727399E0F3",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "825A1A45E6BFC1F3E76C2C52ED197A2666494C64A1EFFD8D9B4A7A727399E0F3"
+  },
+  "ui/battery": {
+    "source_sha256": "99BF1AEFB38865CD9CA6E3E3B4691756359DFE726C6004BEFFC3E8B38F8657A4",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "99BF1AEFB38865CD9CA6E3E3B4691756359DFE726C6004BEFFC3E8B38F8657A4"
+  },
+  "ui/blade": {
+    "source_sha256": "3C06E405CD84280B2869A66AB55BEEE8A44AD66E4059B474C3079DCDBCA6BB94",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "3C06E405CD84280B2869A66AB55BEEE8A44AD66E4059B474C3079DCDBCA6BB94"
+  },
+  "ui/blizzard": {
+    "source_sha256": "F75B263B401FF8984B0B4AAE686175A893031879F71BD070131A27D75B075149",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "F75B263B401FF8984B0B4AAE686175A893031879F71BD070131A27D75B075149"
+  },
+  "ui/bounty": {
+    "source_sha256": "A4DEA1BF73CA797772B6C16375252DA8357B72EC0185E96DEF38E5756509314C",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "A4DEA1BF73CA797772B6C16375252DA8357B72EC0185E96DEF38E5756509314C"
+  },
+  "ui/burst": {
+    "source_sha256": "82B0FDEDA6A2787511A3EE2F544CB1216B84CF30FF7A672228EE4A1FE15982D1",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "82B0FDEDA6A2787511A3EE2F544CB1216B84CF30FF7A672228EE4A1FE15982D1"
+  },
+  "ui/cataclysm": {
+    "source_sha256": "593D4F6B943EB96B00FA0610946D8992480FB467B74FA45A580DD41D417BC5E2",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "593D4F6B943EB96B00FA0610946D8992480FB467B74FA45A580DD41D417BC5E2"
+  },
+  "ui/chain": {
+    "source_sha256": "DF7C6A6190791CA57353A7778929B080E9CCCF1CE194C1312F8596E797454333",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "DF7C6A6190791CA57353A7778929B080E9CCCF1CE194C1312F8596E797454333"
+  },
+  "ui/citadel": {
+    "source_sha256": "A78AAF5402798366B41094AB924BBE58BD6D5F0CBD54ECF7CF2FFC7516B95487",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "A78AAF5402798366B41094AB924BBE58BD6D5F0CBD54ECF7CF2FFC7516B95487"
+  },
+  "ui/core": {
+    "source_sha256": "0CB9FF18537EDB8D9AE4A436338835301500F7720931F064238E78CB1F87594D",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "0CB9FF18537EDB8D9AE4A436338835301500F7720931F064238E78CB1F87594D"
+  },
+  "ui/dash": {
+    "source_sha256": "AC0FEFA1ECE30B6CFD386967F1CD8666331C37BB4403795779FD6571B11604F0",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "AC0FEFA1ECE30B6CFD386967F1CD8666331C37BB4403795779FD6571B11604F0"
+  },
+  "ui/dash_hits": {
+    "source_sha256": "1D40442327D05CB9ABBE9D529DA7F102ABA3AC39D35B90AA587C05A42C392AC9",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "1D40442327D05CB9ABBE9D529DA7F102ABA3AC39D35B90AA587C05A42C392AC9"
+  },
+  "ui/drive": {
+    "source_sha256": "A089E2B52F018DF9094CA98C7B290B583792BA7B322419ADAFA60FE8090F49C8",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "A089E2B52F018DF9094CA98C7B290B583792BA7B322419ADAFA60FE8090F49C8"
+  },
+  "ui/ellipse": {
+    "source_sha256": "3C9A2986546DE3D37950F26230908FB86937F7BD9140DCACF35A615127533BC3",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "3C9A2986546DE3D37950F26230908FB86937F7BD9140DCACF35A615127533BC3"
+  },
+  "ui/emp": {
+    "source_sha256": "4D93A0100572B853B5337383F7F2A3722E80308D984D90AD19D3C2ADD3F95C30",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "4D93A0100572B853B5337383F7F2A3722E80308D984D90AD19D3C2ADD3F95C30"
+  },
+  "ui/focus_amp": {
+    "source_sha256": "24E21DFD0A13E2FA32C0EF6CABD843DAA2BA9F40BE11AA9C51AF61EE125E7ADE",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "24E21DFD0A13E2FA32C0EF6CABD843DAA2BA9F40BE11AA9C51AF61EE125E7ADE"
+  },
+  "ui/focus_memory": {
+    "source_sha256": "5CB864EEA9315FCE87784A2F50CCEAC5F71B5698D9564C090201ED22EC0E03DF",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "5CB864EEA9315FCE87784A2F50CCEAC5F71B5698D9564C090201ED22EC0E03DF"
+  },
+  "ui/fortune": {
+    "source_sha256": "41E73A25A3C7396A6A37A655FB127966C28697838D0E4258689DE136C19F3B9B",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "41E73A25A3C7396A6A37A655FB127966C28697838D0E4258689DE136C19F3B9B"
+  },
+  "ui/frenzy": {
+    "source_sha256": "6095F18A0D59DD2232C46A9615AEC1752279B70D1866C74D8AC6DC95EFC480A2",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "6095F18A0D59DD2232C46A9615AEC1752279B70D1866C74D8AC6DC95EFC480A2"
+  },
+  "ui/frost": {
+    "source_sha256": "FF043ECB23D42250360EAB5C8FAB52DE280D17AB95896E6836D6B4F7EF268EF0",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "FF043ECB23D42250360EAB5C8FAB52DE280D17AB95896E6836D6B4F7EF268EF0"
+  },
+  "ui/guard_pulse": {
+    "source_sha256": "AFC0A6696425620151432AF762C03E688B6D4CC988F9D7A8FB10F1BF7A124776",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "AFC0A6696425620151432AF762C03E688B6D4CC988F9D7A8FB10F1BF7A124776"
+  },
+  "ui/guard_reserve": {
+    "source_sha256": "D8B306EED1174B3CDD719C0C7F8BDA8CD9683FAE8F5BC2ED9F80212FE58B8108",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "D8B306EED1174B3CDD719C0C7F8BDA8CD9683FAE8F5BC2ED9F80212FE58B8108"
+  },
+  "ui/haste": {
+    "source_sha256": "2BF7C00659B2EB5801A952CB987D47D740478514BD4C90148417DC2B3D037031",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "2BF7C00659B2EB5801A952CB987D47D740478514BD4C90148417DC2B3D037031"
+  },
+  "ui/hatchet": {
+    "source_sha256": "983FB06DCB5EA126FE8866D905445AB8AB2CB9F832AD95061DA052D9D7D68851",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "983FB06DCB5EA126FE8866D905445AB8AB2CB9F832AD95061DA052D9D7D68851"
+  },
+  "ui/heal": {
+    "source_sha256": "435E090F2B4CD052E14D9D2D14B209D4DE949D855B75A649C8C40A0A70A2455F",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "435E090F2B4CD052E14D9D2D14B209D4DE949D855B75A649C8C40A0A70A2455F"
+  },
+  "ui/insight": {
+    "source_sha256": "82E4AD740D751529DAF8238937E6344DA5134177296C4138F39EB6E86E934B8F",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "82E4AD740D751529DAF8238937E6344DA5134177296C4138F39EB6E86E934B8F"
+  },
+  "ui/lancer": {
+    "source_sha256": "9B60D3CF04EA6D9C4A04725603484F729C29204860E2CE32729A624E4913481E",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "9B60D3CF04EA6D9C4A04725603484F729C29204860E2CE32729A624E4913481E"
+  },
+  "ui/magnet": {
+    "source_sha256": "C42F5001182D8F1EE7C285546316CC196A3CAB4BAB796100BFCEF6AB266A6B6D",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "C42F5001182D8F1EE7C285546316CC196A3CAB4BAB796100BFCEF6AB266A6B6D"
+  },
+  "ui/minefield": {
+    "source_sha256": "9D5B55D97C5E7BC6E18A8BD6199079BB617F1AD71748046EAE3ADA357C4746F7",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "9D5B55D97C5E7BC6E18A8BD6199079BB617F1AD71748046EAE3ADA357C4746F7"
+  },
+  "ui/missile": {
+    "source_sha256": "B747F215596C012B9CE10ACE1158FB53BC78E4683D37DFE5A713C4E96B8B5D07",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "B747F215596C012B9CE10ACE1158FB53BC78E4683D37DFE5A713C4E96B8B5D07"
+  },
+  "ui/normal": {
+    "source_sha256": "B598891715D8180D4ED3FDF31EB41C2BA6AEC323BCD3B6FF71A72344AFF58AE3",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "B598891715D8180D4ED3FDF31EB41C2BA6AEC323BCD3B6FF71A72344AFF58AE3"
+  },
+  "ui/nova": {
+    "source_sha256": "6DFEFAAD10465FA168E3D9F338E7DBA41AEEC8EA491E7BC0B757BFEB7BFEC700",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "6DFEFAAD10465FA168E3D9F338E7DBA41AEEC8EA491E7BC0B757BFEB7BFEC700"
+  },
+  "ui/orbit": {
+    "source_sha256": "C3401C17E208B9C7AB8DA677A748B92400D43A3DC4DBB520B04C2D6BE281E4C2",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "C3401C17E208B9C7AB8DA677A748B92400D43A3DC4DBB520B04C2D6BE281E4C2"
+  },
+  "ui/orbit_range": {
+    "source_sha256": "C38B713CABF5D358BF8087894AF4EAFF4CF7324AFACBCBA600B8D517F3D713AA",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "C38B713CABF5D358BF8087894AF4EAFF4CF7324AFACBCBA600B8D517F3D713AA"
+  },
+  "ui/outer": {
+    "source_sha256": "B38699DEF79E3FB875FE1492D5ABA55A93E19C5B10F87CD1522CF53DC48194E8",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "B38699DEF79E3FB875FE1492D5ABA55A93E19C5B10F87CD1522CF53DC48194E8"
+  },
+  "ui/outer_kills": {
+    "source_sha256": "7B7E843FCB7EF73CAA555977CD1553E3ACF01DAD9FDFCD33517C6673EBEC514F",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "7B7E843FCB7EF73CAA555977CD1553E3ACF01DAD9FDFCD33517C6673EBEC514F"
+  },
+  "ui/overdrive": {
+    "source_sha256": "F45B8F7BEC0C0129862711CDD67FADE211180718CCCCE337550752D09BB000F5",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "F45B8F7BEC0C0129862711CDD67FADE211180718CCCCE337550752D09BB000F5"
+  },
+  "ui/power": {
+    "source_sha256": "5BBF34C576D1805D80EC0FCADDD5057A2CD66E582CA656920587334F3A718DF7",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "5BBF34C576D1805D80EC0FCADDD5057A2CD66E582CA656920587334F3A718DF7"
+  },
+  "ui/pulse": {
+    "source_sha256": "6FFE50EF89A4DAB4B731FB455153E67F40AEBF8CF73F8D5A88C88964A7B57391",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "6FFE50EF89A4DAB4B731FB455153E67F40AEBF8CF73F8D5A88C88964A7B57391"
+  },
+  "ui/rail": {
+    "source_sha256": "E341F12367629283CDF5420362E4FF6B277A872DDF697AD3530A5100B82FFFEA",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "E341F12367629283CDF5420362E4FF6B277A872DDF697AD3530A5100B82FFFEA"
+  },
+  "ui/rapid": {
+    "source_sha256": "A666112B89A367496FD0BC9E7CA68B836B1FFAA8AB4F82F86FDBD415A4649827",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "A666112B89A367496FD0BC9E7CA68B836B1FFAA8AB4F82F86FDBD415A4649827"
+  },
+  "ui/relaxed": {
+    "source_sha256": "FF3BA9836D9A9FF93EC60F9F496989326D73A0E48ABD9AE751C8AD484CA928A7",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "FF3BA9836D9A9FF93EC60F9F496989326D73A0E48ABD9AE751C8AD484CA928A7"
+  },
+  "ui/repair": {
+    "source_sha256": "E3EF5ED197F5A75BD78FDB33687B98E6BE36B4B4F119C8A346B6A1D5DF616C13",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "E3EF5ED197F5A75BD78FDB33687B98E6BE36B4B4F119C8A346B6A1D5DF616C13"
+  },
+  "ui/restore": {
+    "source_sha256": "C1560D8F891031235034FBD608AEBB74A3C40995BA4BD50BEA12C6ABCCC6EE64",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "C1560D8F891031235034FBD608AEBB74A3C40995BA4BD50BEA12C6ABCCC6EE64"
+  },
+  "ui/returns": {
+    "source_sha256": "343CFE750F221383009C8EE372667199DD2FBB5529DE4094C5FA0F1BBEA60C9A",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "343CFE750F221383009C8EE372667199DD2FBB5529DE4094C5FA0F1BBEA60C9A"
+  },
+  "ui/salvo": {
+    "source_sha256": "3D38261F8E9E0C16B31F9F706C24A56CEEC2C72B10F36927EBFB43AEA06DCB9A",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "3D38261F8E9E0C16B31F9F706C24A56CEEC2C72B10F36927EBFB43AEA06DCB9A"
+  },
+  "ui/scout_drive": {
+    "source_sha256": "D829102888C954824362E772AA6482F5CCEFA24FF387CEA8BB98487825C933B0",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "D829102888C954824362E772AA6482F5CCEFA24FF387CEA8BB98487825C933B0"
+  },
+  "ui/scout_lance": {
+    "source_sha256": "A29899DF02DF99120D4467114360FDBDE81A34215A902B408D0D75E54C25FED9",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "A29899DF02DF99120D4467114360FDBDE81A34215A902B408D0D75E54C25FED9"
+  },
+  "ui/sentry": {
+    "source_sha256": "50E158C4E5986252520D880B7949683A2E1C9F4D472750FD5C3E7C5CBA596346",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "50E158C4E5986252520D880B7949683A2E1C9F4D472750FD5C3E7C5CBA596346"
+  },
+  "ui/shell": {
+    "source_sha256": "B44B61321FFB03599B5697BB1234F67E52A5D5CDCE336EBD2EA4D014F5886BD8",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "B44B61321FFB03599B5697BB1234F67E52A5D5CDCE336EBD2EA4D014F5886BD8"
+  },
+  "ui/shield": {
+    "source_sha256": "761312AB1031FF1B6BD57A6ADBDC8F1FFD7E778F16588E659B6704221BFA2412",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "761312AB1031FF1B6BD57A6ADBDC8F1FFD7E778F16588E659B6704221BFA2412"
+  },
+  "ui/speed": {
+    "source_sha256": "C5F6E0CC2D6D8FD7F2BDD6C10B38D9C4ACCF839D15F1521818344376E568AE31",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "C5F6E0CC2D6D8FD7F2BDD6C10B38D9C4ACCF839D15F1521818344376E568AE31"
+  },
+  "ui/storm": {
+    "source_sha256": "E76291DF3575613E91C80DF5429E6FDAE1B92860C8EAC6C1847489F94D29C28D",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "E76291DF3575613E91C80DF5429E6FDAE1B92860C8EAC6C1847489F94D29C28D"
+  },
+  "ui/stun": {
+    "source_sha256": "A0017691BBF4227CC379EEAA48B67B065CFC72E0A5CCA4DE367721420D4C6048",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "A0017691BBF4227CC379EEAA48B67B065CFC72E0A5CCA4DE367721420D4C6048"
+  },
+  "ui/superorbit": {
+    "source_sha256": "082F973F2F1750F18CE58D343290BF87B41B6C3A75D39953931B68C4844E2696",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "082F973F2F1750F18CE58D343290BF87B41B6C3A75D39953931B68C4844E2696"
+  },
+  "ui/survive": {
+    "source_sha256": "E004E92C07176031CAB5C78E8FCB9BBD7416C6987846E21423DC4628C8AD0475",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "E004E92C07176031CAB5C78E8FCB9BBD7416C6987846E21423DC4628C8AD0475"
+  },
+  "ui/trinity": {
+    "source_sha256": "564F60C47E2F0B69A5686628AF94AB5C9708C4E3A0687AA2DA25B0CB69CA5D31",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "564F60C47E2F0B69A5686628AF94AB5C9708C4E3A0687AA2DA25B0CB69CA5D31"
+  },
+  "ui/veteran": {
+    "source_sha256": "9F71FAB543B0FA626D4EF43AE08A671EBE095889375651C9D48017463DF54CE8",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "9F71FAB543B0FA626D4EF43AE08A671EBE095889375651C9D48017463DF54CE8"
+  },
+  "ui/vitality": {
+    "source_sha256": "0A51D6B029DCCEDFCFD8E38BEABD72E23052B4B5B6F9E19F7CB65B0431C34473",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "0A51D6B029DCCEDFCFD8E38BEABD72E23052B4B5B6F9E19F7CB65B0431C34473"
+  },
+  "ui/wake": {
+    "source_sha256": "2695FE42BF217F9CB646A32DBABA5CA476D083386990D094CC1F31B85BDD7A2C",
+    "family": "ui",
+    "treatment": "stronger diagram strokes and quieter corner marks",
+    "output_sha256": "2695FE42BF217F9CB646A32DBABA5CA476D083386990D094CC1F31B85BDD7A2C"
+  },
+  "world/forge": {
+    "source_sha256": "BFD0BD19ACD8848A0DB1480BE81D47594D64083DEABAA3B85F4F1DBD3756F915",
+    "family": "world",
+    "size": [
+      1672,
+      941
+    ],
+    "source_alpha_bounds": [
+      0,
+      0,
+      1672,
+      941
+    ],
+    "treatment": "source retained; contrast separated in space shader",
+    "output_sha256": "BFD0BD19ACD8848A0DB1480BE81D47594D64083DEABAA3B85F4F1DBD3756F915"
+  },
+  "world/ring": {
+    "source_sha256": "C85436168F1AE8355D661E9BFFB24CD5E62C88AB91CB71DA8BE03F8A3233F808",
+    "family": "world",
+    "size": [
+      1672,
+      941
+    ],
+    "source_alpha_bounds": [
+      0,
+      0,
+      1672,
+      941
+    ],
+    "treatment": "source retained; contrast separated in space shader",
+    "output_sha256": "C85436168F1AE8355D661E9BFFB24CD5E62C88AB91CB71DA8BE03F8A3233F808"
+  },
+  "world/storm": {
+    "source_sha256": "709CEF2280F37E414644187A0EC90AFE26A4106D991537B55658B405771B8E53",
+    "family": "world",
+    "size": [
+      1672,
+      941
+    ],
+    "source_alpha_bounds": [
+      0,
+      0,
+      1672,
+      941
+    ],
+    "treatment": "source retained; contrast separated in space shader",
+    "output_sha256": "709CEF2280F37E414644187A0EC90AFE26A4106D991537B55658B405771B8E53"
+  }
+}

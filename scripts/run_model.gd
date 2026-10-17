@@ -21,6 +21,8 @@ const ENCOUNTERS := {
 	"flare": {"name": "태양 플레어", "hint": "퍼지는 충격파를 돌진 무적으로 통과", "radius": 320.0, "duration": 3.0},
 }
 
+var online_world: Variant = null
+
 var state := "playing"
 var elapsed := 0.0
 var duration := 600.0
@@ -400,6 +402,32 @@ func step(delta: float, move: Vector2, dash_pressed: bool, dash_aim: Vector2 = V
 		return
 	_tick_finale()
 	_tick_mission_clock()
+	var old_position := _step_player(dt, move, dash_pressed, dash_aim)
+	_step_spawns(dt)
+	_step_weapons(dt)
+	_update_enemies(dt, old_position)
+	_update_shots(dt)
+	_update_hazards(dt)
+	_finish_deaths()
+	if state != "playing":
+		_update_run_stats()
+		return
+	_collect_items(old_position)
+	_update_expedition(dt, old_position)
+	_collect_gems(dt)
+	dash_time = maxf(0.0, dash_time - dt)
+	for i in range(effects.size() - 1, -1, -1):
+		effects[i].ttl -= dt
+		if float(effects[i].ttl) <= 0.0:
+			effects.remove_at(i)
+	if elapsed >= 300.0 and boss_defeated and not survival_cleared:
+		survival_cleared = true
+		_grant_score(2500 + int(hp * 10.0))
+		_announce("5분 돌파! 정예·지휘체 증원 가속 · 주기적 붕괴 완화", "milestone")
+	_check_level()
+	_update_run_stats()
+
+func _step_player(dt: float, move: Vector2, dash_pressed: bool, dash_aim: Vector2) -> Vector2:
 	overdrive_time = maxf(0.0, overdrive_time - dt)
 	slipstream_time = maxf(0.0, slipstream_time - dt)
 	guard_cooldown = maxf(0.0, guard_cooldown - dt)
@@ -465,6 +493,9 @@ func step(delta: float, move: Vector2, dash_pressed: bool, dash_aim: Vector2 = V
 		_outside = false
 	current_speed = player.distance_to(old_position) / dt
 	orbit_angle = fmod(orbit_angle + dt * (3.5 + float(upgrades.get("speed", 0)) * 0.3), TAU)
+	return old_position
+
+func _step_spawns(dt: float) -> void:
 	_spawn_timer -= dt
 	if _spawn_timer <= 0.0:
 		_spawn_timer = maxf(0.19, 0.92 - elapsed * 0.0023) / (1.8 * float(_mode.spawn) * (1.15 if sector_id == "ring" else 1.0))
@@ -494,32 +525,13 @@ func step(delta: float, move: Vector2, dash_pressed: bool, dash_aim: Vector2 = V
 			_announce("증원 정예 · " + ("돌격형" if int(elite.elite_index) == 1 else "포격형"), "elite")
 	if elapsed >= next_boss_at and enemies.filter(func(e: Dictionary) -> bool: return e.kind == "boss" and float(e.hp) > 0.0).size() < 2:
 		_spawn_pursuit_boss()
+
+func _step_weapons(dt: float) -> void:
 	_shot_timer -= dt
 	if _shot_timer <= 0.0:
 		_fire_player_shot()
 		_shot_timer = 0.68 / ((1.0 + float(upgrades.get("rapid", 0)) * 0.24) * (1.45 if overdrive_time > 0.0 else 1.0) * (1.0 + maxf(buff_value("rapid"), buff_value("frenzy")) / 100.0))
 	_update_weapons(dt)
-	_update_enemies(dt, old_position)
-	_update_shots(dt)
-	_update_hazards(dt)
-	_finish_deaths()
-	if state != "playing":
-		_update_run_stats()
-		return
-	_collect_items(old_position)
-	_update_expedition(dt, old_position)
-	_collect_gems(dt)
-	dash_time = maxf(0.0, dash_time - dt)
-	for i in range(effects.size() - 1, -1, -1):
-		effects[i].ttl -= dt
-		if float(effects[i].ttl) <= 0.0:
-			effects.remove_at(i)
-	if elapsed >= 300.0 and boss_defeated and not survival_cleared:
-		survival_cleared = true
-		_grant_score(2500 + int(hp * 10.0))
-		_announce("5분 돌파! 정예·지휘체 증원 가속 · 주기적 붕괴 완화", "milestone")
-	_check_level()
-	_update_run_stats()
 
 func regeneration_rate() -> float:
 	return (1.0 + float(upgrades.get("repair", 0)) * 1.25 + buff_value("repair")) * repair_efficiency()
@@ -546,6 +558,9 @@ func _risk_feedback(kind: String, amount: float) -> void:
 	_effect(player, kind, amount, 1.1, Vector2(risk_multiplier(), 0))
 
 func _grant_xp(amount: float) -> void:
+	if online_world != null and not online_world.granting_xp:
+		online_world.grant_xp(amount)
+		return
 	var reward := amount * risk_multiplier() * (1.0 + buff_value("insight") / 100.0)
 	xp += reward
 	_risk_feedback("risk_xp", reward)
@@ -556,6 +571,8 @@ func _grant_score(amount: float) -> int:
 	return reward
 
 func enemy_strength() -> float:
+	if online_world != null:
+		return online_world.enemy_strength()
 	var equipment := 0
 	for count: Variant in parts.values():
 		equipment += int(count)
@@ -717,6 +734,8 @@ func spawn_enemy(kind: String, position: Vector2 = Vector2.INF) -> Dictionary:
 		enemy.damage *= 1.0 + 0.08 * pressure
 		enemy.late_pressure = pressure
 	_scale_enemy(enemy)
+	if online_world != null:
+		online_world.enemy_spawned(enemy)
 	return enemy
 
 func _update_enemies(dt: float, old_position: Vector2) -> void:
@@ -740,6 +759,8 @@ func _update_enemies(dt: float, old_position: Vector2) -> void:
 			enemy.env_vulnerable = maxf(0.0, float(enemy.env_vulnerable) - dt)
 		enemy.flash = maxf(0.0, float(enemy.flash) - dt)
 		enemy.orbit_timer = maxf(0.0, float(enemy.orbit_timer) - dt)
+		if online_world != null:
+			old_position = online_world.select_enemy_actor(enemy)
 		var toward: Vector2 = player - Vector2(enemy.pos)
 		var direction := toward.normalized()
 		var stunned := float(enemy.get("stun_time", 0.0)) > 0.0
@@ -786,36 +807,42 @@ func _update_enemies(dt: float, old_position: Vector2) -> void:
 				approach = 2.8 if enemy.has("late_pressure") and toward.length() > 420.0 else 0.7
 			enemy.pos += movement * float(enemy.speed) * approach * (float(enemy.get("slow_factor", 1.0)) if float(enemy.slow_time) > 0.0 else 1.0) * dt
 		enemy.pos += gravity_pull(enemy.pos) * dt
-		if dash_time > 0.0 and int(enemy.dash_id) != _dash_id:
-			var part := _segment_part(enemy, old_position, player, 28.0)
-			if part != -2:
-				enemy.dash_id = _dash_id
-				_mission_add("dash_hits", 1.0)
-				_hit_enemy(enemy, (52.0 + float(upgrades.get("dash", 0)) * 15.0) * power * (1.75 * (1.0 + 0.25 * int(upgrades.get("scout_lance", 0))) if ship_id == "scout" else 1.0) * branch_value("dash_damage", 1.0), part)
-		var orbit_distance := player.distance_squared_to(enemy.pos)
-		var orbit_contact := combat_radius(enemy) + 17.0
-		if float(enemy.orbit_timer) <= 0.0 and orbit_distance <= pow(orbit_radius * (1.8 if evolutions.has("ellipse") else 1.0) + orbit_contact, 2) and orbit_distance >= pow(maxf(0.0, orbit_radius * (0.7 if evolutions.has("ellipse") else 1.0) - orbit_contact), 2):
-			for j in orbit_count:
-				var orb := _orbit_positions[j]
-				if _area_part(enemy, orb, 17.0 if evolutions.has("superorbit") else 10.0) != -2:
-					var kind := orbit_kind(j)
-					_audio("weapon_orbit_" + (kind if kind in ["blade", "frost"] else "normal"), enemy.pos)
-					_hit_enemy(enemy, 25.0 * power * (1.2 if evolutions.has("ellipse") else 1.0) * (1.6 + 0.15 * evolution_mastery("superorbit") if evolutions.has("superorbit") else 1.0) * (1.0 + 0.35 * float(upgrades.get("blade", 0))) * ((1.12 + 0.12 * evolution_mastery("blizzard") if evolutions.has("blizzard") else 0.8) if kind == "frost" else 1.0), _area_part(enemy, orb, 17.0 if evolutions.has("superorbit") else 10.0))
-					if kind == "frost":
-						var rank := float(upgrades.get("frost", 0))
-						enemy.slow_time = 0.7 + 0.4 * rank + 0.3 * evolution_mastery("blizzard")
-						enemy.slow_factor = maxf(0.15, 0.7 - 0.1 * rank - (0.15 if evolutions.has("blizzard") else 0.0))
-					enemy.orbit_timer = 0.23 if evolutions.has("superorbit") else 0.28
-					break
+		if online_world != null:
+			online_world.enemy_contacts(enemy, dt)
+		else:
+			_attack_enemy_contact(enemy, old_position, power)
 		if float(enemy.hp) <= 0.0:
 			_kill_enemy(enemy)
 			enemies.remove_at(i)
-		elif player.distance_to(enemy.pos) < PLAYER_RADIUS + float(enemy.radius):
+		elif online_world == null and player.distance_to(enemy.pos) < PLAYER_RADIUS + float(enemy.radius):
 			take_damage(float(enemy.damage), "combat", enemy.pos)
 			if state != "playing":
 				return
 			if enemy.kind != "boss" and enemy.kind != "elite":
 				enemy.pos -= direction * 12.0
+
+func _attack_enemy_contact(enemy: Dictionary, old_position: Vector2, power: float) -> void:
+	if dash_time > 0.0 and int(enemy.dash_id) != _dash_id:
+		var part := _segment_part(enemy, old_position, player, 28.0)
+		if part != -2:
+			enemy.dash_id = _dash_id
+			_mission_add("dash_hits", 1.0)
+			_hit_enemy(enemy, (52.0 + float(upgrades.get("dash", 0)) * 15.0) * power * (1.75 * (1.0 + 0.25 * int(upgrades.get("scout_lance", 0))) if ship_id == "scout" else 1.0) * branch_value("dash_damage", 1.0), part)
+	var orbit_distance := player.distance_squared_to(enemy.pos)
+	var orbit_contact := combat_radius(enemy) + 17.0
+	if float(enemy.orbit_timer) <= 0.0 and orbit_distance <= pow(orbit_radius * (1.8 if evolutions.has("ellipse") else 1.0) + orbit_contact, 2) and orbit_distance >= pow(maxf(0.0, orbit_radius * (0.7 if evolutions.has("ellipse") else 1.0) - orbit_contact), 2):
+		for j in orbit_count:
+			var orb := _orbit_positions[j]
+			if _area_part(enemy, orb, 17.0 if evolutions.has("superorbit") else 10.0) != -2:
+				var kind := orbit_kind(j)
+				_audio("weapon_orbit_" + (kind if kind in ["blade", "frost"] else "normal"), enemy.pos)
+				_hit_enemy(enemy, 25.0 * power * (1.2 if evolutions.has("ellipse") else 1.0) * (1.6 + 0.15 * evolution_mastery("superorbit") if evolutions.has("superorbit") else 1.0) * (1.0 + 0.35 * float(upgrades.get("blade", 0))) * ((1.12 + 0.12 * evolution_mastery("blizzard") if evolutions.has("blizzard") else 0.8) if kind == "frost" else 1.0), _area_part(enemy, orb, 17.0 if evolutions.has("superorbit") else 10.0))
+				if kind == "frost":
+					var rank := float(upgrades.get("frost", 0))
+					enemy.slow_time = 0.7 + 0.4 * rank + 0.3 * evolution_mastery("blizzard")
+					enemy.slow_factor = maxf(0.15, 0.7 - 0.1 * rank - (0.15 if evolutions.has("blizzard") else 0.0))
+				enemy.orbit_timer = 0.23 if evolutions.has("superorbit") else 0.28
+				break
 
 func _fire_player_shot() -> void:
 	var nearest: Dictionary = {}
@@ -884,9 +911,12 @@ func _update_shots(dt: float) -> void:
 		_collision_radius = maxf(_collision_radius, combat_radius(enemy) if enemy.has("relays") else float(enemy.radius))
 	for i in range(shots.size() - 1, -1, -1):
 		var shot: Dictionary = shots[i]
+		if online_world != null:
+			online_world.select_shot_actor(shot, dt)
 		var kind: String = str(shot.get("kind", ""))
 		if kind in ["sentry", "mine", "wake"]:
 			_update_deployed(shot, dt)
+			if online_world != null: online_world.stamp_shots(online_world.active)
 			if float(shot.ttl) <= 0.0:
 				shots.remove_at(i)
 			continue
@@ -995,9 +1025,12 @@ func take_damage(amount: float, source: String = "combat", origin: Vector2 = Vec
 	events.append("hurt")
 	if hp < previous_hp: _audio("player_hurt")
 	if hp <= 0.0:
-		_finish_run("combat")
+		if online_world != null: online_world.knocked_down()
+		else: _finish_run("combat")
 
 func _hit_enemy(enemy: Dictionary, damage: float, part: int = -1, environmental: bool = false) -> void:
+	if online_world != null and not environmental and damage > 0.0 and float(enemy.hp) > 0.0:
+		online_world.enemy_damaged(enemy)
 	if float(enemy.hp) <= 0.0 or state in ["won", "lost"] or damage <= 0.0:
 		return
 	if enemy.has("relays") and _shielded(enemy):
@@ -1025,6 +1058,8 @@ func _hit_enemy(enemy: Dictionary, damage: float, part: int = -1, environmental:
 		events.append("hit")
 
 func _kill_enemy(enemy: Dictionary) -> void:
+	if online_world != null:
+		online_world.enemy_killed(enemy)
 	kills += 1
 	_mission_add(str(enemy.kind), 1.0)
 	if boundary_layer(player) > 0:
@@ -1047,7 +1082,7 @@ func _kill_enemy(enemy: Dictionary) -> void:
 	else:
 		_grant_xp(float(enemy.value))
 	if enemy.kind == "boss":
-		if bool(enemy.get("final_commander", false)) and finale_status == "active" and elapsed < duration and hp > 0.0:
+		if bool(enemy.get("final_commander", false)) and finale_status == "active" and elapsed < duration and (hp > 0.0 or (online_world != null and not online_world.alive().is_empty())):
 			finale_status = "success"
 			finale_success_at = elapsed
 			_audio("combat_final_success")
@@ -1370,14 +1405,19 @@ func _update_hazards(dt: float) -> void:
 		var previous_ttl := float(hazard.ttl)
 		hazard.ttl -= dt
 		if ENCOUNTERS.has(hazard.kind):
-			_update_encounter(hazard, dt, previous_ttl)
+			if online_world != null:
+				online_world.encounter_contact(hazard, dt, previous_ttl)
+			else:
+				_update_encounter(hazard, dt, previous_ttl)
 			if float(hazard.ttl) <= 0.0:
 				_audio("event_end_" + str(hazard.kind))
 				hazards.remove_at(i)
 			continue
 		_apply_environment(hazard)
 		var overlaps: bool = Rect2(hazard.rect).grow(PLAYER_RADIUS * 0.65).has_point(player) if hazard.kind == "lane" else player.distance_to(hazard.pos) < float(hazard.radius) + PLAYER_RADIUS
-		if overlaps:
+		if online_world != null:
+			online_world.hazard_contact(hazard)
+		elif overlaps:
 			take_damage((13.0 if hazard.kind == "lane" else 20.0) * (1.0 + 0.25 * hazard_pressure()), str(hazard.kind), hazard.pos)
 		if float(hazard.ttl) <= 0.0:
 			hazards.remove_at(i)
@@ -1504,12 +1544,15 @@ func spawn_item(position: Vector2, grade: String, id: String = "") -> void:
 	var point := CENTER + (position - CENTER).limit_length(ACTIVITY_RADIUS - PLAYER_RADIUS + LAYER_WIDTH * 1.75)
 	items.append({"id": selected, "grade": grade, "pos": point, "ttl": 35.0})
 
-func _update_items(dt: float) -> void:
+func _update_buffs(dt: float) -> void:
 	for id: String in buffs.keys():
 		buffs[id].ttl = maxf(0.0, float(buffs[id].ttl) - dt)
 		if float(buffs[id].ttl) <= 0.0:
 			buffs.erase(id)
 			_audio("buff_end")
+
+func _update_items(dt: float) -> void:
+	_update_buffs(dt)
 	for i: int in range(items.size() - 1, -1, -1):
 		items[i].pos = _drift_loot(items[i].pos, dt)
 		var previous_ttl := float(items[i].ttl)
@@ -1631,6 +1674,7 @@ func spawn_part(position: Vector2, source: String, id: String = "") -> void:
 	if part_drops.size() >= 9:
 		part_drops.pop_front()
 	part_drops.append({"id": selected, "pos": point, "ttl": 45.0, "locked": source == "explore", "source": source})
+	if online_world != null and source == "mission": part_drops.back().owner = online_world.active
 	events.append("part_spawn")
 
 func collect_part(id: String) -> bool:

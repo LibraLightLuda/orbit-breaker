@@ -9,6 +9,7 @@ const DEFAULTS: Dictionary = {
 	"recent_runs": [], "best_by_loadout": {},
 	"player_name": "파일럿", "leaderboard": [], "achievement_progress": {}, "achievements": [],
 	"cleared_modes": [], "discovered_items": [], "discovered_parts": [], "discovered_hulls": [],
+	"online_records": [],
 }
 const MISSION_IDS: Array[String] = ["first_run", "hunter", "survivor", "elite", "evolved", "victory"]
 const SHIP_IDS: Array[String] = ["striker", "scout", "bastion"]
@@ -120,6 +121,23 @@ func _migrate_profile(destination: String, sources: Array[String]) -> bool:
 		return true
 	return true
 
+
+func record_online(value: Dictionary) -> bool:
+	var entry := _online_entry(value)
+	if entry.is_empty(): return false
+	var before := data.duplicate(true)
+	data.online_records = data.online_records.filter(func(old: Dictionary) -> bool: return old.id != entry.id)
+	data.online_records.push_front(entry)
+	if data.online_records.size() > 20: data.online_records.resize(20)
+	if save_data(): return true
+	data = before
+	return false
+
+func _online_entry(value: Dictionary) -> Dictionary:
+	var id := str(value.get("id", ""))
+	if id.length() != 32 or not id.is_valid_hex_number(false) or not value.get("mode") in ["solo", "coop"] or not value.get("difficulty") in MODE_IDS or not value.get("sector") in SECTOR_IDS: return {}
+	if not _is_number(value.get("score")) or not _is_number(value.get("ticks")): return {}
+	return {"id": id, "score": _integer(value.score), "ticks": mini(_integer(value.ticks), 36001), "mode": value.mode, "difficulty": value.difficulty, "sector": value.sector, "nickname": clean_name(value.get("nickname")), "finished_at": str(value.get("finished_at", "")).left(30)}
 
 func record_run(score: int, time: float, won: bool, details: Dictionary = {}) -> bool:
 	data = _validated(data)
@@ -243,6 +261,12 @@ func _read_json(path: String) -> Variant:
 
 func _validated(source: Dictionary) -> Dictionary:
 	var result: Dictionary = DEFAULTS.duplicate(true)
+	var online_history: Variant = source.get("online_records")
+	if online_history is Array:
+		for value: Variant in online_history.slice(0, 20):
+			if value is Dictionary:
+				var entry := _online_entry(value)
+				if not entry.is_empty(): result.online_records.append(entry)
 	for pair: Array in [["discovered_parts", Expedition.PART_IDS], ["discovered_hulls", Expedition.RECIPE_IDS]]:
 		var known: Variant = source.get(pair[0])
 		if known is Array:

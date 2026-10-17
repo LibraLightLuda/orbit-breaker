@@ -3,9 +3,11 @@ extends SceneTree
 var game: Node2D
 var checks := 0
 var failures := 0
-var folder := "res://artifacts/candidate/art/final"
+var folder := "res://artifacts/clarity-work/art-headless"
 
 func _init() -> void:
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--output="): folder = arg.trim_prefix("--output=")
 	call_deferred("run_checks")
 
 func check(ok: bool, message: String) -> void:
@@ -216,11 +218,14 @@ func moving_benchmark() -> void:
 			game._physics_process(1.0/60.0)
 			while game.run.shots.size()<240:
 				game.run.shots.append({"pos":game.run.player+Vector2(350,0),"velocity":Vector2(0,50),"friendly":false,"radius":7,"damage":0,"ttl":30.0})
+			while game.run.gems.size()<300:
+				game.run.gems.append({"pos":game.run.player+Vector2(500,0),"kind":"xp","value":1})
 			game.queue_redraw()
 			await RenderingServer.frame_post_draw
 			if frame>=60: samples.append(Time.get_ticks_usec()-started)
 			min_enemies=mini(min_enemies,game.run.enemies.size())
 			min_shots=mini(min_shots,game.run.shots.size())
+			check(game.run.gems.size() == 300, "moving fixture sustains exactly 300 gems")
 			for shot: Dictionary in game.run.shots:
 				if shot.get("kind","") in ["wake","mine","sentry"]: shot.ttl=18.0
 			samples.sort()

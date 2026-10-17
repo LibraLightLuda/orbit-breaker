@@ -1,0 +1,100 @@
+[
+  {
+    "id": "admission",
+    "configured": 1,
+    "statuses": [
+      201,
+      503,
+      503
+    ],
+    "config": {
+      "protocol": 1,
+      "rules": {
+        "solo": "online-solo-v1",
+        "coop": "coop-v1"
+      },
+      "rankings_backend": "local-development",
+      "capacity": 1,
+      "rooms": 1,
+      "anonymous": true,
+      "draining": false
+    }
+  },
+  {
+    "id": "high_refresh",
+    "sent": 119,
+    "close": {
+      "code": 1008,
+      "reason": ""
+    },
+    "results": 0
+  },
+  {
+    "id": "resume_completed",
+    "stored": 200,
+    "resumed_messages": [
+      "hello",
+      "begin"
+    ]
+  },
+  {
+    "id": "orphan_replay",
+    "room": {
+      "status": 503,
+      "body": {
+        "error": "전투 서버가 가득 찼거나 점검 중입니다. 잠시 후 다시 시도하세요."
+      }
+    },
+    "directory": "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-independent-audit-orphan-dmaY7j"
+  },
+  {
+    "id": "remote_replay_route",
+    "rankings": {
+      "status": 200,
+      "body": {
+        "items": [
+          {
+            "id": "dddddddddddddddddddddddddddddddd",
+            "score": 100,
+            "replay": {
+              "status": "complete"
+            }
+          }
+        ],
+        "storage": "sites"
+      }
+    },
+    "manifest": {
+      "status": 404,
+      "body": {
+        "error": "고스트 처리 중 또는 만료"
+      }
+    }
+  },
+  {
+    "id": "public_readonly",
+    "checks": [
+      {
+        "path": "/v1/config",
+        "origin": null,
+        "status": 200,
+        "cors": null,
+        "body": "{\"anonymous\":true,\"service\":\"Orbit Breaker records\",\"protocol\":1}"
+      },
+      {
+        "path": "/v1/rankings",
+        "origin": "https://libralightluda.github.io",
+        "status": 200,
+        "cors": "https://libralightluda.github.io",
+        "body": "{\"items\":[],\"next_cursor\":null}"
+      },
+      {
+        "path": "/v1/config",
+        "origin": "https://invalid.example",
+        "status": 403,
+        "cors": null,
+        "body": "{\"error\":\"origin not allowed\"}"
+      }
+    ]
+  }
+]

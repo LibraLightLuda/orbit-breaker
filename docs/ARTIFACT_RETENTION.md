@@ -1,8 +1,18 @@
 # 배포본·검증 자료 보관 규칙
 
+## 2026-10-18 공개 랭킹·웹 클라이언트 게시
+
+공개 랭킹 Site 버전 3 배포와 API 7검사를 완료했다. GitHub 웹 클라이언트는 공개 랭킹 API로 연결하고 Sites/로컬 개발의 동일 출처 연결을 유지한다. 게임 전체 검사 후 최종 연결 회귀·재내보내기·소스/출력 해시를 검증했다. 온라인 권위 전투·공식 도전·2인 협동은 미제공 상태로 명시한다. 이번 공개 게시 대상은 웹과 랭킹 서비스이며 기존 정상 로컬 `build/current`는 유지한다. 실제 GitHub 게시·원격 파일 대조 결과와 남은 자료는 [게시 보고서](PUBLICATION_20261018.json)를 따른다. 아래는 이전 세대의 역사 기록이다.
+
 적용일: 2026-10-11. 사용자가 최신 배포 버전만 보관하도록 변경했다. 기존의 최신·직전 두 세대 보관 규칙보다 이 규칙이 우선한다.
 
-## 현재 최신 로컬본: audit-20261014 (2026-10-14)
+## 현재 최신 로컬본: clarity-20261016 (2026-10-16)
+
+3.19 선명도 개선 세대. `build/current`·`artifacts/current`·`web/`가 대응한다. Windows SHA-256 `1363DFF57C0B3FF8264F95EB52FDD71F4E289AAFD807F18EA7D337F24272B2FC`, Web PCK `24F2E97FBBCDCF3BA483ECE0C6152197A56B9C5A977A344772D366CBD2F5ACA4`. 기존 정상본을 보존한 뒤 후보 필수 검사·내보내기·실제 실행/브라우저 확인을 완료하고 guarded promotion으로 교체했다. 교체 후 배포/Web/소스/증거 해시를 재확인한 다음 이전 정상본·대응 증거·교체용 백업을 정리했다. 임시 비교 프로젝트/QA 내보내기를 포함한 이번 `artifacts/clarity-work`도 정리했다. 별도 영구 배포 아카이브는 만들지 않았다.
+
+현재 정상 배포 경로는 한 세대이며 **이번 작업 임시 정리는 완료, 전체 자료 정리는 미완료**다. 과거 정책 차단 잔여 15개를 재삭제하지 않았다. 정확한 경로와 기존 차단 사유는 `artifacts/current/retention-status.json`, 최신 파일 목록은 `file-inventory.json`을 따른다. 소스와 플레이어 기록/설정을 보존했다. 이번 세대의 공개 게시/원격 push는 수행하지 않았으며 공개 v3.19.0은 이전 audit-20261014다. 아래는 과거 작업 기록이고 과거 `artifacts/current` 증거 참조는 당시 경로다.
+
+## 이전 로컬본: audit-20261014 (2026-10-14)
 
 2026-10-16 후속 요청으로 [v3.19.0](https://github.com/LibraLightLuda/orbit-breaker/releases/tag/v3.19.0)과 [공개 Web](https://libralightluda.github.io/orbit-breaker/)을 배포했다. 공개 Web 9개 파일·기본 HTML과 릴리즈 다운로드 6개의 해시/크기 확인 뒤 이전 v3.18.3-audio-ui 첨부 6개를 정리했다. 소스 태그·릴리즈 이력은 보존한다. Actions Pages artifact는 보관 기간 만료로 잔여 0개다. 공개 최신 한 세대의 첨부 6개만 남으며, 실제 공개 정리 상태는 `artifacts/current/public-retention.json`을 따른다. 아래 공개 게시를 수행하지 않았다는 문장은 최초 로컬 검증 당시 기록이다.
 

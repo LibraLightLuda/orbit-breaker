@@ -3,7 +3,7 @@ extends SceneTree
 var checks := 0
 var failures := 0
 var game: Node2D
-const FOLDER := "res://artifacts/feedback-candidate"
+const FOLDER := "res://artifacts/clarity-work/mobile"
 
 func _initialize() -> void: call_deferred("run_checks")
 func check(ok: bool, message: String) -> void:

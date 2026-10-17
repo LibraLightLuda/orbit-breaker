@@ -21,6 +21,27 @@ var arena_grid := preload("res://scripts/arena_grid.gd").new()
 var backdrop := preload("res://scripts/space_backdrop.gd").new()
 var menu_tween: Tween
 
+var online := preload("res://scripts/online_client.gd").new()
+var online_mode := false
+var online_paused := false
+var online_choice_revision := -1
+var online_form := {"nickname": "파일럿", "code": "", "ship": "striker", "sector": "ring", "difficulty": "normal", "rank_mode": "solo", "rank_ship": "", "season": ""}
+var online_notice := ""
+var online_players: Array = []
+var online_result: Dictionary = {}
+var online_rows: Array = []
+var online_cursor := 0
+var online_board_mode := "solo"
+var online_packet: Dictionary = {}
+var online_pending: Array = []
+var online_replay_loader: Node
+var ghost_race: Node
+var ghost_race_time := 0.0
+var online_overdrive := false
+var online_request := ""
+var online_replay_manifest: Dictionary = {}
+var online_replay_chunks: Array = []
+var online_replay_id := ""
 var run := RunModel.new()
 var records := SaveStore.new()
 var sound := SoundBank.new()
@@ -93,6 +114,7 @@ var touch_landscape := true
 var closing := false
 
 func _ready() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	get_tree().auto_accept_quit = false
 	run.audio_enabled = true
 	add_child(backdrop)
@@ -120,6 +142,11 @@ func _ready() -> void:
 	ui.theme = theme
 	layer.add_child(ui)
 	records.load_data()
+	add_child(online)
+	online.message.connect(_online_message)
+	online.response.connect(_online_response)
+	online.failed.connect(_online_failed)
+	online_form.nickname = records.data.player_name
 	add_child(sound)
 	sound.set_muted(bool(records.data.muted))
 	sound.set_music_enabled(bool(records.data.music))
@@ -142,9 +169,9 @@ func _viewport_rect() -> Rect2:
 func _fit_viewport() -> void:
 	if OS.has_feature("web"):
 		touch_mode = bool(JavaScriptBridge.eval("window.orbitMobile === true"))
-		var portrait := DisplayServer.window_get_size().x < DisplayServer.window_get_size().y
-		var base := (Vector2i(540, 960) if portrait else Vector2i(960, 540)) if touch_mode else Vector2i(1280, 720)
-		if get_window().content_scale_size != base: get_window().content_scale_size = base
+	var portrait := DisplayServer.window_get_size().x < DisplayServer.window_get_size().y
+	var base := (Vector2i(540, 960) if portrait else Vector2i(960, 540)) if touch_mode else Vector2i(1280, 720)
+	if get_window().content_scale_size != base: get_window().content_scale_size = base
 	var landscape := get_viewport_rect().size.x >= get_viewport_rect().size.y
 	if touch_mode and landscape != touch_landscape:
 		touch.reset()
@@ -222,7 +249,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		click_dash_queued = true
 		dash_aim = (get_global_transform_with_canvas().affine_inverse() * event.position + camera_offset - run.player).normalized()
 	elif event.button_index == MOUSE_BUTTON_RIGHT:
-		run.activate_overdrive()
+		_activate_overdrive()
 	else:
 		return
 	get_viewport().set_input_as_handled()
@@ -248,7 +275,7 @@ func _touch_skill(action: String, at: Vector2) -> void:
 		dash_aim = touch.dash_direction if not touch.dash_direction.is_zero_approx() else (at + camera_offset - run.player).normalized()
 		touch.dash_direction = Vector2.ZERO
 	elif action == "overdrive":
-		run.activate_overdrive()
+		_activate_overdrive()
 
 func _mouse_direction(cursor: Vector2) -> Vector2:
 	var offset := cursor + camera_offset - run.player
@@ -273,6 +300,7 @@ func _notification(what: int) -> void:
 		# Let the audio mixer release streaming playbacks before engine teardown.
 		get_tree().create_timer(.15).timeout.connect(get_tree().quit)
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and screen == "playing":
+		if online_mode: online.input(Vector2.ZERO, false, Vector2.ZERO, false)
 		_show_pause()
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -300,7 +328,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				dash_aim = (mouse_target + camera_offset - run.player).normalized() if mouse_active else _movement_direction().normalized()
 		KEY_E:
 			if screen == "playing":
-				run.activate_overdrive()
+				_activate_overdrive()
 		KEY_TAB:
 			if screen == "branch": _open_arsenal("branch")
 			elif screen in ["playing", "pause"]:
@@ -308,13 +336,17 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_1, KEY_2, KEY_3:
 			if screen == "branch": _pick_branch(event.physical_keycode - KEY_1)
 			elif screen == "playing" and run.finale_status == "preview" and event.physical_keycode in [KEY_1, KEY_2]:
-				run.select_finale(event.physical_keycode == KEY_1)
+				_select_finale(event.physical_keycode == KEY_1)
 			elif screen == "upgrade":
 				_pick_upgrade(event.physical_keycode - KEY_1)
 	get_viewport().set_input_as_handled()
 
 func _physics_process(delta: float) -> void:
 	clock_time += delta
+	if online_mode:
+		_poll_ghost_save()
+		_online_tick(delta)
+		return
 	touch_mouse_guard = maxf(0, touch_mouse_guard - delta)
 	if screen == "playing": _touch_skill(touch.advance(delta), touch.dash_position)
 	_poll_ghost_save()
@@ -334,7 +366,7 @@ func _physics_process(delta: float) -> void:
 			toast = "도감 저장 실패 · 자동 재시도 중"
 			toast_time = 3.0
 	if screen == "replay":
-		if not replay_paused:
+		if not replay_paused and (online_replay_loader == null or online_replay_loader.ready_for(replay_time + delta * replay_speed)):
 			replay_time = minf(float(replay_frames.back()[0]), replay_time + delta * replay_speed)
 			replay_slider.set_value_no_signal(replay_time)
 			if replay_time >= float(replay_frames.back()[0]):
@@ -521,6 +553,9 @@ func _clear_ui(animate: bool = true) -> void:
 	if animate: _animate_menu.call_deferred()
 
 func _refresh_menu_layout() -> void:
+	if screen.begins_with("online"):
+		preload("res://scripts/online_menu.gd").show(self, screen)
+		return
 	var focused := get_viewport().gui_get_focus_owner()
 	var typing_name := screen == "hangar" and focused is LineEdit
 	var caret: int = focused.caret_column if typing_name else 0
@@ -633,6 +668,13 @@ func _button(text: String, rect: Rect2, callback: Callable, primary: bool = fals
 	return button
 
 func _show_menu() -> void:
+	if ghost_race != null:
+		ghost_race.queue_free()
+		ghost_race = null
+	if online_mode or not online.room.is_empty():
+		online.leave()
+		online_mode = false
+		run = RunModel.new()
 	screen = "menu"
 	_clear_ui()
 	_label("OB / 03     COLLAPSING ORBITS", Rect2(80, 58, 520, 28), 16, LIME)
@@ -643,9 +685,10 @@ func _show_menu() -> void:
 	_button("출격 준비   →", Rect2(80, 385, 290, 64), _show_hangar, true, true)
 	_button("작전 기록", Rect2(388, 385, 170, 64), _show_records)
 	_button("플레이 방법", Rect2(80, 468, 150, 50), _show_help)
+	_button("온라인 출격", Rect2(80, 528, 478, 44), _show_online)
 	_button("무기 도감", Rect2(246, 468, 148, 50), func() -> void: _open_arsenal("menu"))
 	_button("설정", Rect2(410, 468, 148, 50), _show_settings)
-	_label("최고 %s   /   돌파 %d회   /   업적 %d점" % [_number(int(records.data.best_score)), int(records.data.wins), Achievements.points(records.data.achievements)], Rect2(80, 565, 660, 30), 18, MUTED)
+	_label("최고 %s   /   돌파 %d회   /   업적 %d점" % [_number(int(records.data.best_score)), int(records.data.wins), Achievements.points(records.data.achievements)], Rect2(80, 588, 660, 30), 18, MUTED)
 	_label("마우스 / WASD 이동    좌클릭 / SPACE 돌진    우클릭 / E 오버드라이브", Rect2(80, 642, 850, 30), 16, MUTED)
 	_label("VERSION 3.19  /  MADE WITH GODOT", Rect2(922, 650, 350, 24), 13, MUTED)
 
@@ -866,7 +909,7 @@ func _start_run() -> void:
 			_show_records()
 			return
 		run.pending_items.clear()
-	if not mode in records.available_modes():
+	if ghost_race == null and not mode in records.available_modes():
 		mode = "normal"
 	run.reset(0, mode, selected_ship, selected_sector)
 	sound.begin_run(selected_sector)
@@ -930,8 +973,8 @@ func _resume() -> void:
 	pause.focus_mode = Control.FOCUS_NONE
 	hud.level = _label("", Rect2(48, 684, 270, 27), 14, CYAN)
 	_label("TAB 도감   ESC 정지", Rect2(1060, 684, 210, 27), 14, MUTED)
-	hud.final_accept = _button("최종 작전 도전", Rect2(438, 109, 198, 44), func() -> void: run.select_finale(true))
-	hud.final_decline = _button("생존 계속", Rect2(644, 109, 198, 44), func() -> void: run.select_finale(false))
+	hud.final_accept = _button("최종 작전 도전", Rect2(438, 109, 198, 44), func() -> void: _select_finale(true))
+	hud.final_decline = _button("생존 계속", Rect2(644, 109, 198, 44), func() -> void: _select_finale(false))
 	hud.final_accept.visible = false
 	hud.final_decline.visible = false
 	hud.final_accept.tooltip_text = "1: 최종 작전 도전"
@@ -1009,6 +1052,10 @@ func _shade() -> void:
 	ui.add_child(shade)
 
 func _show_pause() -> void:
+	if online_mode:
+		online.send({"type": "pause", "accept": not online_paused})
+		online_notice = "동료의 정지 동의를 기다립니다."
+		return
 	if screen != "playing":
 		return
 	screen = "pause"
@@ -1207,6 +1254,9 @@ func _upgrade_links(id: String, compact: bool = false) -> String:
 	return "\n".join(links) if not links.is_empty() else "독립 강화 · 모든 빌드에 적용"
 
 func _pick_upgrade(index: int) -> void:
+	if online_mode:
+		if index >= 0 and index < choices.size(): online.send({"type": "choice", "revision": online_choice_revision, "id": str(choices[index].id) if choices[index] is Dictionary else str(choices[index])})
+		return
 	if screen != "upgrade" or index < 0 or index >= choices.size():
 		return
 	var entry = choices[index]
@@ -1222,6 +1272,11 @@ func _pick_upgrade(index: int) -> void:
 			_resume()
 
 func _show_result() -> void:
+	if ghost_race != null:
+		online_result = {"score": run.ranked_score(), "ticks": roundi(run.elapsed * 60.0)}
+		online_notice = "이번 도전은 연습 기록입니다."
+		preload("res://scripts/online_menu.gd").show(self, "online_practice_result")
+		return
 	screen = "result"
 	var won := run.state == "won"
 	var new_record := run.ranked_score() > int(records.data.best_score)
@@ -1293,6 +1348,9 @@ func _number(value: int) -> String:
 
 func _draw() -> void:
 	arena_grid.visible = false
+	if screen.begins_with("online"):
+		backdrop.sync(_viewport_rect(), "ring", clock_time, Vector2.ZERO)
+		return
 	if screen in ["menu", "help", "settings", "credits", "hangar", "records", "replay"] or (screen == "arsenal" and codex_return == "menu"):
 		backdrop.sync(_viewport_rect(), "ring", 0.0 if records.data.reduced_motion else (replay_time if screen == "replay" else clock_time), Vector2.ZERO)
 	if screen in ["menu", "help", "settings", "credits", "hangar", "records"] or (screen == "arsenal" and codex_return == "menu"):
@@ -1303,6 +1361,8 @@ func _draw() -> void:
 		_draw_replay()
 		return
 	_draw_arena()
+	if ghost_race != null: _draw_ghost_race()
+	if online_mode: _draw_online_teammate()
 	if screen == "playing" and run.boundary_depth(run.player) > 0.0:
 		_draw_boundary_warning()
 	if screen == "playing":
@@ -1352,7 +1412,7 @@ func _draw_arena(world: RunModel = null) -> void:
 		var is_heal: bool = str(gem.get("kind", "xp")) == "heal"
 		var phase := visual_time * 3.2 + pos.x * 0.01
 		var gem_size := Vector2(1.0 - absf(sin(phase)) * 0.18, 1.0) * (22 if is_heal else 18)
-		ArtAssets.sprite(self, "objects/heal" if is_heal else "objects/xp", pos, gem_size, 0, camera_offset, Color(1.45, 1.55, 1.6))
+		ArtAssets.sprite(self, "objects/heal" if is_heal else "objects/xp", pos, gem_size, 0, camera_offset, LIME if is_heal else CYAN)
 		var distance := pos.distance_to(model.player)
 		if not records.data.reduced_motion and distance < 86 + int(model.upgrades.get("magnet", 0)) * 38:
 			var toward := (model.player - pos).normalized()
@@ -1409,7 +1469,7 @@ func _draw_arena(world: RunModel = null) -> void:
 				ArtAssets.sprite(self, "fx/wave", shot.pos, Vector2.ONE * float(shot.radius) * 2, 0, camera_offset, Color(CORAL if model.branch_id == "pierce" else (SPEED_BLUE if model.branch_id == "trail" else Color.WHITE), clampf(float(shot.ttl) / model.branch_value("wake_life", 2.4), 0.2, 0.45)))
 			else:
 				var deploy_scale := 0.6 if kind == "mine" and float(shot.get("armed",0)) > 0 else 1.0
-				ArtAssets.sprite(self, "objects/" + kind, shot.pos, Vector2.ONE * (float(shot.radius) + 4) * 2.4 * deploy_scale, visual_time * 5 if kind == "axe" else sin(visual_time * 2) * 0.12, camera_offset, Color(1.3, 1.35, 1.4))
+				ArtAssets.sprite(self, "objects/" + kind, shot.pos, Vector2.ONE * (float(shot.radius) + 4) * 2.4 * deploy_scale, visual_time * 5 if kind == "axe" else sin(visual_time * 2) * 0.12, camera_offset, Color.WHITE)
 				if kind == "sentry" and not model.branch_id.is_empty():
 					draw_arc(shot.pos, 23, 0, TAU, 20, GOLD if model.branch_id == "focus" else CYAN, 3 if model.branch_id == "focus" else 1, true)
 			continue
@@ -1428,11 +1488,6 @@ func _draw_arena(world: RunModel = null) -> void:
 	if not friendly_tails.is_empty(): draw_multiline(friendly_tails, Color(LIME,0.5),2,true)
 	if not hostile_tails.is_empty(): draw_multiline(hostile_tails, Color(GOLD,0.5),2,true)
 	if not rail_tails.is_empty(): draw_multiline(rail_tails,Color(CYAN,0.65),3,true)
-	for shot: Dictionary in projectile_bodies:
-		var color := LIME if bool(shot.friendly) else GOLD
-		var radius := float(shot.get("radius",4))
-		# The SVG core is 24/64 of its width: its visible radius equals the model radius.
-		ArtAssets.sprite(self,"fx/projectile",shot.pos,Vector2.ONE * radius * (64.0/24.0),0,camera_offset,color)
 	if model.buffs.has("shield"):
 		draw_arc(model.player, 36, 0, TAU, 40, CYAN, 3, true)
 	# GPU instance the shared exhaust quad; rotated canvas primitives submit separately on Web.
@@ -1473,7 +1528,7 @@ func _draw_arena(world: RunModel = null) -> void:
 		var color: Color = info.color
 		var at: Vector2 = drop.pos
 		ArtAssets.container(self, at, "B", 27)
-		ArtAssets.sprite(self, "objects/" + str(drop.id), at + Vector2(0, sin(visual_time * 2.2) * 2), Vector2.ONE * 34, sin(visual_time * 1.4) * 0.08, camera_offset, Color(1.25, 1.3, 1.35))
+		ArtAssets.sprite(self, "objects/" + str(drop.id), at + Vector2(0, sin(visual_time * 2.2) * 2), Vector2.ONE * 34, sin(visual_time * 1.4) * 0.08, camera_offset, Color.WHITE)
 		draw_arc(at, 26, 0, TAU * clampf(float(drop.ttl) / 45.0, 0, 1), 36, color, 2, true)
 		draw_string(font, at + Vector2(-52, -33), str(info.name), HORIZONTAL_ALIGNMENT_CENTER, 104, 13, color)
 		draw_string(font, at + Vector2(-52, 43), "%d초 · %s" % [ceili(float(drop.ttl)), "2층 탐사" if bool(drop.locked) else "회수"], HORIZONTAL_ALIGNMENT_CENTER, 104, 12, INK)
@@ -1489,7 +1544,7 @@ func _draw_arena(world: RunModel = null) -> void:
 				recoil = proximity
 				fire_angle = Vector2(shot.velocity).angle()
 	for side in [-1, 1]:
-		Motion.engine(self, player - model.facing * 15 + model.facing.orthogonal() * side * 6, model.facing.angle(), 0.18 + movement * 0.8 + (1.2 if model.dash_time > 0 else 0), visual_time, ship_color, 0.75, reduced)
+		Motion.engine(self, player - model.facing * 15 * Motion.PLAYER_VISUAL_SCALE + model.facing.orthogonal() * side * 6 * Motion.PLAYER_VISUAL_SCALE, model.facing.angle(), 0.18 + movement * 0.8 + (1.2 if model.dash_time > 0 else 0), visual_time, ship_color, 0.75, reduced)
 	if model.overdrive_time > 0:
 		draw_arc(player, 31, 0, TAU, 40, GOLD, 3, true)
 		draw_arc(player, model.orbit_radius + 7, 0, TAU, 64, Color(GOLD, 0.35), 2, true)
@@ -1511,36 +1566,36 @@ func _draw_arena(world: RunModel = null) -> void:
 		Motion.orbital(self, pos, kind, angle + PI / 2, 30 if model.evolutions.has("superorbit") else 23, visual_time, reduced)
 	if model.dash_time > 0 and not reduced:
 		for i in [2, 1]:
-			ArtAssets.sprite(self, "ships/" + model.ship_id, player - model.facing * i * 24, Vector2.ONE * 42, model.facing.angle(), camera_offset, Color(CYAN, 0.18 / i))
-	Motion.hull(self, model.ship_id, player, model.facing.angle(), 42, visual_time, movement, recoil, damage_flash, reduced)
-	for side in [-1, 1]: Motion.muzzle(self, player + Vector2.from_angle(fire_angle) * 19 + Vector2.from_angle(fire_angle).orthogonal() * side * 5, fire_angle, recoil, GOLD, 0.5)
+			ArtAssets.sprite(self, "ships/" + model.ship_id, player - model.facing * i * 24, Vector2.ONE * Motion.PLAYER_SIZE, model.facing.angle(), camera_offset, Color(CYAN, 0.18 / i))
+	Motion.hull(self, model.ship_id, player, model.facing.angle(), Motion.PLAYER_SIZE, visual_time, movement, recoil, damage_flash, reduced)
+	for side in [-1, 1]: Motion.muzzle(self, player + Vector2.from_angle(fire_angle) * 19 * Motion.PLAYER_VISUAL_SCALE + Vector2.from_angle(fire_angle).orthogonal() * side * 5 * Motion.PLAYER_VISUAL_SCALE, fire_angle, recoil, GOLD, 0.5)
 	for i in 3:
 		var id: String = Expedition.PART_IDS[i]
 		if int(model.parts.get(id, 0)) > 0:
-			var at := player + Vector2.from_angle(model.facing.angle() + TAU * i / 3.0) * 24.0
+			var at := player + Vector2.from_angle(model.facing.angle() + TAU * i / 3.0) * 24.0 * Motion.PLAYER_VISUAL_SCALE
 			_draw_part_icon(at, id, Expedition.part(id).color, 0.45, true)
 	if not model.hull_forms.is_empty():
 		for form: String in model.hull_forms:
 			var rank := model.hull_rank(form)
 			if form == "battery":
 				for mount in (3 if rank == 2 else 2):
-					var at := player + model.facing * (11 - recoil * 3) + model.facing.orthogonal() * (mount - (1.0 if rank == 2 else 0.5)) * 13
+					var at := player + (model.facing * (11 - recoil * 3) + model.facing.orthogonal() * (mount - (1.0 if rank == 2 else 0.5)) * 13) * Motion.PLAYER_VISUAL_SCALE
 					ArtAssets.sprite(self, "objects/missile", at, Vector2(19,10), model.facing.angle(), camera_offset)
 			elif form == "lancer":
-				ArtAssets.sprite(self, "objects/core", player + model.facing * (17 - recoil * 3), Vector2.ONE * (14 if rank == 2 else 10), model.facing.angle(), camera_offset)
+				ArtAssets.sprite(self, "objects/core", player + model.facing * (17 - recoil * 3) * Motion.PLAYER_VISUAL_SCALE, Vector2.ONE * (14 if rank == 2 else 10), model.facing.angle(), camera_offset)
 			elif form == "aegis":
 				for side in [-1,1]:
-					ArtAssets.sprite(self, "objects/shell", player + model.facing.orthogonal() * side * 23, Vector2.ONE * (15 if rank == 2 else 11), model.facing.angle(), camera_offset)
+					ArtAssets.sprite(self, "objects/shell", player + model.facing.orthogonal() * side * 23 * Motion.PLAYER_VISUAL_SCALE, Vector2.ONE * (15 if rank == 2 else 11), model.facing.angle(), camera_offset)
 			elif form == "trinity":
 				draw_arc(player, 24, model.facing.angle()-1, model.facing.angle()+1, 20, Color(LIME,0.65), rank + 1, true)
 	var wing := model.facing.orthogonal()
 	match model.ship_id:
 		"striker":
 			for i: int in range(5):
-				draw_circle(player - model.facing * 22 + wing * (i - 2) * 7, 2.5, ship_color if i < floori(model.focus_time / 1.2 * 5) else LINE, true, -1, true)
+				draw_circle(player + (-model.facing * 22 + wing * (i - 2) * 7) * Motion.PLAYER_VISUAL_SCALE, 2.5, ship_color if i < floori(model.focus_time / 1.2 * 5) else LINE, true, -1, true)
 		"scout":
 			for side: float in [-1.0, 1.0]:
-				var tip := player - model.facing * 12 + wing * side * 22
+				var tip := player + (-model.facing * 12 + wing * side * 22) * Motion.PLAYER_VISUAL_SCALE
 				if model.slipstream_time > 0.0:
 					Motion.engine(self, tip, model.facing.angle(), 0.6, visual_time, ship_color, 0.8, reduced)
 		"bastion":
@@ -1554,6 +1609,12 @@ func _draw_arena(world: RunModel = null) -> void:
 			var at := player + Vector2(-25 if side == 0 else 25, 37)
 			draw_style_box(_style(BG, MUTED), Rect2(at - Vector2(4, 6), Vector2(8, 12)))
 			draw_rect(Rect2(at + Vector2(-3 if side == 0 else 0, -5), Vector2(3, 4)), LIME if side == 0 else GOLD)
+	# Projectile cores remain visible over enlarged hulls; trails stay behind the bodies.
+	for shot: Dictionary in projectile_bodies:
+		var color := LIME if bool(shot.friendly) else GOLD
+		var radius := float(shot.get("radius",4))
+		# The SVG core is 24/64 of its width: its visible radius equals the model radius.
+		ArtAssets.sprite(self,"fx/projectile",shot.pos,Vector2.ONE * radius * (64.0/24.0),0,camera_offset,color)
 	draw_set_transform(Vector2.ZERO)
 	if screen == "playing":
 		if not touch_mode: draw_rect(Rect2(_viewport_rect().position, Vector2(_viewport_rect().size.x, 176 - _viewport_rect().position.y)), Color(BG, HUD_ALPHA))
@@ -1718,6 +1779,7 @@ func _draw_hazard(hazard: Dictionary, visual_time: float = 0.0) -> void:
 	if str(hazard.kind) == "lane":
 		var rect: Rect2 = hazard.rect
 		draw_rect(rect, Color(color, 0.28 if active else 0.09))
+		draw_rect(rect, BG, false, 4)
 		draw_rect(rect, Color(color, 0.9), false, 2)
 		var center := rect.get_center()
 		ArtAssets.icon(self, center, "chain", color, 0.65)
@@ -1728,12 +1790,13 @@ func _draw_hazard(hazard: Dictionary, visual_time: float = 0.0) -> void:
 				var along := float(i) / 24.0
 				var jitter := 0.0 if records.data.reduced_motion else sin(i * 7.0 + visual_time * 30.0) * 14.0
 				points.append(Vector2(center.x + jitter, rect.position.y + rect.size.y * along) if vertical else Vector2(rect.position.x + rect.size.x * along, center.y + jitter))
-			draw_polyline(points, Color(CYAN, 0.35), 13, true)
+			draw_polyline(points, Color(CYAN, 0.3), 7, true)
 			draw_polyline(points, INK, 3, true)
 	else:
 		var pos: Vector2 = hazard.pos
 		var radius: float = hazard.radius
 		ArtAssets.sprite(self, "fx/explosion" if active else "fx/wave", pos, Vector2.ONE * radius * 2, 0.0 if records.data.reduced_motion else visual_time * 0.2, camera_offset, Color(color, 0.6 if active else 0.2))
+		draw_arc(pos, radius, 0, TAU, 48, BG, 4, true)
 		draw_arc(pos, radius, 0, TAU, 48, color, 2, true)
 		ArtAssets.icon(self, pos, "pulse", color, 0.55)
 
@@ -1743,7 +1806,8 @@ func _draw_encounter(hazard: Dictionary, visual_time: float = 0.0) -> void:
 	var active: bool = hazard.active
 	var color: Color = {"black_hole": Color("b695ff"), "planet": CYAN, "meteor": GOLD, "flare": CORAL}[str(hazard.kind)]
 	draw_circle(pos, radius, Color(color, 0.07), true, -1, true)
-	draw_arc(pos, radius, 0, TAU, 96, Color(color, 0.7), 2, true)
+	draw_arc(pos, radius, 0, TAU, 96, BG, 4, true)
+	draw_arc(pos, radius, 0, TAU, 96, Color(color, 0.9), 2, true)
 	if not active:
 		draw_arc(pos, radius + 6, -PI / 2, -PI / 2 + TAU * clampf(float(hazard.warn) / 10.0, 0.001, 1.0), 96, color, 4, true)
 		ArtAssets.icon(self, pos, {"black_hole": "nova", "planet": "shell", "meteor": "missile", "flare": "pulse"}[str(hazard.kind)], color, 0.8)
@@ -1766,6 +1830,7 @@ func _draw_encounter(hazard: Dictionary, visual_time: float = 0.0) -> void:
 		"meteor":
 			for point: Vector2 in RunModel.meteor_points(hazard):
 				draw_circle(point, 64, Color(color, 0.09), true, -1, true)
+				draw_arc(point, 64, 0, TAU, 40, BG, 4, true)
 				draw_arc(point, 64, 0, TAU, 40, color, 2, true)
 				ArtAssets.icon(self, point, "missile", color, 0.55)
 				if active and not records.data.reduced_motion:
@@ -1870,7 +1935,7 @@ func _draw_enemy(enemy: Dictionary, model: RunModel = null) -> void:
 	var hit := clampf(float(enemy.get("flash", 0)) / 0.12, 0, 1)
 	var attack := maxf(0, 1 - float(enemy.get("shot_timer", 1))) * 0.04
 	var dimensions := Vector2(1 + breath - charge * 0.1 - hit * 0.12, 1 - breath + charge * 0.12 + attack) * radius * 2.3
-	ArtAssets.sprite(self, "enemies/" + art_id, pos - Vector2.from_angle(angle) * hit * 2, dimensions, angle, camera_offset, Color(1.42 + hit, 1.3 + hit, 1.4 + hit))
+	ArtAssets.sprite(self, "enemies/" + art_id, pos - Vector2.from_angle(angle) * hit * 2, dimensions, angle, camera_offset, Color(1.1 + hit * 0.35, 1.04 + hit * 0.35, 1.08 + hit * 0.35))
 	if kind == "boss" and model != null:
 		var phase_color := CORAL if float(enemy.hp) > float(enemy.max_hp) * 0.5 else GOLD
 		var count := 3 if model.sector_id == "forge" else (5 if model.sector_id == "storm" else 6)
@@ -1979,6 +2044,7 @@ func _show_replay(entry: Dictionary) -> void:
 	_button("랭킹으로", Rect2(965, 655, 235, 48), _show_records, true, true)
 
 func _sample_replay() -> Array:
+	if online_replay_loader != null: return online_replay_loader.sample(replay_time)
 	if _cached_replay_frame.is_empty() or _cached_replay_time != replay_time:
 		_cached_replay_frame = GhostReplay.sample(replay_frames, replay_time)
 		_cached_replay_time = replay_time
@@ -1994,7 +2060,7 @@ func _draw_replay() -> void:
 		replay_run.current_speed = Vector2(frame[1], frame[2]).distance_to(previous) / maxf(0.001, replay_time - previous_time)
 		_draw_arena(replay_run)
 		draw_set_transform(-camera_offset)
-		_draw_replay_path()
+		if online_replay_loader == null: _draw_replay_path()
 		draw_set_transform(Vector2.ZERO)
 		_draw_item_status(replay_run, 126.0)
 		_draw_expedition(replay_run)
@@ -2007,14 +2073,14 @@ func _draw_replay() -> void:
 	draw_set_transform(-camera_offset)
 	_draw_orbital_regions(CYAN)
 	_draw_replay_path()
-	Motion.engine(self, point - Vector2.from_angle(float(frame[3])) * 16, float(frame[3]), 0.6, replay_time, CYAN, 0.8, bool(records.data.reduced_motion))
-	Motion.hull(self, str(replay_entry.ship), point, float(frame[3]), 42, replay_time, 0.5, 0, 0, bool(records.data.reduced_motion))
+	Motion.engine(self, point - Vector2.from_angle(float(frame[3])) * 16 * Motion.PLAYER_VISUAL_SCALE, float(frame[3]), 0.6, replay_time, CYAN, 0.8, bool(records.data.reduced_motion))
+	Motion.hull(self, str(replay_entry.ship), point, float(frame[3]), Motion.PLAYER_SIZE, replay_time, 0.5, 0, 0, bool(records.data.reduced_motion))
 	for i: int in range(int(frame[6])):
 		var angle := float(frame[8]) + TAU * i / float(frame[6])
 		var frost := int(frame[12]) > 0 and i % 3 == 0
 		Motion.orbital(self, point + Vector2.from_angle(angle) * float(frame[7]), "frost" if frost else ("blade" if int(frame[11]) > 0 else "normal"), angle, 23, replay_time, bool(records.data.reduced_motion))
 	if int(frame[9]) > 0:
-		Motion.engine(self, point - Vector2.from_angle(float(frame[3])) * 16, float(frame[3]), 1.5, replay_time, CYAN, 1.0, bool(records.data.reduced_motion))
+		Motion.engine(self, point - Vector2.from_angle(float(frame[3])) * 16 * Motion.PLAYER_VISUAL_SCALE, float(frame[3]), 1.5, replay_time, CYAN, 1.0, bool(records.data.reduced_motion))
 	if int(frame[10]) > 0:
 		draw_arc(point, 30, 0, TAU, 32, GOLD, 3, true)
 	draw_set_transform(Vector2.ZERO)
@@ -2268,6 +2334,9 @@ func _show_branch() -> void:
 func _pick_branch(index: int) -> void:
 	if screen != "branch" or index < 0 or index > 1: return
 	var ids: Array = GameContent.BRANCH_IDS.filter(func(id: String) -> bool: return GameContent.branch_info(id).ship == run.ship_id)
+	if online_mode:
+		online.send({"type": "choice", "revision": online_choice_revision, "id": ids[index]})
+		return
 	if not run.choose_branch(ids[index]): return
 	sound.consume(run, camera_offset)
 	if run.state == "upgrade": _show_upgrades()
@@ -2295,3 +2364,291 @@ func _show_combat_codex() -> void:
 		_wrap_label(str(info.description) + "\n" + str(info.tradeoff), Rect2(at + Vector2(16, 43), Vector2(530, 72)), 16)
 	_button("돌아가기", Rect2(64, 650, 310, 48), _close_arsenal, true, true)
 	_button("공통 조합 ←", Rect2(912, 650, 304, 48), func() -> void: tech_page = 0; _open_arsenal(codex_return))
+
+func _show_online() -> void:
+	if ghost_race != null:
+		ghost_race.queue_free()
+		ghost_race = null
+	online_notice = "로그인 없이 경기 기록을 등록합니다."
+	online_request = "config"
+	online.api("/v1/config")
+	preload("res://scripts/online_menu.gd").show(self)
+
+func _online_back() -> void:
+	if not online.room.is_empty(): online.leave()
+	online_mode = false
+	if ghost_race != null:
+		ghost_race.queue_free()
+		ghost_race = null
+	preload("res://scripts/online_menu.gd").show(self)
+
+func _online_create(kind: String) -> void:
+	online_notice = "전투 서버 준비 중…"
+	online_request = "room"
+	online.api("/v1/rooms", {"mode": kind, "nickname": online_form.nickname, "ship": online_form.ship, "difficulty": online_form.difficulty, "sector": online_form.sector})
+
+func _online_join() -> void:
+	online_request = "room"
+	online.api("/v1/rooms/join", {"code": str(online_form.code).strip_edges().to_upper()})
+
+func _online_response(value: Dictionary) -> void:
+	match online_request:
+		"config":
+			online.features = value.get("features", {"combat": false})
+			if not bool(online.features.get("combat", false)): online_notice = "온라인 출격 준비 중 · 기록과 고스트를 이용할 수 있습니다."
+			preload("res://scripts/online_menu.gd").show(self)
+		"room":
+			online.join(value, str(online_form.nickname), str(online_form.ship))
+			online_notice = "방 연결 중…"
+			preload("res://scripts/online_menu.gd").show(self, "online_lobby")
+		"rank":
+			online_rows = value.items
+			online_notice = "최근 저장된 캐시입니다." if value.get("stale", false) else "기록을 누르면 고스트를 봅니다."
+			preload("res://scripts/online_menu.gd").show(self, "online_rank")
+		"publish":
+			online_notice = "기록 보존 완료 · 온라인 저장 재시도 중" if value.get("storage") == "pending" else "익명 기록 등록 완료"
+			preload("res://scripts/online_menu.gd").show(self, "online_result")
+		"manifest":
+			online_replay_manifest = value
+			online_notice = "고스트 다운로드 준비 완료"
+			_online_download_replay()
+
+func _online_failed(reason: String) -> void:
+	online_notice = reason
+	if screen == "replay":
+		replay_paused = true
+		if hud.has("replay"): hud.replay.text = reason
+	if online_mode and online.room.is_empty():
+		online_mode = false
+		run = RunModel.new()
+		preload("res://scripts/online_menu.gd").show(self)
+	elif screen.begins_with("online"):
+		preload("res://scripts/online_menu.gd").show(self, screen)
+
+func _online_message(value: Dictionary) -> void:
+	match str(value.get("type", "")):
+		"lobby":
+			online_players = value.players
+			online_notice = "두 사람 모두 준비하면 출격합니다."
+			preload("res://scripts/online_menu.gd").show(self, "online_lobby")
+			if value.players.size() == 1: online.send({"type": "ready", "ready": true})
+		"begin":
+			run.reset(int(value.seed), str(value.difficulty), str(value.ships[online.slot]), str(value.sector))
+			online_mode = true
+			online_packet = {}
+			online_pending.clear()
+			online_paused = false
+			sound.begin_run(str(value.sector))
+			_resume()
+		"state":
+			var frame: Variant = value.get("frame")
+			if not frame is Array or frame.size() != 14 or not GhostReplay.valid([frame], float(frame[0])): return
+			online_packet = value
+			online_paused = str(value.get("phase", "playing")) != "playing"
+			GhostReplay.restore(run, frame)
+			preload("res://scripts/online_motion.gd").restore(run, value.get("motion", {}))
+			var life := str(value.players[online.slot].get("life", "alive"))
+			if life != "alive":
+				run.hp = 0.0
+				toast = "구조 대기 · 동료가 가까이서 3초 유지" if life == "down" else "관전 중 · 동료가 전투를 계속합니다"
+				toast_time = 0.3
+			elif online_paused and str(value.state) == "playing":
+				toast = "동료 강화 선택 중…"
+				toast_time = 0.3
+			run.score = int(value.score)
+			if str(value.state) != "playing" or online_paused: online_pending.clear()
+			online_pending = online_pending.filter(func(input: Dictionary) -> bool: return int(input.seq) > int(value.ack))
+			for input: Dictionary in online_pending:
+				preload("res://scripts/online_motion.gd").predict(run, float(input.dt), input.move, bool(input.dash), input.aim)
+			run.audio_events.clear()
+			for cue: String in value.get("audio", {}):
+				var point: Array = value.audio[cue]
+				run.audio_events[cue] = Vector2(point[0], point[1]) if point.size() == 2 else Vector2.INF
+			run.current_speed = float(value.speed)
+			run.state = str(value.state)
+			run.finale_offered = bool(value.finale_offered)
+			run.finale_selected = bool(value.finale_selected)
+			run.events.assign(value.get("events", []))
+			if run.events.has("hurt"): hurt_flash = 0.35
+			var new_choice := int(value.get("choice_revision", 0)) != online_choice_revision
+			online_choice_revision = int(value.get("choice_revision", 0))
+			if run.state == "upgrade" and (screen != "upgrade" or new_choice):
+				run._choices = value.choices
+				_show_upgrades()
+			elif run.state == "branch" and (screen != "branch" or new_choice): _show_branch()
+			elif run.state == "playing" and screen != "playing": _resume()
+		"pause_request":
+			toast = "동료가 정지를 요청했습니다 · ESC로 동의"
+			toast_time = 3.0
+		"status":
+			online_paused = value.phase in ["paused", "reconnecting"]
+			if value.phase == "paused":
+				toast = "함께 정지 · ESC로 재개"
+			elif value.phase == "reconnecting": toast = "동료 재접속 중…"
+			toast_time = 1.0
+		"result":
+			online_result = value.result
+			var kept := records.record_online(online_result)
+			online.leave()
+			online_mode = false
+			online_notice = "완료한 경기의 닉네임과 기록을 공개할 수 있습니다."
+			if not kept: online_notice = "경기 완료 · 이 기기의 기록 저장에 실패했습니다."
+			preload("res://scripts/online_menu.gd").show(self, "online_result")
+		"error":
+			online.leave()
+			online_mode = false
+			online_notice = str(value.get("message", "경기 중단"))
+			run = RunModel.new()
+			preload("res://scripts/online_menu.gd").show(self)
+
+func _online_tick(delta: float) -> void:
+	if screen == "playing" and not online_paused and (online_packet.is_empty() or online_packet.players[online.slot].life == "alive"):
+		_touch_skill(touch.advance(delta), touch.dash_position)
+		var direction := _movement_direction()
+		online.input(direction, dash_queued, dash_aim, online_overdrive)
+		online_pending.append({"seq": online.sequence, "dt": delta, "move": direction, "dash": dash_queued, "aim": dash_aim})
+		if online_pending.size() > 120: online_pending.pop_front()
+		preload("res://scripts/online_motion.gd").predict(run, delta, direction, dash_queued, dash_aim)
+		dash_queued = false
+		online_overdrive = false
+		camera_offset = camera_offset.lerp(_camera_target(run.player), 1.0 - exp(-7.0 * delta))
+		sound.consume(run, camera_offset)
+		run.events.clear()
+	elif online.connected:
+		online.input(Vector2.ZERO, false, Vector2.ZERO, false)
+	if screen == "playing":
+		if not online_packet.is_empty() and str(online_packet.players[online.slot].life) == "dead":
+			for participant: Dictionary in online_packet.players:
+				if participant.life == "alive":
+					var at := Vector2(participant.position[0], participant.position[1])
+					camera_offset = camera_offset.lerp(_camera_target(at), 1.0 - exp(-7.0 * delta))
+		_hud_timer -= delta
+		if _hud_timer <= 0.0:
+			_update_hud()
+			if not online_packet.is_empty(): hud.score.text = _number(int(online_packet.team_score))
+			_hud_timer = 0.1
+	toast_time = maxf(0.0, toast_time - delta)
+	hurt_flash = maxf(0.0, hurt_flash - delta * 2.0)
+	sound.update_state(screen, run, delta, camera_offset)
+	queue_redraw()
+
+func _activate_overdrive() -> bool:
+	if online_mode:
+		online_overdrive = true
+		return true
+	return run.activate_overdrive()
+
+func _select_finale(accept: bool) -> bool:
+	if online_mode:
+		online.send({"type": "finale", "accept": accept})
+		return true
+	return run.select_finale(accept)
+
+func _online_publish() -> void:
+	online_request = "publish"
+	online.api("/v1/rankings", {"run_id": online_result.id, "nickname": online_form.nickname})
+
+func _online_rank() -> void:
+	online_board_mode = str(online_form.rank_mode)
+	online_request = "rank"
+	online.api("/v1/rankings?mode=%s&difficulty=%s&sector=%s&cursor=%d&ship=%s&season=%s" % [online_board_mode, online_form.difficulty, online_form.sector, online_cursor, str(online_form.rank_ship).uri_encode(), str(online_form.season).uri_encode()])
+
+func _online_history() -> void:
+	online_cursor = mini(19, online_cursor)
+	online_rows = records.data.online_records.slice(online_cursor).duplicate(true)
+	for i in online_rows.size(): online_rows[i].rank = online_cursor + i + 1
+	online_notice = "경기를 누르면 공개 등록과 고스트 관전을 할 수 있습니다."
+	preload("res://scripts/online_menu.gd").show(self, "online_history")
+
+func _online_watch(id: String) -> void:
+	online_replay_id = id
+	online_request = "manifest"
+	online.api("/v1/replays/" + id + "/manifest")
+
+func _online_download_replay() -> void:
+	online_notice = "고스트 자료를 불러오는 중…"
+	if online_replay_loader != null: online_replay_loader.queue_free()
+	var loader := preload("res://scripts/online_replay.gd").new()
+	online_replay_loader = loader
+	add_child(loader)
+	loader.completed.connect(func(frames: Array, metadata: Dictionary) -> void:
+		if frames.is_empty(): _online_failed("고스트 자료를 읽지 못했습니다."); return
+		replay_frames = frames
+		replay_entry = {"ship": metadata.ships[0], "sector": metadata.sector, "mode": metadata.difficulty, "name": "온라인 고스트"}
+		replay_run.reset(1, metadata.difficulty, metadata.ships[0], metadata.sector)
+		replay_time = 0.0
+		replay_paused = false
+		replay_speed = 1.0
+		_show_online_replay()
+	)
+	loader.failed.connect(_online_failed)
+	loader.load_replay(online.base_url, online_replay_id, online_replay_manifest)
+
+func _show_online_replay() -> void:
+	screen = "replay"
+	_clear_ui()
+	var window := Vector2(DisplayServer.window_get_size())
+	if window.x < 1: window = get_viewport_rect().size
+	ui.set_meta("fitted_menu", true)
+	ui.scale = Vector2.ONE * get_viewport_rect().size.x / window.x
+	ui.get_parent().offset = Vector2.ZERO
+	var width := minf(640.0, window.x - 24.0)
+	var x := (window.x - width) * 0.5
+	replay_slider = HSlider.new()
+	replay_slider.position = Vector2(x, window.y - 164)
+	replay_slider.size = Vector2(width, 44)
+	replay_slider.max_value = float(replay_frames.back()[0])
+	replay_slider.step = 0.1
+	replay_slider.value_changed.connect(func(value: float) -> void: replay_time = value)
+	ui.add_child(replay_slider)
+	hud.replay = _label("", Rect2(x, window.y - 200, width, 32), 18, CYAN)
+	_button("정지/재생", Rect2(x, window.y - 112, width * 0.49, 44), func() -> void: replay_paused = not replay_paused)
+	_button("시점 전환", Rect2(x + width * 0.51, window.y - 112, width * 0.49, 44), func() -> void:
+		online_replay_loader.focus = (online_replay_loader.focus + 1) % online_replay_manifest.ships.size()
+		replay_run.reset(1, online_replay_manifest.difficulty, online_replay_manifest.ships[online_replay_loader.focus], online_replay_manifest.sector)
+	)
+	if online_replay_manifest.get("rules") == "online-solo-v1" and online_replay_manifest.ships.size() == 1:
+		_button("이 기록에 도전", Rect2(x, window.y - 64, width * 0.49, 44), _start_ghost_race)
+	_button("돌아가기", Rect2(x + width * 0.51, window.y - 64, width * 0.49, 44), _show_online)
+
+func _draw_online_teammate() -> void:
+	if online_packet.is_empty(): return
+	draw_set_transform(-camera_offset)
+	for i in online_packet.players.size():
+		if i == online.slot: continue
+		var player: Dictionary = online_packet.players[i]
+		var point := Vector2(player.position[0], player.position[1])
+		Motion.hull(self, str(player.ship), point, float(player.facing), Motion.PLAYER_SIZE, run.elapsed, 0.5, 0, 0, bool(records.data.reduced_motion))
+		draw_arc(point, 36, 0, TAU * clampf(float(player.hp) / float(player.max_hp), 0, 1), 32, GOLD, 3, true)
+		if player.life == "down": draw_arc(point, 44, -PI / 2, -PI / 2 + TAU * float(player.rescue) / 3.0, 32, CORAL, 4, true)
+	draw_set_transform(Vector2.ZERO)
+
+func _start_ghost_race() -> void:
+	if online_replay_loader == null or online_replay_manifest.get("rules") != "online-solo-v1" or online_replay_manifest.ships.size() != 1: return
+	ghost_race = online_replay_loader
+	online_replay_loader = null
+	selected_ship = str(online_replay_manifest.ships[ghost_race.focus])
+	selected_sector = str(online_replay_manifest.sector)
+	mode = str(online_replay_manifest.difficulty)
+	_start_run()
+	run.reset(int(online_replay_manifest.seed), mode, selected_ship, selected_sector)
+	ghost = GhostReplay.new()
+	ghost.capture(run)
+	online.leave()
+	online_mode = false
+
+func _draw_ghost_race() -> void:
+	var frame: Array = ghost_race.sample(run.elapsed)
+	if frame.size() < 13: return
+	draw_set_transform(-camera_offset)
+	var point := Vector2(frame[1], frame[2])
+	draw_arc(point, 30, 0, TAU, 24, Color(GOLD, 0.55), 2, true)
+	draw_line(point, point + Vector2.from_angle(float(frame[3])) * 40, Color(GOLD, 0.55), 3)
+	draw_set_transform(Vector2.ZERO)
+	if screen == "playing":
+		draw_string(font, Vector2(get_viewport_rect().size.x - 400.0, 100), "고스트 %s / 나 %s" % [_number(int(frame[5])), _number(run.ranked_score())], HORIZONTAL_ALIGNMENT_LEFT, -1, 17, GOLD)
+
+func _retry_ghost_race() -> void:
+	online_replay_loader = ghost_race
+	ghost_race = null
+	_start_ghost_race()

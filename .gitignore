@@ -15,3 +15,13 @@ art_source/motion_baseline_project/
 docs/**/*.import
 tools/__pycache__/
 tests/__pycache__/
+art_source/__pycache__/
+
+# Online runtime data and deployment secrets
+/server/data/
+/server/.env
+/server/.env.*
+!/server/.env.example
+
+!/server/ranking/build/
+!/server/ranking/build/**

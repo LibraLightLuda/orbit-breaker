@@ -1,0 +1,67 @@
+{
+  "date_kst": "2026-10-18",
+  "status": "ready_for_github_publication",
+  "request": "Publish latest code and web game to GitHub and update the existing public ranking Site",
+  "github_repository": "https://github.com/LibraLightLuda/orbit-breaker",
+  "ranking_site": "https://orbit-breaker-records.chrcra89.chatgpt.site",
+  "ranking_project_id": "appgprj_6ad16bc1fe7c819185c816d7f37b2222",
+  "preserve_site_audience": "public",
+  "private_validation_site": "unchanged",
+  "scope_limit": "Rankings and ghosts are supported; authoritative online combat remains unavailable on Sites",
+  "required_connection_fix": "GitHub-hosted web clients must use the public ranking API instead of the GitHub Pages origin",
+  "source_upload": "pending",
+  "deployment": "pending",
+  "site": {
+    "status": "succeeded",
+    "project_id": "appgprj_6ad16bc1fe7c819185c816d7f37b2222",
+    "version_number": 3,
+    "version_id": "appgprj_6ad16bc1fe7c819185c816d7f37b2222~appgver_1bc7d79d5af881918f3621ec9c1efacd",
+    "deployment_id": "appgdep_6ad3996988a081918ac478cd9c51b621",
+    "source_commit": "fc02de14a94d77fc8576a7ed063e1f417666699a",
+    "url": "https://orbit-breaker-records.chrcra89.chatgpt.site",
+    "verification": "artifacts/publish-work/site-public-verification.json",
+    "browser_screenshot": "artifacts/publish-work/public-ranking.png",
+    "browser_check": "Coop/storm filters and empty leaderboard rendered"
+  },
+  "game_build": {
+    "full_log": "artifacts/publish-work/full-build.log",
+    "final_log": "artifacts/publish-work/final-routing-build.log",
+    "sources": 849,
+    "outputs": 21,
+    "checksum_checks": 870,
+    "mismatches": 0,
+    "validation_basis": {
+      "full_build": "artifacts/publish-work/full-build.log",
+      "incremental_log": "artifacts/publish-work/final-routing-build.log",
+      "full_manifest": "artifacts/publish-work/full-build-validation.json",
+      "reason": "Preserve same-origin localhost development while routing GitHub Pages to public ranking API; combat/render/server code unchanged",
+      "changed_sources": [
+        "scripts/online_config.gd",
+        "tests/test_online_regressions.gd"
+      ]
+    },
+    "local_normal_release_preserved": true,
+    "current_not_promoted": true
+  },
+  "public_web_sha256": {
+    "index.apple-touch-icon.png": "ADEEABB932655E2C5213F1B4626EF9BC127C9539CD2BEDEEEF8A15E64B9C4469",
+    "index.audio.position.worklet.js": "BE33985BC7160D6BF9646F259CD86B259CD67B02CCB297EE5C44F8AC84327BC8",
+    "index.audio.worklet.js": "5B476A9C9CE642C0EE4256436D1BC31D9C38F868ACA0F9A8E2A57C18D2DEC2A3",
+    "index.html": "3B095BE825019569BB052276516E39295C440BEE0F4EB3C32EBEB8A8F144FA94",
+    "index.icon.png": "99ECFD3A4E2DA83B85CFC50B8B3989F9AC1F95F3022093E0B474A52092B85280",
+    "index.js": "68586D6DAAFC93C6E697B3FB258976874AA7459B8931165EBB1DC3C9614CC42C",
+    "index.pck": "B31634BBE0E367B1E8125FC7EB506610D4B27B514FCB0C79B9B7A55055FE0936",
+    "index.png": "05FAE7E12C9839BB6FAE5AF9F51DF64B1A26EF83B68478BA61C3A3987F37E50E",
+    "index.wasm": "35116F68540AC41ACF7D71EA457ADDED91B5E960A9CCA3E2ACC72918EAF01277"
+  },
+  "public_web_source": "build/candidate/web",
+  "temporary_web_backup": "build/publish-web-previous-20261018",
+  "local_development_compatibility": "GitHub Pages uses configured public API; Sites and localhost preserve same-origin behavior",
+  "local_web_metadata": [
+    ".gdignore"
+  ],
+  "source_whitespace_check": {
+    "historical_audit_blank_eof_warnings": 6,
+    "handling": "Preserved historical audit documents/logs as-is; check all other whitespace rules with core.whitespace=-blank-at-eof"
+  }
+}

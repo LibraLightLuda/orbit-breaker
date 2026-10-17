@@ -1,0 +1,23 @@
+[Unit]
+Description=Orbit Breaker authoritative game service
+After=network-online.target
+
+[Service]
+Type=simple
+User=orbit-breaker
+WorkingDirectory=/opt/orbit-breaker
+EnvironmentFile=/etc/orbit-breaker.env
+Environment=XDG_DATA_HOME=/var/lib/orbit-breaker
+ExecStart=/usr/bin/node server/gateway.mjs
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/orbit-breaker
+KillMode=mixed
+TimeoutStopSec=660
+
+[Install]
+WantedBy=multi-user.target

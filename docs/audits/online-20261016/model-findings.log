@@ -1,0 +1,6 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+
+AUDIT_INPUT_OVERWRITE {"aim":"(1.0, 0.0)","dash":false,"move":"(1.0, 0.0)","overdrive":false}
+AUDIT_DASH_STATE {"restored_seconds":0.2,"server_seconds":0.01}
+AUDIT_DASH_POSITION_ERROR 28.8800048828125
+AUDIT_LEAVE_TIMERS {"retry_left":0.8,"retry_window":29.5}

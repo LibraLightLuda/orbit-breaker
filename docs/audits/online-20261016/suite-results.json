@@ -1,0 +1,153 @@
+[
+  {
+    "test": "node",
+    "exit": 0,
+    "runtime_error": false,
+    "tail": [
+      "ℹ cancelled 0",
+      "ℹ skipped 0",
+      "ℹ todo 0",
+      "ℹ duration_ms 3306.3143"
+    ]
+  },
+  {
+    "test": "online_world",
+    "exit": 0,
+    "runtime_error": false,
+    "tail": [
+      "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+      "",
+      "ONLINE WORLD SELF-CHECK: 12 checks passed"
+    ]
+  },
+  {
+    "test": "online_ui",
+    "exit": 0,
+    "runtime_error": false,
+    "tail": [
+      "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+      "",
+      "ONLINE UI SELF-CHECK: 560 checks passed"
+    ]
+  },
+  {
+    "test": "online_history",
+    "exit": 0,
+    "runtime_error": false,
+    "tail": [
+      "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+      "",
+      "ONLINE HISTORY SELF-CHECK: 8 assertions passed"
+    ]
+  },
+  {
+    "test": "online_life",
+    "exit": 0,
+    "runtime_error": false,
+    "tail": [
+      "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+      "",
+      "ONLINE LIFE SELF-CHECK: 10 assertions passed"
+    ]
+  },
+  {
+    "test": "online_damage",
+    "exit": 0,
+    "runtime_error": false,
+    "tail": [
+      "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+      "",
+      "ONLINE DAMAGE SELF-CHECK: 8 assertions passed"
+    ]
+  },
+  {
+    "test": "online_choices",
+    "exit": 0,
+    "runtime_error": false,
+    "tail": [
+      "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+      "",
+      "ONLINE CHOICES SELF-CHECK: 8 assertions passed"
+    ]
+  },
+  {
+    "test": "online_replay",
+    "exit": 0,
+    "runtime_error": false,
+    "tail": [
+      "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+      "",
+      "ONLINE REPLAY SELF-CHECK: 134 assertions passed"
+    ]
+  },
+  {
+    "test": "online_practice",
+    "exit": 0,
+    "runtime_error": false,
+    "tail": [
+      "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+      "",
+      "ONLINE PRACTICE SELF-CHECK: 8 assertions passed"
+    ]
+  },
+  {
+    "test": "online_soak",
+    "exit": "timeout",
+    "runtime_error": false,
+    "tail": [
+      "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+      ""
+    ]
+  },
+  {
+    "test": "model",
+    "exit": 0,
+    "runtime_error": false,
+    "tail": [
+      "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+      "",
+      "MODEL SELF-CHECK: 35 / 35 assertions passed"
+    ]
+  },
+  {
+    "test": "survival",
+    "exit": 0,
+    "runtime_error": false,
+    "tail": [
+      "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+      "",
+      "SURVIVAL SELF-CHECK: 198 / 198 assertions passed"
+    ]
+  },
+  {
+    "test": "combat_expansion",
+    "exit": 0,
+    "runtime_error": false,
+    "tail": [
+      "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+      "",
+      "COMBAT SELF-CHECK: 194 / 194 assertions passed"
+    ]
+  },
+  {
+    "test": "replay_world",
+    "exit": 0,
+    "runtime_error": false,
+    "tail": [
+      "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+      "",
+      "REPLAY CAPACITY: 600s, 3001 frames, 23 enemies, 42 gems; 83395 bytes; write/read 2907ms",
+      "REPLAY WORLD SELF-CHECK: 90 / 90 assertions passed"
+    ]
+  },
+  {
+    "test": "progression",
+    "exit": 0,
+    "runtime_error": false,
+    "tail": [
+      "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+      "",
+      "PROGRESSION SELF-CHECK: 42 / 42 assertions passed"
+    ]
+  }
+]

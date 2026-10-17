@@ -1,0 +1,22 @@
+{
+  "status": "blocked by policy before execution",
+  "reason": "Automatic approval review rejected recursive cleanup command; no workaround or retry attempted. Not an operating-system lock finding.",
+  "remaining": [
+    "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-failure-audit-AhKNZN",
+    "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-failure-audit-MGhhD6",
+    "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-independent-audit-0BzBEl",
+    "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-independent-audit-44LB5h",
+    "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-independent-audit-bTQv6X",
+    "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-independent-audit-L34rnR",
+    "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-independent-audit-MWMmlL",
+    "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-independent-audit-orphan-dmaY7j",
+    "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-independent-audit-orphan-Lk9O8D",
+    "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-independent-audit-rEEstK",
+    "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-independent-audit-sEPFu8",
+    "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-independent-audit-u9IRw4",
+    "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-independent-audit-xkePQa",
+    "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-independent-audit-YJPlx3",
+    "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-missing-replay-audit-JGiCB4"
+  ],
+  "removed": []
+}

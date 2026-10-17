@@ -16,8 +16,9 @@ func _run() -> void:
 	_test_progression()
 	_test_save_versions()
 	await _test_audio()
+	await create_timer(0.2).timeout
 	print("SUPPORT TESTS: %d checks, %d failures" % [_checks, _failures])
-	quit(0 if _failures == 0 else 1)
+	call_deferred("quit", 0 if _failures == 0 else 1)
 
 
 func _check(condition: bool, description: String) -> void:

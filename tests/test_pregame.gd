@@ -3,7 +3,7 @@ extends SceneTree
 var game: Node2D
 var checks := 0
 var failures := 0
-var folder := "res://artifacts/pregame-candidate"
+var folder := "res://artifacts/clarity-work/pregame"
 var captured := {}
 
 func _initialize() -> void:

@@ -491,6 +491,7 @@ func _track(run: RunModel) -> void:
 				_serial += 1
 				entity._replay_id = _serial
 			var id: Variant = entity._replay_id
+			_serial = maxi(_serial, int(id))
 			present[id] = entity
 			if not previous.has(id):
 				_events.append([snappedf(run.elapsed, 0.0001), key, true, _row(key, entity)])
@@ -552,3 +553,18 @@ static func _restore_combat(run: RunModel, value: Dictionary) -> void:
 			enemy.relay_max = float(row[4])
 			enemy.relays = row[5].duplicate()
 			enemy.relay_axis = Vector2(float(row[6][0]), float(row[6][1]))
+
+func snapshot_current(run: RunModel) -> Array:
+	_track(run)
+	var frame: Array = [snappedf(run.elapsed, 0.0001), snappedf(run.player.x, 0.01), snappedf(run.player.y, 0.01), run.facing.angle(), snappedf(run.hp, 0.01), run.ranked_score(), run.orbit_count, run.orbit_radius, run.orbit_angle, int(run.dash_time > 0), int(run.overdrive_time > 0), int(run.upgrades.get("blade", 0)), int(run.upgrades.get("frost", 0)), _world(run)]
+	align_online_event_times(frame)
+	return frame
+
+static func align_online_event_times(frame: Array) -> void:
+	# Online snapshots and event clocks must use the same precision, including early v1 chunks.
+	if frame.size() != 14 or not (frame[0] is int or frame[0] is float) or not is_finite(float(frame[0])) or not frame[13] is Dictionary or not frame[13].get("events") is Array: return
+	for event: Variant in frame[13].events:
+		if event is Array and event.size() == 4 and (event[0] is int or event[0] is float) and is_finite(float(event[0])):
+			var timestamp := float(event[0])
+			if timestamp >= 0.0 and timestamp <= float(frame[0]) + 0.0001:
+				event[0] = minf(snappedf(timestamp, 0.0001), float(frame[0]))

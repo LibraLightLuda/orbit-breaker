@@ -18,8 +18,8 @@ void fragment() {
 	vec2 near_uv = uv * 0.70 + 0.15 + world_shift * 0.000045 - flow * 0.024;
 	vec3 far_field = texture(TEXTURE, clamp(far_uv, vec2(0.01), vec2(0.99))).rgb;
 	vec3 near_field = texture(TEXTURE, clamp(near_uv, vec2(0.01), vec2(0.99))).rgb;
-	vec3 color = far_field * 0.90 + near_field * 0.20;
+	vec3 color = far_field * 0.82 + near_field * 0.12;
 	float gray = dot(color, vec3(0.2126, 0.7152, 0.0722));
 	color = mix(vec3(gray), color, 1.18);
-	COLOR = vec4(pow(max(color, vec3(0.0)), vec3(0.88)), 1.0);
+	COLOR = vec4(pow(max(color, vec3(0.0)), vec3(1.02)), 1.0);
 }

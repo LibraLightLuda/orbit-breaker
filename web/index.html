@@ -127,7 +127,7 @@ body {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":true,"fileSizes":{"index.pck":19401608,"index.wasm":39513091},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":true,"fileSizes":{"index.pck":19444708,"index.wasm":39513091},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 
 const canvas = document.getElementById('canvas');
@@ -136,7 +136,7 @@ function fitGame() {
 	window.orbitMobile = navigator.maxTouchPoints > 0 || matchMedia('(pointer: coarse)').matches || innerWidth < 900;
 	document.documentElement.classList.toggle('orbit-mobile', window.orbitMobile);
 	const bounds = gameFrame.getBoundingClientRect();
-	// Phone DPR 2-4 should not multiply fragment work while drawing the same game.
+	// Pixel-sized UI and gestures currently share CSS dimensions on phones.
 	const ratio = window.orbitMobile ? 1 : Math.min(devicePixelRatio || 1, 2);
 	canvas.width = Math.max(1, Math.round(bounds.width * ratio));
 	canvas.height = Math.max(1, Math.round(bounds.height * ratio));

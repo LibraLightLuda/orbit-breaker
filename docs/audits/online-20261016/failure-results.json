@@ -1,0 +1,48 @@
+[
+  {
+    "id": "heartbeat_stale_input",
+    "seconds": 1.0999999999999999,
+    "distance": 239.79345703125,
+    "ack": 1,
+    "reported_speed": 217.957763671875
+  },
+  {
+    "id": "missing_replay_blocks_score",
+    "local_result": {
+      "status": 200,
+      "body": {
+        "id": "cccccccccccccccccccccccccccccccc",
+        "nickname": "audit",
+        "score": 100,
+        "ticks": 60,
+        "mode": "solo",
+        "difficulty": "normal",
+        "sector": "ring",
+        "ships": [
+          "striker"
+        ],
+        "rules": "online-solo-v1",
+        "season": "2026-10",
+        "started_at": "2026-10-16T11:42:38.726Z",
+        "finished_at": "2026-10-16T11:42:38.726Z",
+        "published": 0,
+        "replay": {
+          "status": "complete",
+          "chunks": [
+            {
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "bytes": 128,
+              "start": 0,
+              "end": 1
+            }
+          ]
+        },
+        "verification": "server"
+      }
+    },
+    "cloud_requests": [
+      "/internal/retention"
+    ],
+    "directory": "C:\\Users\\home\\AppData\\Local\\Temp\\orbit-missing-replay-audit-JGiCB4"
+  }
+]
